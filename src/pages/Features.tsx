@@ -12,102 +12,78 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 
-const featureSections = [
+const heroFeature = {
+  title: 'Executive Control Center',
+  subtitle: 'Your entire chapter’s financial health — in one intelligent view.',
+  bullets: [
+    'Real‑time cash position',
+    'Upcoming dues + recurring alerts',
+    'AI‑powered financial insights'
+  ],
+  cta: 'See Dashboard in Action'
+};
+
+const coreFeatures = [
   {
-    title: 'Dashboard — Executive Control Center',
-    description:
-      'Give treasurers and execs a live snapshot of chapter finances in one place.',
-    bullets: [
-      'Total cash position and budget health at a glance',
-      'Recent activity, upcoming recurring items, and dues status',
-      'AI insights and operational alerts to guide focus'
-    ],
-    icon: ChartBarIcon
+    title: 'Transactions',
+    subtitle: 'All transactions. Zero chaos.',
+    bullets: ['Search & filter instantly', 'CSV + manual entries', 'Clean audit trail'],
+    icon: ClipboardDocumentCheckIcon,
+    tone: 'text-blue-700 border-blue-200 bg-blue-50',
+    cta: 'Explore Transactions'
   },
   {
-    title: 'Transactions — Real‑Time Ledger',
-    description:
-      'A centralized transactions hub with search, filters, and categorization.',
-    bullets: [
-      'Full transaction history in one place',
-      'Manual entry and CSV import',
-      'Inline category editing and clean audit trail'
-    ],
-    icon: ClipboardDocumentCheckIcon
+    title: 'Budgets',
+    subtitle: 'See overspending before it happens.',
+    bullets: ['Live vs. budgeted tracking', 'Period rollups', 'Variance alerts'],
+    icon: CurrencyDollarIcon,
+    tone: 'text-emerald-700 border-emerald-200 bg-emerald-50',
+    cta: 'View Budgets'
   },
   {
-    title: 'Budgets — Planning & Control',
-    description:
-      'Budget creation, allocation, and monitoring by category.',
-    bullets: [
-      'Live spend vs. budgeted tracking',
-      'Period‑based planning with real‑time variance',
-      'Catch overspend early'
-    ],
-    icon: CurrencyDollarIcon
+    title: 'Members & Dues',
+    subtitle: 'Collections that run themselves.',
+    bullets: ['Automated dues setup', 'Late fee tracking', 'Member portal'],
+    icon: UserGroupIcon,
+    tone: 'text-amber-700 border-amber-200 bg-amber-50',
+    cta: 'Manage Members'
   },
   {
-    title: 'Members & Dues — Billing + Collections',
-    description:
-      'Manage member roster, assign dues, and track payments.',
-    bullets: [
-      'Automated dues configuration and assignments',
-      'Payment tracking, late fees, and reminders',
-      'Member portal for fast, self‑serve payment'
-    ],
-    icon: UserGroupIcon
-  },
+    title: 'Reports',
+    subtitle: 'Board‑ready in minutes.',
+    bullets: ['PDF & CSV exports', 'Dues collection rates', 'Budget health'],
+    icon: ArrowTrendingUpIcon,
+    tone: 'text-violet-700 border-violet-200 bg-violet-50',
+    cta: 'See Reports'
+  }
+];
+
+const highlightFeature = {
+  title: 'AI Financial Advisor',
+  subtitle: 'Instant answers. Smarter decisions.',
+  description:
+    'Ask questions about budgets, dues, and cash health and get fast, contextual guidance.',
+  cta: 'Ask the AI',
+  icon: SparklesIcon
+};
+
+const utilityFeatures = [
   {
-    title: 'Reports — Board‑Ready Outputs',
-    description:
-      'Clear reports for execs, alumni boards, and audits.',
-    bullets: [
-      'Exportable charts and summaries (PDF/CSV)',
-      'Dues collection rates and budget health reports',
-      'Transparency for leadership and stakeholders'
-    ],
-    icon: ArrowTrendingUpIcon
-  },
-  {
-    title: 'Bank Sync (Plaid) — Automated Reconciliation',
-    description:
-      'Connect accounts and pull transactions automatically.',
-    bullets: [
-      'Always‑up‑to‑date ledger',
-      'Reduces manual entry errors',
-      'Continuous reconciliation with live imports'
-    ],
-    icon: BanknotesIcon
-  },
-  {
-    title: 'Recurring Transactions — Predictable Cash Flow',
-    description:
-      'Set and manage recurring income/expenses.',
-    bullets: [
-      'Clear future cash flow outlook',
-      'Automated posting and forecasted impact'
-    ],
+    title: 'Recurring',
+    subtitle: 'Predictable cash flow.',
+    bullets: ['Automated posting', 'Forecasted impact', 'Easy adjustments'],
     icon: ArrowPathIcon
   },
   {
-    title: 'AI Advisor — Smart Financial Guidance',
-    description:
-      'Chat‑based advisor using chapter data and knowledge context.',
-    bullets: [
-      'Fast answers about budgets, dues, and cash health',
-      'Insights that help execs make better decisions'
-    ],
-    icon: SparklesIcon
+    title: 'Security',
+    subtitle: 'Trustworthy by default.',
+    bullets: ['Role‑based access', 'Audit‑ready logs', 'Secure by design'],
+    icon: Cog6ToothIcon
   },
   {
-    title: 'Settings & Organization Management',
-    description:
-      'Control branding, roles, permissions, and integrations.',
-    bullets: [
-      'Role‑based access (treasurer, exec, member)',
-      'Secure multi‑tenant setup',
-      'Custom chapter branding and preferences'
-    ],
+    title: 'Settings',
+    subtitle: 'Customize your chapter.',
+    bullets: ['Branding & prefs', 'Chapter controls', 'Integration settings'],
     icon: Cog6ToothIcon
   }
 ];
@@ -182,31 +158,81 @@ const Features: React.FC = () => {
       </header>
 
       <main>
-        <section className="border-b border-[var(--brand-border)] bg-gradient-to-b from-[#0f172a] via-[#0b1222] to-[var(--brand-surface)]">
+        <section className="border-b border-[var(--brand-border)] bg-gradient-to-b from-[#ffffff] via-[#f1f5f9] to-[var(--brand-surface)]">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8 lg:py-20">
-            <div className="max-w-3xl">
-              <span className="inline-flex items-center rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-white/70">
-                Product Features
-              </span>
-              <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
-                Everything your chapter needs to run a modern treasury.
-              </h1>
-              <p className="mt-4 text-lg text-white/70">
-                GreekPay brings dues, budgets, transactions, reporting, and member management into one
-                trusted workspace—so leaders stay clear, fast, and audit‑ready.
-              </p>
-              <div className="mt-6 flex flex-wrap gap-3">
+            <div className="grid gap-10 lg:grid-cols-[1.1fr,0.9fr] lg:items-center">
+              <div>
+                <span className="inline-flex items-center rounded-full border border-[var(--brand-border)] bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-slate-500">
+                  Product Features
+                </span>
+                <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
+                  Powerful financial oversight for chapter leaders.
+                </h1>
+                <p className="mt-4 text-lg text-slate-600">
+                  GreekPay brings dues, budgets, transactions, reporting, and member management into one trusted
+                  workspace—so leaders stay clear, fast, and audit‑ready.
+                </p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <button
+                    onClick={() => navigate('/demo')}
+                    className="rounded-full bg-[var(--brand-primary)] px-6 py-3 text-sm font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5"
+                  >
+                    Launch interactive demo
+                  </button>
+                  <button
+                    onClick={() => navigate('/contact')}
+                    className="rounded-full border border-[var(--brand-border)] bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
+                  >
+                    Talk to sales
+                  </button>
+                </div>
+              </div>
+              <div className="rounded-3xl border border-[var(--brand-border)] bg-white p-6 shadow-sm">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                    {heroFeature.title}
+                  </p>
+                  <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                    Up to date
+                  </span>
+                </div>
+                <div className="mt-6 space-y-4">
+                  <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">Available funds</p>
+                    <p className="mt-2 text-2xl font-semibold" style={{ color: '#0b1120' }}>
+                      $48,320
+                    </p>
+                    <p className="text-xs text-slate-500">+12.4% vs last quarter</p>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="rounded-xl border border-slate-200 bg-white p-3">
+                      <p className="text-xs text-slate-500">Dues collected</p>
+                      <p className="mt-1 text-sm font-semibold" style={{ color: '#0b1120' }}>
+                        88%
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-slate-200 bg-white p-3">
+                      <p className="text-xs text-slate-500">Budget health</p>
+                      <p className="mt-1 text-sm font-semibold" style={{ color: '#0b1120' }}>
+                        On track
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <p className="mt-6 text-sm text-slate-600">{heroFeature.subtitle}</p>
+                <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                  {heroFeature.bullets.map((item) => (
+                    <li key={item} className="flex items-start gap-2">
+                      <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--brand-primary)]" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
                 <button
                   onClick={() => navigate('/demo')}
-                  className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-sm transition-transform hover:-translate-y-0.5"
+                  className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-[var(--brand-primary)]"
                 >
-                  Launch interactive demo
-                </button>
-                <button
-                  onClick={() => navigate('/contact')}
-                  className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
-                >
-                  Talk to sales
+                  {heroFeature.cta} →
                 </button>
               </div>
             </div>
@@ -215,23 +241,85 @@ const Features: React.FC = () => {
 
         <section className="bg-[var(--brand-surface)]">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-semibold text-slate-950">
+                Everything you need to run chapter finances
+              </h2>
+              <p className="mt-2 text-sm text-slate-600">
+                Clean, modern tools built for treasurers and executive boards.
+              </p>
+            </div>
             <div className="grid gap-6 md:grid-cols-2">
-              {featureSections.map((feature) => {
+              {coreFeatures.map((feature) => {
                 const Icon = feature.icon;
                 return (
                   <div
                     key={feature.title}
-                    className="rounded-3xl border border-[var(--brand-border)] bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
+                    className="group rounded-3xl border border-[var(--brand-border)] bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-xl hover:border-[var(--brand-primary)]"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[var(--brand-primary-soft)] text-[var(--brand-primary)]">
+                    <div className="flex items-center justify-between">
+                      <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl border ${feature.tone} transition-colors group-hover:brightness-105`}>
                         <Icon className="h-6 w-6" />
                       </div>
-                      <h2 className="text-lg font-semibold" style={{ color: '#0b1120' }}>
-                        {feature.title}
-                      </h2>
                     </div>
-                    <p className="mt-3 text-sm text-slate-600">{feature.description}</p>
+                    <h2 className="mt-4 text-xl font-semibold" style={{ color: '#0b1120' }}>
+                      {feature.title}
+                    </h2>
+                    <p className="mt-1 text-sm text-slate-600">{feature.subtitle}</p>
+                    <ul className="mt-4 space-y-2 text-sm text-slate-700">
+                      {feature.bullets.map((item) => (
+                        <li key={item} className="flex items-start gap-2">
+                          <span className="mt-1 h-1.5 w-1.5 rounded-full bg-[var(--brand-primary)]" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <button className="mt-4 inline-flex items-center text-sm font-semibold text-[var(--brand-primary)] transition-colors group-hover:text-[var(--brand-primary-dark)]">
+                      {feature.cta} →
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="mt-10 rounded-3xl border border-[var(--brand-border)] bg-gradient-to-br from-[#EEF2FF] via-white to-white p-8 shadow-sm">
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-[var(--brand-primary)] shadow-sm">
+                      <highlightFeature.icon className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-semibold" style={{ color: '#0b1120' }}>
+                        {highlightFeature.title}
+                      </h2>
+                      <p className="text-sm text-slate-600">{highlightFeature.subtitle}</p>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-slate-600">{highlightFeature.description}</p>
+                </div>
+                <button
+                  onClick={() => navigate('/demo')}
+                  className="rounded-full bg-[var(--brand-primary)] px-5 py-2 text-sm font-semibold text-white shadow-sm"
+                >
+                  {highlightFeature.cta}
+                </button>
+              </div>
+            </div>
+            <div className="mt-8 grid gap-6 md:grid-cols-3">
+              {utilityFeatures.map((feature) => {
+                const Icon = feature.icon;
+                return (
+                  <div
+                    key={feature.title}
+                    className="rounded-3xl border border-[var(--brand-border)] bg-white p-6 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:border-[var(--brand-primary)]"
+                  >
+                    <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-slate-100 text-slate-700">
+                      <Icon className="h-6 w-6" />
+                    </div>
+                    <h3 className="mt-4 text-lg font-semibold" style={{ color: '#0b1120' }}>
+                      {feature.title}
+                    </h3>
+                    <p className="mt-1 text-sm text-slate-600">{feature.subtitle}</p>
                     <ul className="mt-4 space-y-2 text-sm text-slate-700">
                       {feature.bullets.map((item) => (
                         <li key={item} className="flex items-start gap-2">
