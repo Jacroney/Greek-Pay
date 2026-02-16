@@ -166,12 +166,11 @@ const Home: React.FC = () => {
       >
         <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
           <Link to="/" className="-ml-36 flex items-center gap-3">
-            <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#E2B15A] shadow-sm overflow-hidden">
+            <span className="flex h-14 w-14 items-center justify-center rounded-xl shadow-sm overflow-hidden">
               <img
-                src="/GreekPay-logo-icon-solid-bold3.png"
+                src="/GreekPay-logo-white.png"
                 alt="GreekPay Logo"
-                className="h-full w-full object-contain scale-[1.55] origin-center"
-                style={{ filter: 'none' }}
+                className="h-full w-full object-cover"
               />
             </span>
             <span className="text-xl font-semibold tracking-tight text-slate-950">Greek Pay</span>

@@ -148,27 +148,26 @@ const Features: React.FC = () => {
       <header
         className={`sticky top-0 z-50 transition-colors duration-200 ${
           isHeaderScrolled
-            ? 'border-b border-[var(--brand-border)] bg-[var(--brand-surface)]'
-            : 'border-b border-transparent bg-[var(--brand-surface)]'
+            ? 'border-b border-[var(--brand-border)] bg-white/90 backdrop-blur'
+            : 'border-b border-transparent bg-white'
         }`}
       >
         <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
           <Link to="/" className="-ml-36 flex items-center gap-3">
-            <span className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#E2B15A] shadow-sm overflow-hidden">
+            <span className="flex h-14 w-14 items-center justify-center rounded-xl shadow-sm overflow-hidden">
               <img
-                src="/GreekPay-logo-icon-solid-bold3.png"
+                src="/GreekPay-logo-white.png"
                 alt="GreekPay Logo"
-                className="h-full w-full object-contain scale-[1.55] origin-center"
-                style={{ filter: 'none' }}
+                className="h-full w-full object-cover"
               />
             </span>
-            <span className="text-xl font-semibold tracking-tight text-white">Greek Pay</span>
+            <span className="text-xl font-semibold tracking-tight text-slate-950">Greek Pay</span>
           </Link>
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 text-sm font-medium text-white/80 sm:flex scale-[1.3] origin-center">
-            <Link to="/features" className="text-white">Features</Link>
-            <Link to="/pricing" className="transition-colors hover:text-white">Pricing</Link>
-            <Link to="/demo" className="transition-colors hover:text-white">Demo</Link>
-            <Link to="/contact" className="transition-colors hover:text-white">Contact</Link>
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 text-sm font-medium text-slate-700 sm:flex scale-[1.3] origin-center">
+            <Link to="/features" className="text-[var(--brand-primary)]">Features</Link>
+            <Link to="/pricing" className="transition-colors hover:text-[var(--brand-primary)]">Pricing</Link>
+            <Link to="/demo" className="transition-colors hover:text-[var(--brand-primary)]">Demo</Link>
+            <Link to="/contact" className="transition-colors hover:text-[var(--brand-primary)]">Contact</Link>
           </nav>
           <div className="absolute -right-28 flex items-center gap-3">
             <button
