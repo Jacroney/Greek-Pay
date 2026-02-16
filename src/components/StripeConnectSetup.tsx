@@ -151,10 +151,10 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
 
   if (isLoading) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center justify-center py-8">
           <svg
-            className="animate-spin h-8 w-8 text-blue-600 dark:text-blue-400"
+            className="animate-spin h-8 w-8 text-blue-600"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
@@ -181,11 +181,11 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
   // No account exists yet - show setup wizard
   if (!account) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-8 text-center">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white dark:bg-gray-800 rounded-full mb-4">
-            <CreditCard className="w-8 h-8 text-blue-600 dark:text-blue-500" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full mb-4">
+            <CreditCard className="w-8 h-8 text-blue-600" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Enable Online Payments</h2>
           <p className="text-blue-100">
@@ -197,35 +197,35 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
         <div className="px-6 py-8">
           {/* Benefits */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <DollarSign className="w-8 h-8 text-green-600 dark:text-green-400 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Easy Payments</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <DollarSign className="w-8 h-8 text-green-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">Easy Payments</h3>
+              <p className="text-sm text-gray-600">
                 Accept card and ACH payments directly from members
               </p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <Building2 className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Direct Deposits</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <Building2 className="w-8 h-8 text-blue-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">Direct Deposits</h3>
+              <p className="text-sm text-gray-600">
                 Funds deposited directly to your chapter's bank account
               </p>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
-              <Shield className="w-8 h-8 text-purple-600 dark:text-purple-400 mb-3" />
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Secure & Trusted</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+            <div className="bg-gray-50 rounded-lg p-4">
+              <Shield className="w-8 h-8 text-purple-600 mb-3" />
+              <h3 className="font-semibold text-gray-900 mb-1">Secure & Trusted</h3>
+              <p className="text-sm text-gray-600">
                 Industry-leading security powered by Stripe
               </p>
             </div>
           </div>
 
           {/* What you'll need */}
-          <div className="bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-900 dark:text-blue-200 mb-3">
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-blue-900 mb-3">
               What you'll need:
             </h3>
-            <ul className="text-sm text-blue-800 dark:text-blue-300 space-y-2">
+            <ul className="text-sm text-blue-800 space-y-2">
               <li className="flex items-start">
                 <CheckCircle className="w-4 h-4 mr-2 mt-0.5 flex-shrink-0" />
                 <span>Chapter's legal name and EIN (Tax ID)</span>
@@ -246,16 +246,16 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
           </div>
 
           {/* Fees Information */}
-          <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Payment Fees:</h3>
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-gray-900 mb-3">Payment Fees:</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Credit/Debit Cards:</span>
-                <span className="font-medium text-gray-900 dark:text-white">2.9% + $0.30</span>
+                <span className="text-gray-600">Credit/Debit Cards:</span>
+                <span className="font-medium text-gray-900">2.9% + $0.30</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600 dark:text-gray-400">Bank Account (ACH):</span>
-                <span className="font-medium text-gray-900 dark:text-white">$0.80 flat fee</span>
+                <span className="text-gray-600">Bank Account (ACH):</span>
+                <span className="font-medium text-gray-900">$0.80 flat fee</span>
               </div>
             </div>
           </div>
@@ -264,7 +264,7 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
           <button
             onClick={handleCreateAccount}
             disabled={isCreating}
-            className="w-full px-6 py-4 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center"
+            className="w-full px-6 py-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-lg flex items-center justify-center"
           >
             {isCreating ? (
               <>
@@ -298,7 +298,7 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
             )}
           </button>
 
-          <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
+          <p className="text-xs text-gray-500 text-center mt-4">
             You'll be redirected to Stripe to securely complete the setup process
           </p>
         </div>
@@ -311,7 +311,7 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
     account.onboarding_completed && account.charges_enabled && account.payouts_enabled;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-hidden">
       {/* Header */}
       <div
         className={`px-6 py-6 ${
@@ -353,9 +353,9 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
       <div className="px-6 py-6">
         <div className="space-y-4">
           {/* Account ID */}
-          <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-700">
-            <span className="text-gray-600 dark:text-gray-400">Stripe Account:</span>
-            <span className="font-mono text-sm text-gray-900 dark:text-white">
+          <div className="flex items-center justify-between py-3 border-b border-gray-200">
+            <span className="text-gray-600">Stripe Account:</span>
+            <span className="font-mono text-sm text-gray-900">
               {account.stripe_account_id}
             </span>
           </div>
@@ -377,7 +377,7 @@ const StripeConnectSetup: React.FC<StripeConnectSetupProps> = ({
               <button
                 onClick={handleRetryOnboarding}
                 disabled={isCreating}
-                className="w-full px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
+                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center justify-center"
               >
                 <ExternalLink className="w-5 h-5 mr-2" />
                 {isCreating ? 'Opening Stripe...' : 'Complete Setup in Stripe'}
@@ -400,23 +400,23 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({ label, isComplete }) 
     <div
       className={`flex items-center justify-between p-3 rounded-lg ${
         isComplete
-          ? 'bg-green-50 dark:bg-green-900/30 border border-green-200 dark:border-green-800'
-          : 'bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600'
+          ? 'bg-green-50 border border-green-200'
+          : 'bg-gray-50 border border-gray-200'
       }`}
     >
       <span
         className={`text-sm font-medium ${
           isComplete
-            ? 'text-green-900 dark:text-green-200'
-            : 'text-gray-600 dark:text-gray-400'
+            ? 'text-green-900'
+            : 'text-gray-600'
         }`}
       >
         {label}
       </span>
       {isComplete ? (
-        <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+        <CheckCircle className="w-5 h-5 text-green-600" />
       ) : (
-        <div className="w-5 h-5 rounded-full border-2 border-gray-300 dark:border-gray-600" />
+        <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
       )}
     </div>
   );

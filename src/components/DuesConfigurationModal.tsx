@@ -79,51 +79,51 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-4xl w-full my-8">
+      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full my-8">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">
             {existingConfig ? 'Edit' : 'Create'} Dues Configuration
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-6 space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto">
           {/* Period Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <Calendar className="w-5 h-5" />
               Period Information
             </h3>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Period Name *
                 </label>
                 <input
                   type="text"
                   value={formData.period_name}
                   onChange={(e) => setFormData({ ...formData, period_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="e.g., Fall 2025"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Period Type *
                 </label>
                 <select
                   value={formData.period_type}
                   onChange={(e) => setFormData({ ...formData, period_type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   required
                 >
                   <option value="Quarter">Quarter</option>
@@ -133,40 +133,40 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Start Date *
                 </label>
                 <input
                   type="date"
                   value={formData.period_start_date}
                   onChange={(e) => setFormData({ ...formData, period_start_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   End Date *
                 </label>
                 <input
                   type="date"
                   value={formData.period_end_date}
                   onChange={(e) => setFormData({ ...formData, period_end_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fiscal Year *
                 </label>
                 <input
                   type="number"
                   value={formData.fiscal_year}
                   onChange={(e) => setFormData({ ...formData, fiscal_year: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min={2020}
                   max={2050}
                   required
@@ -174,14 +174,14 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Due Date
                 </label>
                 <input
                   type="date"
                   value={formData.due_date || ''}
                   onChange={(e) => setFormData({ ...formData, due_date: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 />
               </div>
             </div>
@@ -192,9 +192,9 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
                 id="is_current"
                 checked={formData.is_current}
                 onChange={(e) => setFormData({ ...formData, is_current: e.target.checked })}
-                className="rounded border-gray-300 dark:border-gray-600"
+                className="rounded border-gray-300"
               />
-              <label htmlFor="is_current" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="is_current" className="text-sm font-medium text-gray-700">
                 Set as current period
               </label>
             </div>
@@ -202,7 +202,7 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
 
           {/* Dues Amounts by Year */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <DollarSign className="w-5 h-5" />
               Dues Amounts by Year
             </h3>
@@ -219,16 +219,16 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
                 { key: 'default_dues', label: 'Default Dues (No Year Set)' }
               ].map(({ key, label }) => (
                 <div key={key}>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     {label}
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">$</span>
+                    <span className="absolute left-3 top-2.5 text-gray-500">$</span>
                     <input
                       type="number"
                       value={formData[key as keyof DuesConfiguration] || 0}
                       onChange={(e) => setFormData({ ...formData, [key]: parseFloat(e.target.value) || 0 })}
-                      className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg"
                       min="0"
                       step="0.01"
                     />
@@ -240,7 +240,7 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
 
           {/* Late Fee Configuration */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
               <AlertCircle className="w-5 h-5" />
               Late Fee Configuration
             </h3>
@@ -251,9 +251,9 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
                 id="late_fee_enabled"
                 checked={formData.late_fee_enabled}
                 onChange={(e) => setFormData({ ...formData, late_fee_enabled: e.target.checked })}
-                className="rounded border-gray-300 dark:border-gray-600"
+                className="rounded border-gray-300"
               />
-              <label htmlFor="late_fee_enabled" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label htmlFor="late_fee_enabled" className="text-sm font-medium text-gray-700">
                 Enable late fees
               </label>
             </div>
@@ -261,18 +261,18 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
             {formData.late_fee_enabled && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Late Fee Amount
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-2.5 text-gray-500 dark:text-gray-400">
+                    <span className="absolute left-3 top-2.5 text-gray-500">
                       {formData.late_fee_type === 'percentage' ? '%' : '$'}
                     </span>
                     <input
                       type="number"
                       value={formData.late_fee_amount}
                       onChange={(e) => setFormData({ ...formData, late_fee_amount: parseFloat(e.target.value) || 0 })}
-                      className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                      className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg"
                       min="0"
                       step="0.01"
                     />
@@ -280,13 +280,13 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Late Fee Type
                   </label>
                   <select
                     value={formData.late_fee_type}
                     onChange={(e) => setFormData({ ...formData, late_fee_type: e.target.value as any })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   >
                     <option value="flat">Flat Amount</option>
                     <option value="percentage">Percentage</option>
@@ -294,14 +294,14 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Grace Period (Days)
                   </label>
                   <input
                     type="number"
                     value={formData.late_fee_grace_days}
                     onChange={(e) => setFormData({ ...formData, late_fee_grace_days: parseInt(e.target.value) || 0 })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     min="0"
                   />
                 </div>
@@ -311,24 +311,24 @@ const DuesConfigurationModal: React.FC<DuesConfigurationModalProps> = ({
 
           {/* Notes */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Notes
             </label>
             <textarea
               value={formData.notes || ''}
               onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               rows={3}
               placeholder="Optional notes about this dues period..."
             />
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               disabled={isSaving}
             >
               Cancel

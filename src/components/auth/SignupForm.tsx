@@ -156,7 +156,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       <div className="w-full max-w-md">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-300">Validating your invitation...</p>
+          <p className="text-gray-600">Validating your invitation...</p>
         </div>
       </div>
     );
@@ -166,11 +166,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   if (invitationError) {
     return (
       <div className="w-full max-w-md">
-        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 text-center">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <div className="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Invalid Invitation</h2>
-          <p className="text-red-600 dark:text-red-400 mb-4">{invitationError}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid Invitation</h2>
+          <p className="text-red-600 mb-4">{invitationError}</p>
+          <p className="text-sm text-gray-600">
             Please contact your chapter administrator for a new invitation link.
           </p>
         </div>
@@ -182,15 +182,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   if (!invitation && !searchParams.get('token')) {
     return (
       <div className="w-full max-w-md">
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 text-center">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
           <div className="text-blue-500 text-5xl mb-4">✉️</div>
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Invitation Required</h2>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Invitation Required</h2>
+          <p className="text-gray-600 mb-4">
             You need an invitation to create an account. Please check your email for an invitation link from your chapter administrator.
           </p>
           <button
             onClick={onSwitchToLogin}
-            className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
+            className="text-blue-600 hover:text-blue-500 font-medium"
           >
             Already have an account? Sign in
           </button>
@@ -204,15 +204,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
   return (
     <div className="w-full max-w-md">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold text-gray-900">
           Join Your Chapter
         </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-gray-600">
           Create your account
         </p>
         {invitation && invitedChapter && (
-          <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
-            <p className="text-sm text-green-800 dark:text-green-300">
+          <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+            <p className="text-sm text-green-800">
               ✓ You've been invited to <strong>{invitedChapter.name}</strong> as <strong>{invitation.role}</strong>
             </p>
           </div>
@@ -222,7 +222,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Personal Information */}
         <div>
-          <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="full_name" className="block text-sm font-medium text-gray-700 mb-2">
             Full Name *
           </label>
           <input
@@ -232,15 +232,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             required
             value={formData.full_name}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+                    "
             placeholder="John Doe"
           />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
             Email Address *
           </label>
           <input
@@ -252,22 +252,22 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             value={formData.email}
             onChange={handleChange}
             readOnly={!!invitation}
-            className={`w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400
+            className={`w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 ${
-                       invitation ? 'bg-gray-100 dark:bg-gray-800 cursor-not-allowed' : ''
+                     ${
+                       invitation ? 'bg-gray-100 cursor-not-allowed' : ''
                      }`}
             placeholder="john.doe@university.edu"
           />
           {invitation && (
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-gray-500">
               Email is set by your invitation and cannot be changed
             </p>
           )}
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
             Password *
           </label>
           <div className="relative">
@@ -279,9 +279,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               required
               value={formData.password}
               onChange={handleChange}
-              className="w-full px-3 py-2 pr-10 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400
+              className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+                      "
               placeholder="Create a strong password"
               minLength={6}
             />
@@ -298,7 +298,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         {/* Academic Information */}
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label htmlFor="year" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="year" className="block text-sm font-medium text-gray-700 mb-2">
               Year
             </label>
             <select
@@ -306,9 +306,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               name="year"
               value={formData.year}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                       [&>option]: [&>option]:"
             >
               {YEAR_OPTIONS.map(({ value, label }) => (
                 <option key={value} value={value}>{label}</option>
@@ -317,7 +317,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           </div>
 
           <div>
-            <label htmlFor="position" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label htmlFor="position" className="block text-sm font-medium text-gray-700 mb-2">
               Position
             </label>
             <select
@@ -325,9 +325,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
               name="position"
               value={formData.position}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                       dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                       [&>option]: [&>option]:"
             >
               {positions.map((position) => (
                 <option key={position} value={position}>{position}</option>
@@ -337,7 +337,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
         </div>
 
         <div>
-          <label htmlFor="major" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="major" className="block text-sm font-medium text-gray-700 mb-2">
             Major
           </label>
           <input
@@ -346,15 +346,15 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             type="text"
             value={formData.major}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+                    "
             placeholder="Computer Science"
           />
         </div>
 
         <div>
-          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700 mb-2">
             Phone Number
           </label>
           <input
@@ -363,9 +363,9 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
             type="tel"
             value={formData.phone_number}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm placeholder-gray-400
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400
                      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-                     dark:bg-gray-700 dark:text-white dark:placeholder-gray-500"
+                    "
             placeholder="(555) 123-4567"
           />
         </div>
@@ -375,7 +375,7 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
           disabled={isLoading || !invitation}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white
                    bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                   disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-500 dark:hover:bg-blue-600"
+                   disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -389,11 +389,11 @@ export const SignupForm: React.FC<SignupFormProps> = ({ onSwitchToLogin }) => {
       </form>
 
       <div className="mt-6 text-center">
-        <p className="text-sm text-gray-600 dark:text-gray-400">
+        <p className="text-sm text-gray-600">
           Already have an account?{' '}
           <button
             onClick={onSwitchToLogin}
-            className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            className="font-medium text-blue-600 hover:text-blue-500"
           >
             Sign in here
           </button>

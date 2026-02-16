@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { X, Eye, EyeOff, ShieldCheck, Lock, Check } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
+import { isDemoModeEnabled } from '../utils/env';
 
 interface PasswordChangeModalProps {
   isOpen: boolean;
@@ -80,6 +81,13 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
     setIsSubmitting(true);
 
     try {
+      if (isDemoModeEnabled()) {
+        toast.success('Password changed successfully! (Demo)');
+        setFormData({ newPassword: '', confirmPassword: '' });
+        onClose();
+        return;
+      }
+
       // Update password using Supabase Auth
       const { error } = await supabase.auth.updateUser({
         password: formData.newPassword
@@ -115,9 +123,9 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
     if (/[0-9]/.test(password)) score++;
     if (/[^A-Za-z0-9]/.test(password)) score++;
 
-    if (score <= 2) return { strength: 'Weak', color: 'text-red-600 dark:text-red-400' };
-    if (score <= 4) return { strength: 'Medium', color: 'text-yellow-600 dark:text-yellow-400' };
-    return { strength: 'Strong', color: 'text-green-600 dark:text-green-400' };
+    if (score <= 2) return { strength: 'Weak', color: 'text-red-600' };
+    if (score <= 4) return { strength: 'Medium', color: 'text-yellow-600' };
+    return { strength: 'Strong', color: 'text-green-600' };
   };
 
   const passwordStrength = getPasswordStrength(formData.newPassword);
@@ -154,14 +162,14 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
         {/* Drag handle (mobile only) */}
         <div className="sm:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 dark:from-amber-600 dark:via-orange-600 dark:to-rose-600 px-6 py-5 sm:rounded-t-2xl">
+        <div className="bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
@@ -185,8 +193,8 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-5">
           {/* Password Requirements Checklist */}
-          <div className="bg-slate-50 dark:bg-gray-700/50 rounded-xl p-4 border border-[var(--brand-border)]">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+          <div className="bg-slate-50 rounded-xl p-4 border border-[var(--brand-border)]">
+            <p className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
               <Lock className="w-4 h-4" />
               Password Requirements
             </p>
@@ -196,18 +204,18 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
                   key={idx}
                   className={`flex items-center gap-2 text-xs ${
                     formData.newPassword.length === 0
-                      ? 'text-gray-500 dark:text-gray-400'
+                      ? 'text-gray-500'
                       : req.met
-                      ? 'text-emerald-600 dark:text-emerald-400'
-                      : 'text-gray-500 dark:text-gray-400'
+                      ? 'text-emerald-600'
+                      : 'text-gray-500'
                   }`}
                 >
                   <div className={`flex-shrink-0 w-4 h-4 rounded-full flex items-center justify-center ${
                     formData.newPassword.length === 0
-                      ? 'bg-gray-200 dark:bg-gray-600'
+                      ? 'bg-gray-200'
                       : req.met
                       ? 'bg-emerald-500'
-                      : 'bg-gray-200 dark:bg-gray-600'
+                      : 'bg-gray-200'
                   }`}>
                     {req.met && formData.newPassword.length > 0 && (
                       <Check className="w-3 h-3 text-white" />
@@ -221,12 +229,12 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
 
           {/* New Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               New Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <Lock className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type={showPassword.new ? 'text' : 'password'}
@@ -234,9 +242,9 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
                 onChange={(e) => handlePasswordChange('newPassword', e.target.value)}
                 className={`w-full pl-10 pr-12 py-2.5 border ${
                   errors.newPassword
-                    ? 'border-red-500 dark:border-red-500 focus:ring-red-500'
+                    ? 'border-red-500 focus:ring-red-500'
                     : 'border-[var(--brand-border)] focus:ring-blue-500'
-                } rounded-xl focus:ring-2 focus:border-transparent dark:bg-gray-700 dark:text-white transition-shadow`}
+                } rounded-xl focus:ring-2 focus:border-transparent transition-shadow`}
                 placeholder="Enter new password"
                 required
                 disabled={isSubmitting}
@@ -244,19 +252,19 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowPassword({ ...showPassword, new: !showPassword.new })}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 rounded transition-colors"
                 disabled={isSubmitting}
               >
                 {showPassword.new ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {errors.newPassword && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1.5">{errors.newPassword}</p>
+              <p className="text-red-500 text-xs mt-1.5">{errors.newPassword}</p>
             )}
             {formData.newPassword && !errors.newPassword && (
               <div className="mt-2">
                 <div className="flex items-center gap-2">
-                  <div className="flex-1 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="flex-1 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className={`h-full transition-all duration-300 ${
                         passwordStrength.strength === 'Weak'
@@ -277,12 +285,12 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
 
           {/* Confirm Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Confirm New Password <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <Lock className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <Lock className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type={showPassword.confirm ? 'text' : 'password'}
@@ -290,9 +298,9 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
                 onChange={(e) => handlePasswordChange('confirmPassword', e.target.value)}
                 className={`w-full pl-10 pr-12 py-2.5 border ${
                   errors.confirmPassword
-                    ? 'border-red-500 dark:border-red-500 focus:ring-red-500'
+                    ? 'border-red-500 focus:ring-red-500'
                     : 'border-[var(--brand-border)] focus:ring-blue-500'
-                } rounded-xl focus:ring-2 focus:border-transparent dark:bg-gray-700 dark:text-white transition-shadow`}
+                } rounded-xl focus:ring-2 focus:border-transparent transition-shadow`}
                 placeholder="Confirm new password"
                 required
                 disabled={isSubmitting}
@@ -300,17 +308,17 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
               <button
                 type="button"
                 onClick={() => setShowPassword({ ...showPassword, confirm: !showPassword.confirm })}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded transition-colors"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-gray-500 hover:text-gray-700 rounded transition-colors"
                 disabled={isSubmitting}
               >
                 {showPassword.confirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
             {errors.confirmPassword && (
-              <p className="text-red-500 dark:text-red-400 text-xs mt-1.5">{errors.confirmPassword}</p>
+              <p className="text-red-500 text-xs mt-1.5">{errors.confirmPassword}</p>
             )}
             {formData.confirmPassword && formData.newPassword === formData.confirmPassword && !errors.confirmPassword && (
-              <p className="text-emerald-600 dark:text-emerald-400 text-xs mt-1.5 flex items-center gap-1">
+              <p className="text-emerald-600 text-xs mt-1.5 flex items-center gap-1">
                 <Check className="w-3 h-3" />
                 Passwords match
               </p>
@@ -323,7 +331,7 @@ const PasswordChangeModal: React.FC<PasswordChangeModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation font-medium"
+              className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation font-medium"
             >
               Cancel
             </button>

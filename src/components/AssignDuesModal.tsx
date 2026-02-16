@@ -4,6 +4,8 @@ import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import { DuesConfiguration } from '../services/types';
 import { YEAR_OPTIONS, DUES_FIELD_BY_YEAR, YearValue } from '../utils/yearUtils';
+import { isDemoModeEnabled } from '../utils/env';
+import { demoStore } from '../demo/demoStore';
 
 // Extended year options including Pledge
 const ASSIGN_YEAR_OPTIONS = [
@@ -94,6 +96,20 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
   const fetchMembersAndInvitations = async () => {
     setIsLoading(true);
     try {
+      if (isDemoModeEnabled()) {
+        const demoMembers = demoStore.getState().members;
+        const memberOptions: MemberOption[] = demoMembers.map(m => ({
+          id: m.id,
+          email: m.email,
+          name: m.name || m.email,
+          type: 'member' as const
+        }));
+        setMembers(memberOptions);
+        setInvitations([]);
+        setIsLoading(false);
+        return;
+      }
+
       // Fetch existing members
       const { data: memberData, error: memberError } = await supabase
         .from('user_profiles')
@@ -173,6 +189,14 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
     setIsProcessing(true);
 
     try {
+      if (isDemoModeEnabled()) {
+        toast.success(`Dues assigned to ${selectedMember.name}! (Demo)`);
+        resetForm();
+        onSuccess?.();
+        onClose();
+        return;
+      }
+
       // Call the database function to assign dues by email
       const { data, error } = await supabase.rpc('assign_dues_by_email', {
         p_chapter_id: chapterId,
@@ -226,10 +250,10 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="w-full max-w-md rounded-lg bg-white dark:bg-gray-800 shadow-xl">
+      <div className="w-full max-w-md rounded-lg bg-white shadow-xl">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between border-b border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900">
             Assign Dues
           </h3>
           <button
@@ -246,7 +270,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
           <div className="space-y-4">
             {/* Member Selection Dropdown */}
             <div ref={dropdownRef}>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <User className="inline w-4 h-4 mr-1" />
                 Select Member *
               </label>
@@ -255,24 +279,24 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
               <button
                 type="button"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                className="w-full flex items-center justify-between rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-left text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full flex items-center justify-between rounded-lg border border-gray-300 bg-white px-3 py-2 text-left text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 {selectedMember ? (
                   <div className="flex items-center gap-2">
                     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                       selectedMember.type === 'member'
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
-                        : 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+                        ? 'bg-green-100 text-green-800'
+                        : 'bg-amber-100 text-amber-800'
                     }`}>
                       {selectedMember.type === 'member' ? 'Member' : 'Invited'}
                     </span>
                     <span>{selectedMember.name}</span>
-                    <span className="text-gray-500 dark:text-gray-400 text-sm">
+                    <span className="text-gray-500 text-sm">
                       ({selectedMember.email})
                     </span>
                   </div>
                 ) : (
-                  <span className="text-gray-500 dark:text-gray-400">
+                  <span className="text-gray-500">
                     {isLoading ? 'Loading...' : 'Select a member...'}
                   </span>
                 )}
@@ -281,9 +305,9 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
 
               {/* Dropdown Menu */}
               {isDropdownOpen && (
-                <div className="absolute z-10 mt-1 w-full max-w-md bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg shadow-lg max-h-72 overflow-hidden">
+                <div className="absolute z-10 mt-1 w-full max-w-md bg-white border border-gray-200 rounded-lg shadow-lg max-h-72 overflow-hidden">
                   {/* Search Input */}
-                  <div className="p-2 border-b border-gray-200 dark:border-gray-600">
+                  <div className="p-2 border-b border-gray-200">
                     <div className="relative">
                       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
                       <input
@@ -292,7 +316,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         placeholder="Search by name or email..."
-                        className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                        className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-md bg-white text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
                       />
                     </div>
                   </div>
@@ -302,7 +326,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                     {/* Members Section */}
                     {filteredMembers.length > 0 && (
                       <>
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800">
+                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
                           Members ({filteredMembers.length})
                         </div>
                         {filteredMembers.map((member) => (
@@ -310,18 +334,18 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                             key={`member-${member.id}`}
                             type="button"
                             onClick={() => handleSelectMember(member)}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2"
+                            className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
                           >
-                            <div className="flex-shrink-0 w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
-                              <span className="text-green-600 dark:text-green-300 text-sm font-medium">
+                            <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                              <span className="text-green-600 text-sm font-medium">
                                 {member.name.charAt(0).toUpperCase()}
                               </span>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              <div className="text-sm font-medium text-gray-900 truncate">
                                 {member.name}
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              <div className="text-xs text-gray-500 truncate">
                                 {member.email}
                               </div>
                             </div>
@@ -333,7 +357,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                     {/* Pending Invitations Section */}
                     {filteredInvitations.length > 0 && (
                       <>
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800">
+                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider bg-gray-50">
                           Pending Invitations ({filteredInvitations.length})
                         </div>
                         {filteredInvitations.map((invitation) => (
@@ -341,20 +365,20 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                             key={`invitation-${invitation.id}`}
                             type="button"
                             onClick={() => handleSelectMember(invitation)}
-                            className="w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-600 flex items-center gap-2"
+                            className="w-full px-3 py-2 text-left hover:bg-gray-100 flex items-center gap-2"
                           >
-                            <div className="flex-shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center">
-                              <Mail className="w-4 h-4 text-amber-600 dark:text-amber-300" />
+                            <div className="flex-shrink-0 w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                              <Mail className="w-4 h-4 text-amber-600" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                              <div className="text-sm font-medium text-gray-900 truncate">
                                 {invitation.name}
                               </div>
-                              <div className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                              <div className="text-xs text-gray-500 truncate">
                                 {invitation.email}
                               </div>
                             </div>
-                            <span className="flex-shrink-0 text-xs text-amber-600 dark:text-amber-400">
+                            <span className="flex-shrink-0 text-xs text-amber-600">
                               Invited
                             </span>
                           </button>
@@ -364,7 +388,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
 
                     {/* Empty State */}
                     {filteredMembers.length === 0 && filteredInvitations.length === 0 && (
-                      <div className="px-3 py-8 text-center text-gray-500 dark:text-gray-400">
+                      <div className="px-3 py-8 text-center text-gray-500">
                         {searchTerm ? 'No members found matching your search' : 'No members available'}
                       </div>
                     )}
@@ -375,14 +399,14 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
 
             {/* Year Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <GraduationCap className="inline w-4 h-4 mr-1" />
                 Member Year *
               </label>
               <select
                 value={selectedYear}
                 onChange={(e) => handleYearChange(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 {ASSIGN_YEAR_OPTIONS.map((option) => {
                   const yearAmount = getAmountForYear(option.value);
@@ -393,14 +417,14 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                   );
                 })}
               </select>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500">
                 Selecting a year will auto-fill the amount from your dues configuration
               </p>
             </div>
 
             {/* Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <DollarSign className="inline w-4 h-4 mr-1" />
                 Amount *
               </label>
@@ -412,16 +436,16 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500">
                 You can adjust the amount manually if needed
               </p>
             </div>
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Calendar className="inline w-4 h-4 mr-1" />
                 Due Date
               </label>
@@ -429,13 +453,13 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
             </div>
 
             {/* Reason/Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <FileText className="inline w-4 h-4 mr-1" />
                 Reason / Instructions
               </label>
@@ -444,7 +468,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 placeholder="e.g., Spring 2025 chapter dues, Social event fee, etc."
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
             </div>
           </div>
@@ -455,7 +479,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
               type="button"
               onClick={handleClose}
               disabled={isProcessing}
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
               Cancel
             </button>

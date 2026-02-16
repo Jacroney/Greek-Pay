@@ -107,8 +107,8 @@ export const MemberDashboard: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] dark:bg-gray-900">
-        <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)]">
+        <div className="flex items-center gap-2 text-sm text-slate-600">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500" />
           Loading your dashboard...
         </div>
@@ -134,24 +134,24 @@ export const MemberDashboard: React.FC = () => {
   const isProfileIncomplete = profileCompleteness < 75;
 
   return (
-    <div className="min-h-screen bg-[var(--brand-surface)] dark:bg-gray-900">
+    <div className="min-h-screen bg-[var(--brand-surface)]">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-white/80 backdrop-blur-xl dark:bg-gray-900/80">
+      <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
             <img
               src="/GreekPay-logo-transparent.png"
               alt="GreekPay Logo"
-              className="h-9 w-auto dark:invert"
+              className="h-9 w-auto"
             />
             <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Member Portal</h1>
+              <h1 className="text-lg font-semibold text-slate-900">Member Portal</h1>
             </div>
           </div>
           <button
             type="button"
             onClick={signOut}
-            className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-gray-700 dark:hover:text-white"
+            className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Sign out</span>
@@ -164,7 +164,7 @@ export const MemberDashboard: React.FC = () => {
         <div className="space-y-6">
           {/* Hero Welcome Card */}
           <div className="surface-card overflow-hidden">
-            <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-800 dark:via-gray-800 dark:to-indigo-900/20 p-6 sm:p-8">
+            <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6 sm:p-8">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <div className="flex items-center gap-4 sm:gap-5">
                   {/* Avatar with initials */}
@@ -172,13 +172,13 @@ export const MemberDashboard: React.FC = () => {
                     <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xl sm:text-2xl font-bold shadow-lg">
                       {getInitials(profile?.full_name)}
                     </div>
-                    <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 border-[3px] border-white dark:border-gray-800" />
+                    <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 border-[3px] border-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">
+                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
                       Welcome back, {getFirstName(profile?.full_name)}!
                     </h2>
-                    <p className="text-slate-600 dark:text-slate-400 mt-1">
+                    <p className="text-slate-600 mt-1">
                       {chapterName}
                     </p>
                   </div>
@@ -197,7 +197,7 @@ export const MemberDashboard: React.FC = () => {
                     {isProfileIncomplete && (
                       <button
                         onClick={() => setIsProfileModalOpen(true)}
-                        className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
                       >
                         Complete profile <ArrowRight className="h-4 w-4" />
                       </button>
@@ -214,14 +214,14 @@ export const MemberDashboard: React.FC = () => {
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
                 <div className="flex items-center gap-4">
                   <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
-                    isOwed ? 'bg-rose-100 dark:bg-rose-900/40' : 'bg-emerald-100 dark:bg-emerald-900/40'
+                    isOwed ? 'bg-rose-100' : 'bg-emerald-100'
                   }`}>
-                    <DollarSign className={`h-7 w-7 ${isOwed ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'}`} />
+                    <DollarSign className={`h-7 w-7 ${isOwed ? 'text-rose-600' : 'text-emerald-600'}`} />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Dues Balance</p>
+                    <p className="text-sm font-medium text-slate-500">Dues Balance</p>
                     <p className={`text-3xl sm:text-4xl font-bold tracking-tight ${
-                      isOwed ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-600 dark:text-emerald-400'
+                      isOwed ? 'text-rose-600' : 'text-emerald-600'
                     }`}>
                       {formatCurrency(Math.abs(duesBalance))}
                     </p>
@@ -229,8 +229,8 @@ export const MemberDashboard: React.FC = () => {
                 </div>
                 <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
                   isOwed
-                    ? 'bg-rose-50 text-rose-700 dark:bg-rose-900/40 dark:text-rose-200'
-                    : 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200'
+                    ? 'bg-rose-50 text-rose-700'
+                    : 'bg-emerald-50 text-emerald-700'
                 }`}>
                   {isOwed ? (
                     <>
@@ -246,19 +246,19 @@ export const MemberDashboard: React.FC = () => {
                 </span>
               </div>
 
-              <p className="text-sm text-slate-600 dark:text-slate-400">
+              <p className="text-sm text-slate-600">
                 {isOwed ? 'Amount owed for the current term' : duesBalance === 0 ? 'Your balance is paid in full - thank you!' : 'You have a credit balance'}
               </p>
 
               {/* Flexible Payment Plan Info */}
               {memberDuesSummary.some(dues => dues.flexible_plan_deadline) && (
-                <div className="mt-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
+                <div className="mt-4 bg-purple-50 border border-purple-200 rounded-xl p-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
-                      <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+                      <Calendar className="h-5 w-5 text-purple-600" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-purple-900 dark:text-purple-100">Flexible Payment Plan</h4>
+                      <h4 className="font-semibold text-purple-900">Flexible Payment Plan</h4>
                       {memberDuesSummary.filter(dues => dues.flexible_plan_deadline).map(dues => {
                         const deadline = new Date(dues.flexible_plan_deadline!);
                         const today = new Date();
@@ -267,7 +267,7 @@ export const MemberDashboard: React.FC = () => {
                         const suggestedWeekly = dues.balance / weeksRemaining;
 
                         return (
-                          <div key={dues.id} className="text-sm text-purple-700 dark:text-purple-300 mt-1">
+                          <div key={dues.id} className="text-sm text-purple-700 mt-1">
                             <p>
                               Deadline: {deadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                               {daysRemaining > 0 && (
@@ -275,7 +275,7 @@ export const MemberDashboard: React.FC = () => {
                               )}
                             </p>
                             {daysRemaining > 0 && dues.balance > 0 && (
-                              <p className="mt-1 text-xs text-purple-600 dark:text-purple-400">
+                              <p className="mt-1 text-xs text-purple-600">
                                 Suggested: ~{formatCurrency(suggestedWeekly)}/week to pay off on time
                               </p>
                             )}
@@ -292,12 +292,12 @@ export const MemberDashboard: React.FC = () => {
 
               {isOwed && (
                 <div className="mt-6 pt-6 border-t border-[var(--brand-border)] space-y-4">
-                  <div className="rounded-xl bg-slate-50 dark:bg-gray-700/50 p-4">
-                    <h3 className="font-semibold text-slate-900 dark:text-white mb-3 text-sm flex items-center gap-2">
+                  <div className="rounded-xl bg-slate-50 p-4">
+                    <h3 className="font-semibold text-slate-900 mb-3 text-sm flex items-center gap-2">
                       <CreditCard className="h-4 w-4 text-slate-500" />
                       Payment Options
                     </h3>
-                    <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-2">
+                    <ul className="text-sm text-slate-600 space-y-2">
                       <li className="flex items-start gap-3">
                         <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
                         <span>Pay online using the button below</span>
@@ -334,7 +334,7 @@ export const MemberDashboard: React.FC = () => {
                         const body = `Hi,\n\nI have a question about my dues balance.\n\nBest regards,\n${profile?.full_name || ''}`;
                         window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
                       }}
-                      className="focus-ring w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.98] dark:bg-blue-500 dark:hover:bg-blue-600"
+                      className="focus-ring w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.98]"
                     >
                       Contact Treasurer for Payment Options
                     </button>
@@ -357,22 +357,22 @@ export const MemberDashboard: React.FC = () => {
                     <div className="p-6">
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/40">
-                            <Calendar className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100">
+                            <Calendar className="h-6 w-6 text-indigo-600" />
                           </div>
                           <div>
-                            <h3 className="font-semibold text-slate-900 dark:text-white">Payment Plan Active</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
+                            <h3 className="font-semibold text-slate-900">Payment Plan Active</h3>
+                            <p className="text-sm text-slate-500">
                               {plan.num_installments} payments of {formatCurrency(plan.installment_amount)}
                             </p>
                           </div>
                         </div>
                         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
                           plan.status === 'active'
-                            ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300'
+                            ? 'bg-blue-50 text-blue-700'
                             : plan.status === 'completed'
-                            ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300'
-                            : 'bg-rose-50 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'
+                            ? 'bg-emerald-50 text-emerald-700'
+                            : 'bg-rose-50 text-rose-700'
                         }`}>
                           {plan.status === 'active' ? 'Active' : plan.status === 'completed' ? 'Completed' : 'Cancelled'}
                         </span>
@@ -381,12 +381,12 @@ export const MemberDashboard: React.FC = () => {
                       {/* Progress Bar */}
                       <div className="mb-4">
                         <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-slate-600 dark:text-slate-400">Progress</span>
-                          <span className="font-medium text-slate-900 dark:text-white">
+                          <span className="text-slate-600">Progress</span>
+                          <span className="font-medium text-slate-900">
                             {completedPayments} of {plan.num_installments} payments
                           </span>
                         </div>
-                        <div className="h-2.5 bg-slate-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                        <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500"
                             style={{ width: `${progressPercentage}%` }}
@@ -401,12 +401,12 @@ export const MemberDashboard: React.FC = () => {
                             key={payment.id}
                             className={`flex items-center justify-between p-3 rounded-lg ${
                               payment.status === 'succeeded'
-                                ? 'bg-emerald-50 dark:bg-emerald-900/20'
+                                ? 'bg-emerald-50'
                                 : payment.status === 'scheduled'
-                                ? 'bg-slate-50 dark:bg-gray-700/50'
+                                ? 'bg-slate-50'
                                 : payment.status === 'failed'
-                                ? 'bg-rose-50 dark:bg-rose-900/20'
-                                : 'bg-yellow-50 dark:bg-yellow-900/20'
+                                ? 'bg-rose-50'
+                                : 'bg-yellow-50'
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -414,7 +414,7 @@ export const MemberDashboard: React.FC = () => {
                                 payment.status === 'succeeded'
                                   ? 'bg-emerald-500 text-white'
                                   : payment.status === 'scheduled'
-                                  ? 'bg-slate-300 dark:bg-gray-600 text-slate-600 dark:text-slate-300'
+                                  ? 'bg-slate-300 text-slate-600'
                                   : payment.status === 'failed'
                                   ? 'bg-rose-500 text-white'
                                   : 'bg-yellow-500 text-white'
@@ -426,10 +426,10 @@ export const MemberDashboard: React.FC = () => {
                                 )}
                               </div>
                               <div>
-                                <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                <p className="text-sm font-medium text-slate-900">
                                   Payment {idx + 1}
                                 </p>
-                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                <p className="text-xs text-slate-500">
                                   {payment.status === 'succeeded' && payment.processed_at
                                     ? `Paid ${new Date(payment.processed_at).toLocaleDateString()}`
                                     : `Due ${new Date(payment.scheduled_date).toLocaleDateString()}`
@@ -438,15 +438,15 @@ export const MemberDashboard: React.FC = () => {
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                              <p className="text-sm font-semibold text-slate-900">
                                 {formatCurrency(payment.amount)}
                               </p>
                               <p className={`text-xs ${
                                 payment.status === 'succeeded'
-                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  ? 'text-emerald-600'
                                   : payment.status === 'failed'
-                                  ? 'text-rose-600 dark:text-rose-400'
-                                  : 'text-slate-500 dark:text-slate-400'
+                                  ? 'text-rose-600'
+                                  : 'text-slate-500'
                               }`}>
                                 {payment.status === 'succeeded' ? 'Paid'
                                   : payment.status === 'failed' ? 'Failed'
@@ -460,14 +460,14 @@ export const MemberDashboard: React.FC = () => {
 
                       {/* Next Payment Info */}
                       {nextPayment && plan.status === 'active' && (
-                        <div className="mt-4 p-4 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                        <div className="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
                           <div className="flex items-start gap-3">
-                            <CreditCard className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                            <CreditCard className="h-5 w-5 text-blue-600 mt-0.5" />
                             <div>
-                              <p className="text-sm font-medium text-blue-800 dark:text-blue-200">
+                              <p className="text-sm font-medium text-blue-800">
                                 Next payment: {formatCurrency(nextPayment.amount)}
                               </p>
-                              <p className="text-xs text-blue-600 dark:text-blue-300">
+                              <p className="text-xs text-blue-600">
                                 Scheduled for {new Date(nextPayment.scheduled_date).toLocaleDateString()}
                                 {plan.payment_method_type && ` via ${plan.payment_method_type === 'card' ? 'Card' : 'Bank Transfer'}`}
                               </p>
@@ -478,10 +478,10 @@ export const MemberDashboard: React.FC = () => {
 
                       {/* Completion Message */}
                       {plan.status === 'completed' && (
-                        <div className="mt-4 p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                        <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
                           <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
-                            <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+                            <CheckCircle className="h-5 w-5 text-emerald-600" />
+                            <p className="text-sm font-medium text-emerald-800">
                               Payment plan completed! Thank you for your payments.
                             </p>
                           </div>
@@ -499,64 +499,64 @@ export const MemberDashboard: React.FC = () => {
             {/* Member Information */}
             <div className="surface-card p-4 sm:p-6">
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Member Information</h2>
+                <h2 className="text-lg font-semibold text-slate-900">Member Information</h2>
                 <button
                   type="button"
                   onClick={() => setIsProfileModalOpen(true)}
-                  className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium flex items-center gap-1 transition-colors"
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
                 >
                   <Pencil className="h-3.5 w-3.5" />
                   Edit
                 </button>
               </div>
               <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-gray-700/50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm flex-shrink-0">
-                    <Mail className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
+                    <Mail className="h-4 w-4 text-slate-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Email</p>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{profile?.email}</p>
+                    <p className="text-xs text-slate-500">Email</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.email}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-gray-700/50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm flex-shrink-0">
-                    <GraduationCap className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
+                    <GraduationCap className="h-4 w-4 text-slate-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Year</p>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{profile?.year ? getYearLabel(profile.year) : 'Not specified'}</p>
+                    <p className="text-xs text-slate-500">Year</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.year ? getYearLabel(profile.year) : 'Not specified'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-gray-700/50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm flex-shrink-0">
-                    <BookOpen className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
+                    <BookOpen className="h-4 w-4 text-slate-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Major</p>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{profile?.major || 'Not specified'}</p>
+                    <p className="text-xs text-slate-500">Major</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.major || 'Not specified'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-gray-700/50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm flex-shrink-0">
-                    <Award className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
+                    <Award className="h-4 w-4 text-slate-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Position</p>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{profile?.position || 'Member'}</p>
+                    <p className="text-xs text-slate-500">Position</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.position || 'Member'}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-gray-700/50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white dark:bg-gray-800 shadow-sm flex-shrink-0">
-                    <Phone className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
+                    <Phone className="h-4 w-4 text-slate-500" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500 dark:text-slate-400">Phone</p>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white truncate">{profile?.phone_number || 'Not provided'}</p>
+                    <p className="text-xs text-slate-500">Phone</p>
+                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.phone_number || 'Not provided'}</p>
                   </div>
                 </div>
               </div>
@@ -564,39 +564,39 @@ export const MemberDashboard: React.FC = () => {
 
             {/* Quick Actions */}
             <div className="surface-card p-4 sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-5">Quick Actions</h2>
+              <h2 className="text-lg font-semibold text-slate-900 mb-5">Quick Actions</h2>
               <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
                 <button
                   type="button"
                   onClick={() => setIsProfileModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-blue-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-blue-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-blue-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-200 dark:bg-blue-900/40 dark:text-blue-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-200">
                     <User className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Edit Profile</span>
+                  <span className="text-sm font-medium text-slate-700">Edit Profile</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsPaymentHistoryModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-purple-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-purple-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-purple-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform duration-200 dark:bg-purple-900/40 dark:text-purple-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform duration-200">
                     <Clock className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">History</span>
+                  <span className="text-sm font-medium text-slate-700">History</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setIsPasswordModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-amber-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-amber-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-amber-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform duration-200 dark:bg-amber-900/40 dark:text-amber-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform duration-200">
                     <Lock className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Security</span>
+                  <span className="text-sm font-medium text-slate-700">Security</span>
                 </button>
 
                 <button
@@ -607,34 +607,34 @@ export const MemberDashboard: React.FC = () => {
                     const body = `Hi,\n\nI have a question about my dues balance.\n\nBest regards,\n${profile?.full_name || ''}`;
                     window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
                   }}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-emerald-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-emerald-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-emerald-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform duration-200 dark:bg-emerald-900/40 dark:text-emerald-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
                     <Mail className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Contact</span>
+                  <span className="text-sm font-medium text-slate-700">Contact</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={loadDuesInfo}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-cyan-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-cyan-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-cyan-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 transition-transform duration-200 dark:bg-cyan-900/40 dark:text-cyan-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 transition-transform duration-200">
                     <RefreshCw className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Refresh</span>
+                  <span className="text-sm font-medium text-slate-700">Refresh</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={signOut}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-rose-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98] dark:bg-gray-800 dark:hover:bg-gray-700 dark:hover:border-rose-700/50"
+                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-rose-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 group-hover:scale-110 transition-transform duration-200 dark:bg-rose-900/40 dark:text-rose-400">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 group-hover:scale-110 transition-transform duration-200">
                     <LogOut className="h-6 w-6" />
                   </div>
-                  <span className="text-sm font-medium text-slate-700 dark:text-slate-200">Sign Out</span>
+                  <span className="text-sm font-medium text-slate-700">Sign Out</span>
                 </button>
               </div>
             </div>
@@ -643,18 +643,18 @@ export const MemberDashboard: React.FC = () => {
           {/* Help Section */}
           <div className="surface-card p-4 sm:p-6">
             <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 dark:bg-indigo-900/40 flex-shrink-0">
-                <HelpCircle className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 flex-shrink-0">
+                <HelpCircle className="h-6 w-6 text-indigo-600" />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Need Help?</h3>
-                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                <h3 className="text-lg font-semibold text-slate-900">Need Help?</h3>
+                <p className="text-sm text-slate-600 mt-1">
                   Questions about your dues or account? We're here to help.
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
                   <a
                     href="mailto:joseph@greekpay.org"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors dark:bg-blue-900/40 dark:text-blue-300 dark:hover:bg-blue-900/60"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
                   >
                     <Mail className="h-4 w-4" />
                     Email Treasurer
@@ -662,7 +662,7 @@ export const MemberDashboard: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setIsPaymentHistoryModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors dark:bg-gray-700 dark:text-slate-300 dark:hover:bg-gray-600"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
                   >
                     <Clock className="h-4 w-4" />
                     View History

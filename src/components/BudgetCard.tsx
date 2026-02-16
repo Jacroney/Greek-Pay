@@ -24,9 +24,9 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
         label: 'Over Budget',
         color: 'red',
         icon: AlertCircle,
-        bgClass: 'bg-red-50 dark:bg-red-900/20',
-        borderClass: 'border-gray-200 dark:border-gray-700',
-        textClass: 'text-red-700 dark:text-red-300'
+        bgClass: 'bg-red-50',
+        borderClass: 'border-gray-200',
+        textClass: 'text-red-700'
       };
     }
     if (budget.percent_used > 80) {
@@ -34,18 +34,18 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
         label: 'Warning',
         color: 'yellow',
         icon: AlertCircle,
-        bgClass: 'bg-yellow-50 dark:bg-yellow-900/20',
-        borderClass: 'border-gray-200 dark:border-gray-700',
-        textClass: 'text-yellow-700 dark:text-yellow-300'
+        bgClass: 'bg-yellow-50',
+        borderClass: 'border-gray-200',
+        textClass: 'text-yellow-700'
       };
     }
     return {
       label: 'On Track',
       color: 'green',
       icon: CheckCircle,
-      bgClass: 'bg-green-50 dark:bg-green-900/20',
-      borderClass: 'border-gray-200 dark:border-gray-700',
-      textClass: 'text-green-700 dark:text-green-300'
+      bgClass: 'bg-green-50',
+      borderClass: 'border-gray-200',
+      textClass: 'text-green-700'
     };
   };
 
@@ -71,7 +71,7 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
       onClick={onClick}
       className={`
         group relative overflow-hidden
-        bg-white dark:bg-gray-800
+        bg-white
         rounded-2xl shadow-sm hover:shadow-md
         border ${status.borderClass}
         transition-all duration-200
@@ -86,11 +86,11 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
               <span className="text-2xl">{getCategoryIcon()}</span>
-              <h3 className="font-semibold text-lg text-gray-900 dark:text-white line-clamp-1">
+              <h3 className="font-semibold text-lg text-gray-900 line-clamp-1">
                 {budget.category}
               </h3>
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
+            <p className="text-xs text-gray-500">
               {budget.category_type}
             </p>
           </div>
@@ -116,24 +116,24 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
         <div className="space-y-3">
           {/* Allocated */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Allocated</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            <span className="text-sm text-gray-600">Allocated</span>
+            <span className="text-sm font-semibold text-gray-900">
               {formatCurrency(budget.allocated)}
             </span>
           </div>
 
           {/* Spent */}
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Spent</span>
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            <span className="text-sm text-gray-600">Spent</span>
+            <span className="text-sm font-semibold text-gray-900">
               {formatCurrency(budget.spent)}
             </span>
           </div>
 
           {/* Remaining - with color coding */}
-          <div className="flex items-center justify-between pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="flex items-center justify-between pt-3 border-t border-gray-200">
             <div className="flex items-center gap-1.5">
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-medium text-gray-700">
                 Remaining
               </span>
               {isOverBudget ? (
@@ -144,8 +144,8 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
             </div>
             <span className={`text-base font-bold ${
               isOverBudget
-                ? 'text-red-600 dark:text-red-400'
-                : 'text-green-600 dark:text-green-400'
+                ? 'text-red-600'
+                : 'text-green-600'
             }`}>
               {formatCurrency(Math.abs(budget.remaining))}
               {isOverBudget && ' over'}

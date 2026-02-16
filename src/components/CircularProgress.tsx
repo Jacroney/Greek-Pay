@@ -67,7 +67,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-gray-200 dark:text-gray-700"
+          className="text-gray-200"
         />
 
         {/* Progress circle */}
@@ -99,7 +99,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           </span>
         )}
         {label && (
-          <span className="text-xs text-gray-600 dark:text-gray-400 mt-1 text-center px-2">
+          <span className="text-xs text-gray-600 mt-1 text-center px-2">
             {label}
           </span>
         )}

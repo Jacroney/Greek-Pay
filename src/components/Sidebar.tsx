@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 import { isDemoModeEnabled } from '../utils/env';
 
 export interface MenuItem {
@@ -42,9 +41,8 @@ const normalizeBasePath = (basePath?: string): string => {
 
 export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, basePath, menuItems }) => {
   const location = useLocation();
-  const { theme, toggleTheme } = useTheme();
   const normalizedBasePath = normalizeBasePath(basePath);
-  
+
   // Use demo menu items if in demo mode and no custom menu items provided
   const isDemo = isDemoModeEnabled();
   const items = menuItems ?? (isDemo ? DEMO_MENU_ITEMS : DEFAULT_MENU_ITEMS);
@@ -63,7 +61,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, basePath, m
 
   return (
     <div
-      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-gray-200 bg-white text-gray-900 shadow-xl transition-all duration-300 dark:border-gray-800 dark:bg-gray-900 dark:text-white ${
+      className={`fixed left-0 top-0 z-50 flex h-screen flex-col border-r border-[var(--brand-border)] bg-white text-[var(--brand-text)] transition-all duration-150 ${
         collapsed ? 'w-20' : 'w-64'
       }`}
     >
@@ -71,17 +69,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, basePath, m
         <div className={`flex items-center ${collapsed ? 'justify-center' : ''} mb-8`}>
           <div className={`flex items-center ${collapsed ? 'justify-center' : ''}`}>
             <div className="mr-0 flex h-14 w-14 items-center justify-center">
-              {/* Light mode: blue bg, white letters */}
               <img
                 src="/GreekPay-logo-transparent.png"
                 alt="Greek Pay Logo"
-                className="h-full w-full object-contain block dark:hidden"
-              />
-              {/* Dark mode: white bg, blue letters */}
-              <img
-                src="/GreekPay-logo-transparent.png"
-                alt="Greek Pay Logo"
-                className="h-full w-full object-contain hidden dark:block invert"
+                className="h-full w-full object-contain"
               />
             </div>
             <h1 className={`ml-3 text-xl font-semibold tracking-tight ${collapsed ? 'hidden' : 'block'}`}>
@@ -105,23 +96,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, basePath, m
                 <Link
                 key={path}
                 to={path}
-                className={`group relative flex items-center rounded-xl px-3 py-3 text-sm transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${
+                className={`group relative flex items-center rounded-xl px-3 py-3 text-sm transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
                   isActive
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-300 dark:hover:bg-gray-800 dark:hover:text-white'
+                    ? 'bg-primary-50 text-primary font-medium'
+                    : 'text-[var(--brand-text-subdued)] hover:bg-gray-100 hover:text-[var(--brand-text)]'
                 } ${collapsed ? 'justify-center' : ''}`}
                 title={collapsed ? item.title : undefined}
               >
                   <span
                     className={`absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full transition-opacity ${
-                      isActive ? 'bg-[var(--brand-primary)] opacity-100' : 'opacity-0'
+                      isActive ? 'bg-primary opacity-100' : 'opacity-0'
                     }`}
                     aria-hidden="true"
                   />
                 <div
                   className={`flex h-6 w-6 items-center justify-center ${
-                    isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-white'
-                  } transition-colors duration-200`}
+                    isActive ? 'text-primary' : 'text-[var(--brand-text-subdued)] group-hover:text-[var(--brand-text)]'
+                  } transition-colors duration-150`}
                 >
                   <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d={item.icon} />
@@ -134,22 +125,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ collapsed = false, basePath, m
             );
           })}
         </nav>
-        
-        {/* Theme Toggle */}
-        <div className="mt-6 border-t border-gray-300 dark:border-gray-800 pt-4">
-          <button
-            onClick={toggleTheme}
-            className={`flex w-full items-center justify-center rounded-lg border border-gray-300 bg-gray-100 px-3 py-2 text-sm transition-colors hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-900 dark:hover:bg-gray-800 ${collapsed ? 'px-2' : ''}`}
-            title="Toggle theme"
-          >
-            <span className="text-lg" aria-hidden="true">
-              {theme === 'dark' ? '🌙' : '☀️'}
-            </span>
-            <span className={`${collapsed ? 'sr-only' : 'ml-2 whitespace-nowrap'}`}>
-              {theme === 'dark' ? 'Dark mode' : 'Light mode'}
-            </span>
-          </button>
-        </div>
       </div>
     </div>
   );

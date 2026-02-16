@@ -406,14 +406,14 @@ const Budgets: React.FC = () => {
       <div className="p-6 space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <div className="h-8 w-64 bg-gray-200 dark:bg-gray-700 rounded animate-pulse mb-2"></div>
-            <div className="h-4 w-96 bg-gray-200 dark:bg-gray-700 rounded animate-pulse"></div>
+            <div className="h-8 w-64 bg-gray-200 rounded animate-pulse mb-2"></div>
+            <div className="h-4 w-96 bg-gray-200 rounded animate-pulse"></div>
           </div>
           <div className="flex gap-3">
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-            <div className="h-10 w-40 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
-            <div className="h-10 w-32 bg-gray-200 dark:bg-gray-700 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-40 bg-gray-200 rounded-lg animate-pulse"></div>
+            <div className="h-10 w-32 bg-gray-200 rounded-lg animate-pulse"></div>
           </div>
         </div>
 
@@ -451,7 +451,7 @@ const Budgets: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
+          <p className="text-gray-600 text-lg">
             Please select a chapter to view budgets
           </p>
         </div>
@@ -464,8 +464,8 @@ const Budgets: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Budget & Expenses</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">Track budgets and manage all expenses</p>
+          <h1 className="text-3xl font-bold text-gray-900">Budget & Expenses</h1>
+          <p className="text-gray-600 mt-1">Track budgets and manage all expenses</p>
         </div>
         <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
           {/* Period Selector */}
@@ -479,7 +479,7 @@ const Budgets: React.FC = () => {
                 setSelectedPeriodId(period.id);
               }
             }}
-            className="flex-1 sm:flex-none px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+            className="flex-1 sm:flex-none px-4 py-2 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 [&>option]: [&>option]:"
           >
             {periods.map(period => (
               <option key={period.id} value={period.name}>
@@ -492,7 +492,7 @@ const Budgets: React.FC = () => {
           <div className="relative">
             <button
               onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={!currentChapter?.id}
             >
               <Settings className="w-4 h-4" />
@@ -508,13 +508,13 @@ const Budgets: React.FC = () => {
                   onClick={() => setShowSettingsMenu(false)}
                 />
                 {/* Dropdown menu */}
-                <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-20">
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-20">
                   <button
                     onClick={() => {
                       setShowCategoryModal(true);
                       setShowSettingsMenu(false);
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 rounded-t-lg"
+                    className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 rounded-t-lg"
                   >
                     <Plus className="w-4 h-4" />
                     Add Category
@@ -524,7 +524,7 @@ const Budgets: React.FC = () => {
                       setShowPeriodModal(true);
                       setShowSettingsMenu(false);
                     }}
-                    className="w-full px-4 py-3 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3 rounded-b-lg border-t border-gray-200 dark:border-gray-700"
+                    className="w-full px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 rounded-b-lg border-t border-gray-200"
                   >
                     <Calendar className="w-4 h-4" />
                     Add Period
@@ -537,7 +537,7 @@ const Budgets: React.FC = () => {
           {/* Primary Action: Add Expense */}
           <button
             onClick={() => setShowExpenseModal(true)}
-            className="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
             disabled={!currentChapter?.id}
           >
             <Plus className="w-4 h-4" />
@@ -547,14 +547,14 @@ const Budgets: React.FC = () => {
       </div>
 
       {/* View Mode Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200">
         <div className="flex gap-6">
           <button
             onClick={() => setViewMode('grid')}
             className={`px-1 py-3 flex items-center gap-2 border-b-2 transition-colors ${
               viewMode === 'grid'
-                ? 'border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-medium'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+                ? 'border-gray-900 text-gray-900 font-medium'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             <LayoutGrid className="w-4 h-4" />
@@ -564,8 +564,8 @@ const Budgets: React.FC = () => {
             onClick={() => setViewMode('charts')}
             className={`px-1 py-3 flex items-center gap-2 border-b-2 transition-colors ${
               viewMode === 'charts'
-                ? 'border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-medium'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+                ? 'border-gray-900 text-gray-900 font-medium'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             <PieChart className="w-4 h-4" />
@@ -575,8 +575,8 @@ const Budgets: React.FC = () => {
             onClick={() => setViewMode('expenses')}
             className={`px-1 py-3 flex items-center gap-2 border-b-2 transition-colors ${
               viewMode === 'expenses'
-                ? 'border-gray-900 dark:border-gray-100 text-gray-900 dark:text-white font-medium'
-                : 'border-transparent text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-300'
+                ? 'border-gray-900 text-gray-900 font-medium'
+                : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
             <List className="w-4 h-4" />
@@ -591,11 +591,11 @@ const Budgets: React.FC = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Allocated Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Allocated</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Total Allocated</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(grandTotals.allocated)}
               </p>
             </div>
@@ -606,11 +606,11 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Total Spent Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Total Spent</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(grandTotals.spent)}
               </p>
             </div>
@@ -621,16 +621,16 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Remaining Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-sm text-gray-600 mb-1">
                 Remaining
               </p>
               <p className={`text-2xl font-bold ${
                 grandTotals.remaining < 0
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-red-600'
+                  : 'text-gray-900'
               }`}>
                 {formatCurrency(grandTotals.remaining)}
               </p>
@@ -642,19 +642,19 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Utilization Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Utilization</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Utilization</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {grandTotals.allocated > 0
                   ? Math.round((grandTotals.spent / grandTotals.allocated) * 100)
                   : 0}%
               </p>
               {grandTotals.allocated > 0 && (
-                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className="h-1.5 rounded-full bg-gray-900 dark:bg-gray-100"
+                    className="h-1.5 rounded-full bg-gray-900"
                     style={{ width: `${Math.min((grandTotals.spent / grandTotals.allocated) * 100, 100)}%` }}
                   />
                 </div>
@@ -668,11 +668,11 @@ const Budgets: React.FC = () => {
       </div>
 
       {/* Filter and Sort Controls */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+      <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Search */}
           <div className="lg:col-span-2">
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <label className="block text-sm text-gray-600 mb-2">
               Search Budgets
             </label>
             <div className="relative">
@@ -682,20 +682,20 @@ const Budgets: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search by category name..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400"
               />
             </div>
           </div>
 
           {/* Status Filter */}
           <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <label className="block text-sm text-gray-600 mb-2">
               Status
             </label>
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400"
             >
               <option value="all">All Status</option>
               <option value="on-track">On Track (&le;60%)</option>
@@ -706,13 +706,13 @@ const Budgets: React.FC = () => {
 
           {/* Type Filter */}
           <div>
-            <label className="block text-sm text-gray-600 dark:text-gray-400 mb-2">
+            <label className="block text-sm text-gray-600 mb-2">
               Category Type
             </label>
             <select
               value={filterType}
               onChange={(e) => setFilterType(e.target.value as any)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400"
             >
               <option value="all">All Types</option>
               <option value="Fixed Costs">Fixed Costs</option>
@@ -723,17 +723,17 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Sort and Results Count */}
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          <div className="text-sm text-gray-600 dark:text-gray-400">
-            Showing <span className="font-medium text-gray-900 dark:text-white">{filteredAndSortedBudgets.length}</span> of {budgetSummary.length} budgets
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-200">
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-medium text-gray-900">{filteredAndSortedBudgets.length}</span> of {budgetSummary.length} budgets
           </div>
 
           <div className="flex items-center gap-2">
-            <label className="text-sm text-gray-600 dark:text-gray-400">Sort by:</label>
+            <label className="text-sm text-gray-600">Sort by:</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400 dark:bg-gray-700 dark:text-white"
+              className="px-3 py-1 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400"
             >
               <option value="name">Name (A-Z)</option>
               <option value="spent">Amount Spent</option>
@@ -745,11 +745,11 @@ const Budgets: React.FC = () => {
 
       {/* Budget Grid */}
       {filteredAndSortedBudgets.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-12 text-center shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white rounded-lg p-12 text-center shadow-sm border border-gray-200">
           <div className="max-w-md mx-auto">
             <LayoutGrid className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No budgets found</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No budgets found</h3>
+            <p className="text-gray-600">
               {searchQuery || filterStatus !== 'all' || filterType !== 'all'
                 ? 'Try adjusting your filters or search query.'
                 : 'Start by setting budget allocations for your categories.'}
@@ -776,11 +776,11 @@ const Budgets: React.FC = () => {
           {/* Summary Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Allocated Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Allocated</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Total Allocated</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(grandTotals.allocated)}
               </p>
             </div>
@@ -791,11 +791,11 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Total Spent Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Total Spent</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {formatCurrency(grandTotals.spent)}
               </p>
             </div>
@@ -806,16 +806,16 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Remaining Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+              <p className="text-sm text-gray-600 mb-1">
                 Remaining
               </p>
               <p className={`text-2xl font-bold ${
                 grandTotals.remaining < 0
-                  ? 'text-red-600 dark:text-red-400'
-                  : 'text-gray-900 dark:text-white'
+                  ? 'text-red-600'
+                  : 'text-gray-900'
               }`}>
                 {formatCurrency(grandTotals.remaining)}
               </p>
@@ -827,19 +827,19 @@ const Budgets: React.FC = () => {
         </div>
 
         {/* Utilization Card */}
-        <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
+        <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">Utilization</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">
+              <p className="text-sm text-gray-600 mb-1">Utilization</p>
+              <p className="text-2xl font-bold text-gray-900">
                 {grandTotals.allocated > 0
                   ? Math.round((grandTotals.spent / grandTotals.allocated) * 100)
                   : 0}%
               </p>
               {grandTotals.allocated > 0 && (
-                <div className="mt-2 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                <div className="mt-2 w-full bg-gray-200 rounded-full h-1.5">
                   <div
-                    className="h-1.5 rounded-full bg-gray-900 dark:bg-gray-100"
+                    className="h-1.5 rounded-full bg-gray-900"
                     style={{ width: `${Math.min((grandTotals.spent / grandTotals.allocated) * 100, 100)}%` }}
                   />
                 </div>
@@ -890,31 +890,31 @@ const Budgets: React.FC = () => {
       {/* Add Category Modal */}
       {showCategoryModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add Budget Category</h3>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Add Budget Category</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category Name *
                 </label>
                 <input
                   type="text"
                   value={newCategory.name}
                   onChange={(e) => setNewCategory({ ...newCategory, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="e.g., House Maintenance"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Category Type *
                 </label>
                 <select
                   value={newCategory.type}
                   onChange={(e) => setNewCategory({ ...newCategory, type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg [&>option]: [&>option]:"
                 >
                   <option value="Fixed Costs">Fixed Costs</option>
                   <option value="Operational Costs">Operational Costs</option>
@@ -923,13 +923,13 @@ const Budgets: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Description (Optional)
                 </label>
                 <textarea
                   value={newCategory.description}
                   onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   rows={3}
                   placeholder="Describe this category..."
                 />
@@ -942,13 +942,13 @@ const Budgets: React.FC = () => {
                   setShowCategoryModal(false);
                   setNewCategory({ name: '', type: 'Operational Costs', description: '' });
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreateCategory}
-                className="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
               >
                 Create Category
               </button>
@@ -960,31 +960,31 @@ const Budgets: React.FC = () => {
       {/* Add Period Modal */}
       {showPeriodModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Add Budget Period</h3>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Add Budget Period</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Period Name *
                 </label>
                 <input
                   type="text"
                   value={newPeriod.name}
                   onChange={(e) => setNewPeriod({ ...newPeriod, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="e.g., Fall Quarter, Spring Semester"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Period Type *
                 </label>
                 <select
                   value={newPeriod.type}
                   onChange={(e) => setNewPeriod({ ...newPeriod, type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg [&>option]: [&>option]:"
                 >
                   <option value="Quarter">Quarter</option>
                   <option value="Semester">Semester</option>
@@ -994,51 +994,51 @@ const Budgets: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Start Date *
                   </label>
                   <input
                     type="date"
                     value={newPeriod.start_date}
                     onChange={(e) => setNewPeriod({ ...newPeriod, start_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     End Date *
                   </label>
                   <input
                     type="date"
                     value={newPeriod.end_date}
                     onChange={(e) => setNewPeriod({ ...newPeriod, end_date: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Fiscal Year *
                 </label>
                 <input
                   type="number"
                   value={newPeriod.fiscal_year}
                   onChange={(e) => setNewPeriod({ ...newPeriod, fiscal_year: parseInt(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   min={2020}
                   max={2050}
                 />
               </div>
 
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
                   <input
                     type="checkbox"
                     checked={newPeriod.is_current}
                     onChange={(e) => setNewPeriod({ ...newPeriod, is_current: e.target.checked })}
-                    className="rounded border-gray-300 dark:border-gray-600"
+                    className="rounded border-gray-300"
                   />
                   Set as current period
                 </label>
@@ -1058,13 +1058,13 @@ const Budgets: React.FC = () => {
                     is_current: false
                   });
                 }}
-                className="px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 rounded-lg"
+                className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
               >
                 Cancel
               </button>
               <button
                 onClick={handleCreatePeriod}
-                className="px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200"
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
               >
                 Create Period
               </button>

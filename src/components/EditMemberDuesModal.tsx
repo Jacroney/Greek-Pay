@@ -148,48 +148,48 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
         />
 
         {/* Modal */}
-        <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-lg w-full p-6 z-10">
+        <div className="relative bg-white rounded-xl shadow-xl max-w-lg w-full p-6 z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Edit Dues
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500">
                 {memberDues.member_name}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
           {/* Current Summary */}
-          <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-6">
+          <div className="bg-gray-50 rounded-lg p-4 mb-6">
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Current Total:</span>
-                <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                <span className="text-gray-500">Current Total:</span>
+                <span className="ml-2 font-medium text-gray-900">
                   {formatCurrency(memberDues.total_amount)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Amount Paid:</span>
+                <span className="text-gray-500">Amount Paid:</span>
                 <span className="ml-2 font-medium text-green-600">
                   {formatCurrency(memberDues.amount_paid)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Late Fee:</span>
-                <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                <span className="text-gray-500">Late Fee:</span>
+                <span className="ml-2 font-medium text-gray-900">
                   {formatCurrency(memberDues.late_fee)}
                 </span>
               </div>
               <div>
-                <span className="text-gray-500 dark:text-gray-400">Current Balance:</span>
+                <span className="text-gray-500">Current Balance:</span>
                 <span className={`ml-2 font-medium ${memberDues.balance > 0 ? 'text-red-600' : 'text-green-600'}`}>
                   {formatCurrency(memberDues.balance)}
                 </span>
@@ -200,7 +200,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
           <div className="space-y-4">
             {/* Base Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <DollarSign className="w-4 h-4 inline mr-1" />
                 Base Amount
               </label>
@@ -212,8 +212,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                   onChange={(e) => setBaseAmount(e.target.value)}
                   min="0"
                   step="0.01"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg
+                           bg-white text-gray-900
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -221,7 +221,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Calendar className="w-4 h-4 inline mr-1" />
                 Due Date
               </label>
@@ -229,15 +229,15 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                         bg-white text-gray-900
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Adjustment */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Adjustment (+ or -)
               </label>
               <div className="relative">
@@ -248,8 +248,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                   onChange={(e) => setAdjustment(e.target.value)}
                   step="0.01"
                   placeholder="0"
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg
+                           bg-white text-gray-900
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -261,7 +261,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
             {/* Adjustment Reason */}
             {parseFloat(adjustment) !== 0 && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Adjustment Reason *
                 </label>
                 <input
@@ -269,8 +269,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                   value={adjustmentReason}
                   onChange={(e) => setAdjustmentReason(e.target.value)}
                   placeholder="e.g., Scholarship, Payment plan discount"
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                           bg-white text-gray-900
                            focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -278,7 +278,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
 
             {/* Notes */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 <FileText className="w-4 h-4 inline mr-1" />
                 Notes (optional)
               </label>
@@ -287,33 +287,33 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 placeholder="Add any notes..."
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                         bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                         bg-white text-gray-900
                          focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             {/* Flexible Payment Plan Section */}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-sm font-medium text-purple-700 dark:text-purple-300 mb-3 flex items-center gap-2">
+            <div className="pt-4 border-t border-gray-200">
+              <h4 className="text-sm font-medium text-purple-700 mb-3 flex items-center gap-2">
                 <Calendar className="w-4 h-4" />
                 Flexible Payment Plan (Optional)
               </h4>
-              <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
+              <p className="text-xs text-gray-500 mb-3">
                 Set a deadline for members who need flexible payment arrangements. They can pay any amount until the deadline.
               </p>
 
               {/* Flexible Plan Deadline */}
               <div className="mb-3">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Deadline
                 </label>
                 <input
                   type="date"
                   value={flexiblePlanDeadline}
                   onChange={(e) => setFlexiblePlanDeadline(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                           bg-white text-gray-900
                            focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 />
               </div>
@@ -321,7 +321,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
               {/* Flexible Plan Notes */}
               {flexiblePlanDeadline && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Plan Notes (visible to member)
                   </label>
                   <input
@@ -329,8 +329,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                     value={flexiblePlanNotes}
                     onChange={(e) => setFlexiblePlanNotes(e.target.value)}
                     placeholder="e.g., $100-200/week flexible payments"
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                             bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                             bg-white text-gray-900
                              focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                   />
                 </div>
@@ -344,7 +344,7 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
                     setFlexiblePlanDeadline('');
                     setFlexiblePlanNotes('');
                   }}
-                  className="mt-2 text-xs text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                  className="mt-2 text-xs text-red-600 hover:text-red-700"
                 >
                   Remove flexible plan
                 </button>
@@ -353,19 +353,19 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
           </div>
 
           {/* New Totals Preview */}
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-            <h4 className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-2">
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 className="text-sm font-medium text-blue-800 mb-2">
               After Changes:
             </h4>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
-                <span className="text-blue-600 dark:text-blue-300">New Total:</span>
-                <span className="ml-2 font-semibold text-blue-800 dark:text-blue-200">
+                <span className="text-blue-600">New Total:</span>
+                <span className="ml-2 font-semibold text-blue-800">
                   {formatCurrency(newTotal)}
                 </span>
               </div>
               <div>
-                <span className="text-blue-600 dark:text-blue-300">New Balance:</span>
+                <span className="text-blue-600">New Balance:</span>
                 <span className={`ml-2 font-semibold ${newBalance > 0 ? 'text-red-600' : 'text-green-600'}`}>
                   {formatCurrency(Math.max(newBalance, 0))}
                 </span>
@@ -379,8 +379,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
               type="button"
               onClick={handleWaive}
               disabled={loading || memberDues.status === 'waived'}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                       text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700
+              className="px-4 py-2 border border-gray-300 rounded-lg
+                       text-gray-700 hover:bg-gray-50
                        transition-colors disabled:opacity-50 text-sm"
             >
               Waive Dues
@@ -390,8 +390,8 @@ const EditMemberDuesModal: React.FC<EditMemberDuesModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                       text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700
+              className="px-4 py-2 border border-gray-300 rounded-lg
+                       text-gray-700 hover:bg-gray-50
                        transition-colors disabled:opacity-50"
             >
               Cancel

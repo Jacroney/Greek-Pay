@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { enableDemoMode } from '../demo/demoMode';
+import { disableDemoMode } from '../demo/demoMode';
 import {
   ChartBarIcon,
   CurrencyDollarIcon,
@@ -54,11 +54,12 @@ const Demo: React.FC = () => {
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
 
   useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    
-    // Enable demo mode when component mounts (resets data to fresh state)
-    enableDemoMode();
+
+    // This is the landing page, not the dashboard — disable any stale demo flags
+    // so visiting /demo doesn't contaminate auth state. Demo mode is enabled
+    // by DemoRoutes when the user actually enters /demo/dashboard.
+    disableDemoMode();
   }, []);
 
   useEffect(() => {
@@ -78,17 +79,18 @@ const Demo: React.FC = () => {
   };
 
   const handleBackToHome = () => {
+    disableDemoMode();
     navigate('/', { replace: true });
   };
 
   return (
-    <div className="min-h-screen bg-[var(--brand-surface)] text-slate-900 dark:bg-gray-900 dark:text-slate-100">
+    <div className="min-h-screen bg-[var(--brand-surface)] text-slate-900">
       {/* Header */}
       <header
         className={`sticky top-0 z-50 transition-colors duration-200 ${
           isHeaderScrolled
-            ? 'border-b border-[var(--brand-border)] bg-[var(--brand-surface)]'
-            : 'border-b border-transparent bg-[var(--brand-surface)]'
+            ? 'border-b border-[var(--brand-border)] bg-white/90 backdrop-blur'
+            : 'border-b border-transparent bg-white'
         }`}
       >
         <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6 lg:px-8">
@@ -101,13 +103,13 @@ const Demo: React.FC = () => {
                 style={{ filter: 'none' }}
               />
             </span>
-            <span className="text-xl font-semibold tracking-tight text-white">Greek Pay</span>
+            <span className="text-xl font-semibold tracking-tight text-slate-950">Greek Pay</span>
           </Link>
-          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 text-sm font-medium text-white/80 sm:flex scale-[1.3] origin-center">
-            <Link to="/features" className="transition-colors hover:text-white">Features</Link>
-            <Link to="/pricing" className="transition-colors hover:text-white">Pricing</Link>
-            <Link to="/demo" className="text-white">Demo</Link>
-            <Link to="/contact" className="transition-colors hover:text-white">Contact</Link>
+          <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-6 text-sm font-medium text-slate-700 sm:flex scale-[1.3] origin-center">
+            <Link to="/features" className="transition-colors hover:text-[var(--brand-primary)]">Features</Link>
+            <Link to="/pricing" className="transition-colors hover:text-[var(--brand-primary)]">Pricing</Link>
+            <Link to="/demo" className="text-[var(--brand-primary)]">Demo</Link>
+            <Link to="/contact" className="transition-colors hover:text-[var(--brand-primary)]">Contact</Link>
           </nav>
           <div className="absolute -right-28 flex items-center gap-3">
             <button
@@ -126,14 +128,14 @@ const Demo: React.FC = () => {
         <div className="space-y-8">
           {/* Hero Section */}
           <div className="text-center">
-            <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-1.5 text-sm font-medium text-blue-800">
               <InformationCircleIcon className="h-4 w-4" />
               Interactive Demo
             </span>
             <h1 className="mt-4 text-4xl font-semibold tracking-tight sm:text-5xl">
               Try GreekPay with Sample Data
             </h1>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">
+            <p className="mt-4 text-lg text-slate-600">
               Explore a fully functional demo environment with realistic fraternity financial data.
               <br />
               See how GreekPay simplifies chapter treasury management.
@@ -141,14 +143,14 @@ const Demo: React.FC = () => {
           </div>
 
           {/* Important Notice */}
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 dark:border-amber-900/50 dark:bg-amber-900/20">
+          <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6">
             <div className="flex gap-3">
-              <InformationCircleIcon className="h-6 w-6 flex-shrink-0 text-amber-600 dark:text-amber-500" />
+              <InformationCircleIcon className="h-6 w-6 flex-shrink-0 text-amber-600" />
               <div className="space-y-2">
-                <h2 className="font-semibold text-amber-900 dark:text-amber-300">
+                <h2 className="font-semibold text-amber-900">
                   Important: Demo Mode Information
                 </h2>
-                <ul className="space-y-1 text-sm text-amber-800 dark:text-amber-400">
+                <ul className="space-y-1 text-sm text-amber-800">
                   <li>• All data is sample data from "Alpha Beta Chapter" at Demo University</li>
                   <li>• You can make any changes you want - they won't affect real data</li>
                   <li>• Your changes are temporary and will be reset when you exit or refresh</li>
@@ -168,15 +170,15 @@ const Demo: React.FC = () => {
                 return (
                   <div
                     key={feature.title}
-                    className="rounded-xl border border-[var(--brand-border)] bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:bg-gray-800"
+                    className="rounded-xl border border-[var(--brand-border)] bg-white p-6 shadow-sm transition-shadow hover:shadow-md"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-[var(--brand-primary)] dark:bg-blue-900/30">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 text-[var(--brand-primary)]">
                       <Icon className="h-6 w-6" />
                     </div>
-                    <h3 className="mt-4 font-semibold text-slate-900 dark:text-slate-100">
+                    <h3 className="mt-4 font-semibold text-slate-900">
                       {feature.title}
                     </h3>
-                    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                    <p className="mt-2 text-sm text-slate-600">
                       {feature.description}
                     </p>
                   </div>
@@ -211,7 +213,7 @@ const Demo: React.FC = () => {
           </div>
 
           {/* Footer Note */}
-          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+          <p className="text-center text-sm text-slate-500">
             Questions about GreekPay? Visit our{' '}
             <button
               onClick={handleBackToHome}

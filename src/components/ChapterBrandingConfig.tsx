@@ -5,6 +5,7 @@ import { ChapterService } from '../services/chapterService';
 import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import { PhotoIcon, SwatchIcon } from '@heroicons/react/24/outline';
+import { isDemoModeEnabled } from '../utils/env';
 
 export const ChapterBrandingConfig: React.FC = () => {
   const { currentChapter, refreshChapters } = useChapter();
@@ -35,7 +36,7 @@ export const ChapterBrandingConfig: React.FC = () => {
   if (!hasAdminAccess) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500">
           You don't have permission to manage chapter branding.
         </p>
       </div>
@@ -45,7 +46,7 @@ export const ChapterBrandingConfig: React.FC = () => {
   if (!currentChapter) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500 dark:text-gray-400">
+        <p className="text-gray-500">
           No chapter selected.
         </p>
       </div>
@@ -115,6 +116,11 @@ export const ChapterBrandingConfig: React.FC = () => {
   const handleSave = async () => {
     if (!currentChapter) return;
 
+    if (isDemoModeEnabled()) {
+      toast.success('Branding updated successfully! (Demo)');
+      return;
+    }
+
     setLoading(true);
     try {
       // Upload logo if changed
@@ -150,17 +156,17 @@ export const ChapterBrandingConfig: React.FC = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-1">
+        <h2 className="text-lg font-semibold text-gray-900 mb-1">
           Chapter Branding
         </h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-gray-500">
           Customize your chapter's colors, logo, and identity
         </p>
       </div>
 
       {/* Greek Letters */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Greek Letters
         </label>
         <input
@@ -168,21 +174,21 @@ export const ChapterBrandingConfig: React.FC = () => {
           value={greekLetters}
           onChange={(e) => setGreekLetters(e.target.value)}
           placeholder="e.g., ΑΒΓ, ΔΕΖ"
-          className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-primary focus:border-transparent"
         />
-        <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-1 text-xs text-gray-500">
           Enter your chapter's Greek letters (copy from character map or use keyboard shortcuts)
         </p>
       </div>
 
       {/* Logo Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Chapter Logo
         </label>
         <div className="flex items-center gap-4">
           {logoPreview && (
-            <div className="w-24 h-24 border-2 border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-700 flex items-center justify-center">
+            <div className="w-24 h-24 border-2 border-gray-200 rounded-lg overflow-hidden bg-white flex items-center justify-center">
               <img
                 src={logoPreview}
                 alt="Logo preview"
@@ -191,9 +197,9 @@ export const ChapterBrandingConfig: React.FC = () => {
             </div>
           )}
           <div className="flex-1">
-            <label className="flex items-center justify-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+            <label className="flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
               <PhotoIcon className="h-5 w-5 text-gray-400 mr-2" />
-              <span className="text-sm text-gray-700 dark:text-gray-300">
+              <span className="text-sm text-gray-700">
                 {logoFile ? logoFile.name : 'Choose Logo'}
               </span>
               <input
@@ -203,7 +209,7 @@ export const ChapterBrandingConfig: React.FC = () => {
                 onChange={handleLogoChange}
               />
             </label>
-            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+            <p className="mt-1 text-xs text-gray-500">
               PNG, JPG, SVG up to 5MB
             </p>
           </div>
@@ -214,7 +220,7 @@ export const ChapterBrandingConfig: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Primary Color */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Primary Color
           </label>
           <div className="flex items-center gap-2">
@@ -222,24 +228,24 @@ export const ChapterBrandingConfig: React.FC = () => {
               type="color"
               value={primaryColor}
               onChange={(e) => setPrimaryColor(e.target.value)}
-              className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+              className="h-10 w-20 rounded border border-gray-300 cursor-pointer"
             />
             <input
               type="text"
               value={primaryColor}
               onChange={(e) => setPrimaryColor(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div
-            className="mt-2 h-12 rounded-lg border-2 border-gray-200 dark:border-gray-600"
+            className="mt-2 h-12 rounded-lg border-2 border-gray-200"
             style={{ backgroundColor: primaryColor }}
           />
         </div>
 
         {/* Secondary Color */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Secondary Color
           </label>
           <div className="flex items-center gap-2">
@@ -247,24 +253,24 @@ export const ChapterBrandingConfig: React.FC = () => {
               type="color"
               value={secondaryColor}
               onChange={(e) => setSecondaryColor(e.target.value)}
-              className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+              className="h-10 w-20 rounded border border-gray-300 cursor-pointer"
             />
             <input
               type="text"
               value={secondaryColor}
               onChange={(e) => setSecondaryColor(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div
-            className="mt-2 h-12 rounded-lg border-2 border-gray-200 dark:border-gray-600"
+            className="mt-2 h-12 rounded-lg border-2 border-gray-200"
             style={{ backgroundColor: secondaryColor }}
           />
         </div>
 
         {/* Accent Color */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Accent Color
           </label>
           <div className="flex items-center gap-2">
@@ -272,28 +278,28 @@ export const ChapterBrandingConfig: React.FC = () => {
               type="color"
               value={accentColor}
               onChange={(e) => setAccentColor(e.target.value)}
-              className="h-10 w-20 rounded border border-gray-300 dark:border-gray-600 cursor-pointer"
+              className="h-10 w-20 rounded border border-gray-300 cursor-pointer"
             />
             <input
               type="text"
               value={accentColor}
               onChange={(e) => setAccentColor(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg bg-white text-gray-900 text-sm focus:ring-2 focus:ring-primary focus:border-transparent"
             />
           </div>
           <div
-            className="mt-2 h-12 rounded-lg border-2 border-gray-200 dark:border-gray-600"
+            className="mt-2 h-12 rounded-lg border-2 border-gray-200"
             style={{ backgroundColor: accentColor }}
           />
         </div>
       </div>
 
       {/* Preview Section */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-        <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+      <div className="border-t border-gray-200 pt-6">
+        <h3 className="text-sm font-medium text-gray-700 mb-3">
           Preview
         </h3>
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 space-y-4">
+        <div className="bg-gray-50 rounded-lg p-6 space-y-4">
           {/* Button Preview */}
           <div className="flex gap-3 flex-wrap">
             <button
@@ -333,7 +339,7 @@ export const ChapterBrandingConfig: React.FC = () => {
       </div>
 
       {/* Save Button */}
-      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+      <div className="flex justify-end gap-3 pt-4 border-t border-gray-200">
         <button
           onClick={handleSave}
           disabled={loading || uploading}

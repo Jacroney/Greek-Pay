@@ -38,7 +38,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 
   return (
     <div
-      className={`bg-gray-200 dark:bg-gray-700 ${getVariantClasses()} ${getAnimationClasses()} ${className}`}
+      className={`bg-gray-200 ${getVariantClasses()} ${getAnimationClasses()} ${className}`}
       style={style}
     />
   );
@@ -47,7 +47,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
 // Budget Overview Card Skeleton
 export const BudgetCardSkeleton: React.FC = () => {
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
       <div className="flex items-center justify-between">
         <div className="flex-1">
           <Skeleton width="60%" height={16} className="mb-2" />
@@ -62,7 +62,7 @@ export const BudgetCardSkeleton: React.FC = () => {
 // Budget Category Skeleton
 export const BudgetCategorySkeleton: React.FC = () => {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -96,7 +96,7 @@ export const BudgetCategorySkeleton: React.FC = () => {
 // Chart Skeleton
 export const ChartSkeleton: React.FC = () => {
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
+    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
       <div className="flex items-center justify-between mb-4">
         <Skeleton width={200} height={24} />
         <Skeleton width={80} height={24} className="rounded-full" />

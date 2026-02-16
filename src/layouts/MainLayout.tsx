@@ -106,7 +106,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
   };
 
   return (
-    <div className="flex min-h-screen bg-[var(--brand-surface)] text-slate-900 transition-colors duration-200 dark:bg-gray-900 dark:text-slate-100">
+    <div className="flex min-h-screen bg-[var(--brand-surface)] text-[var(--brand-text)]">
       <Sidebar collapsed={sidebarCollapsed} basePath={basePath} menuItems={menuItems} />
       <div
         className={`flex-1 transition-all duration-300 ${sidebarCollapsed ? 'ml-20' : 'ml-64'}`}
@@ -119,13 +119,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({
 
         <DemoBanner />
 
-        <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-white/80 backdrop-blur dark:bg-gray-900/80">
+        <header className="sticky top-0 z-40 h-18 border-b border-[var(--brand-border)] bg-white/80 backdrop-blur-xl">
           <div className="flex flex-col gap-4 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:pr-28">
             <div className="flex items-center gap-3">
               <button
                 type="button"
                 onClick={() => setSidebarCollapsed((prev) => !prev)}
-                className="focus-ring inline-flex items-center justify-center rounded-lg border border-[var(--brand-border)] bg-white p-2.5 text-slate-600 shadow-sm transition-colors hover:bg-slate-100 dark:border-gray-700 dark:bg-gray-800 dark:text-slate-200 dark:hover:bg-gray-700"
+                className="focus-ring inline-flex items-center justify-center rounded-lg border border-[var(--brand-border)] bg-white p-2.5 text-[var(--brand-text-subdued)] shadow-sm transition-colors hover:bg-gray-100"
                 title={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
               >
                 <span className="sr-only">{sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}</span>
@@ -144,10 +144,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 <button
                   type="button"
                   onClick={() => setPaletteOpen(true)}
-                  className="focus-ring inline-flex items-center justify-between rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm text-slate-500 shadow-sm transition-colors hover:bg-slate-100 dark:border-gray-700 dark:bg-gray-800 dark:text-slate-300 dark:hover:bg-gray-700"
+                  className="focus-ring inline-flex items-center justify-between rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm text-[var(--brand-text-subdued)] shadow-sm transition-colors hover:bg-gray-100"
                 >
                   <span className="truncate">Search…</span>
-                  <span className="ml-2 hidden rounded-md border border-slate-200 px-1.5 py-0.5 text-xs text-slate-400 sm:block">⌘K</span>
+                  <span className="ml-2 hidden rounded-md border border-gray-200 px-1.5 py-0.5 text-xs text-gray-400 sm:block">⌘K</span>
                 </button>
               )}
               {showChapterSelector && isSuperAdmin && <ChapterSelector />}
@@ -156,7 +156,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
                 <button
                   type="button"
                   onClick={signOut}
-                  className="focus-ring inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50 dark:border-rose-700/40 dark:bg-gray-800 dark:text-rose-300 dark:hover:bg-gray-700"
+                  className="focus-ring inline-flex items-center justify-center rounded-xl border border-rose-200 bg-white px-4 py-2 text-sm font-semibold text-rose-600 transition-colors hover:bg-rose-50"
                 >
                   Sign out
                 </button>
@@ -166,7 +166,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
         </header>
 
 
-        <main className="px-4 py-6 sm:px-6 lg:px-8">
+        <main className="px-6 py-8 sm:px-8 lg:px-10">
           <Outlet />
         </main>
       </div>

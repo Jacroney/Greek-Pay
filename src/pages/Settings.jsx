@@ -65,58 +65,58 @@ const Settings = () => {
       case 'profile':
         return (
           <div className="space-y-6">
-            <div className="flex items-center space-x-4 pb-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center space-x-4 pb-6 border-b border-gray-200">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full flex items-center justify-center text-white text-2xl font-bold shadow-lg">
                 {profile?.full_name?.charAt(0)?.toUpperCase() || 'U'}
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{profile?.full_name || 'User'}</h2>
-                <p className="text-sm text-gray-500 dark:text-gray-400 capitalize">{profile?.role || 'Member'}</p>
+                <h2 className="text-2xl font-bold text-gray-900">{profile?.full_name || 'User'}</h2>
+                <p className="text-sm text-gray-500 capitalize">{profile?.role || 'Member'}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <EnvelopeIcon className="h-5 w-5 text-gray-400" />
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</h3>
+                  <h3 className="text-sm font-medium text-gray-700">Email</h3>
                 </div>
-                <p className="text-gray-900 dark:text-white ml-8">{profile?.email || 'N/A'}</p>
+                <p className="text-gray-900 ml-8">{profile?.email || 'N/A'}</p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <PhoneIcon className="h-5 w-5 text-gray-400" />
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</h3>
+                  <h3 className="text-sm font-medium text-gray-700">Phone</h3>
                 </div>
-                <p className="text-gray-900 dark:text-white ml-8">{profile?.phone_number || 'Not provided'}</p>
+                <p className="text-gray-900 ml-8">{profile?.phone_number || 'Not provided'}</p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <AcademicCapIcon className="h-5 w-5 text-gray-400" />
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Year & Major</h3>
+                  <h3 className="text-sm font-medium text-gray-700">Year & Major</h3>
                 </div>
-                <p className="text-gray-900 dark:text-white ml-8">
+                <p className="text-gray-900 ml-8">
                   {profile?.year || 'N/A'} {profile?.major ? `- ${profile.major}` : ''}
                 </p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4">
+              <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center space-x-3 mb-2">
                   <BriefcaseIcon className="h-5 w-5 text-gray-400" />
-                  <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Position</h3>
+                  <h3 className="text-sm font-medium text-gray-700">Position</h3>
                 </div>
-                <p className="text-gray-900 dark:text-white ml-8">{profile?.position || 'Not assigned'}</p>
+                <p className="text-gray-900 ml-8">{profile?.position || 'Not assigned'}</p>
               </div>
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
               <div className="flex items-start space-x-3">
-                <UserCircleIcon className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                <UserCircleIcon className="h-5 w-5 text-blue-600 mt-0.5" />
                 <div>
-                  <h3 className="text-sm font-medium text-blue-900 dark:text-blue-100">Account Status</h3>
-                  <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                  <h3 className="text-sm font-medium text-blue-900">Account Status</h3>
+                  <p className="text-sm text-blue-700 mt-1">
                     {profile?.is_active ? 'Active Member' : 'Inactive'}
                     {profile?.dues_balance && profile.dues_balance > 0 && (
                       <span className="ml-2">• Dues Balance: {formatCurrency(profile.dues_balance)}</span>
@@ -132,29 +132,29 @@ const Settings = () => {
         return (
           <div className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Organization Name</label>
+              <label className="block text-sm font-medium text-gray-700">Organization Name</label>
               <input
                 type="text"
                 value={settings.organization.name}
                 onChange={(e) => handleSettingChange('organization', 'name', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Fiscal Year Start</label>
+              <label className="block text-sm font-medium text-gray-700">Fiscal Year Start</label>
               <input
                 type="date"
                 value={settings.organization.fiscalYearStart}
                 onChange={(e) => handleSettingChange('organization', 'fiscalYearStart', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Currency</label>
+              <label className="block text-sm font-medium text-gray-700">Currency</label>
               <select
                 value={settings.organization.currency}
                 onChange={(e) => handleSettingChange('organization', 'currency', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]: [&>option]:"
               >
                 <option value="USD">USD ($)</option>
                 <option value="EUR">EUR (€)</option>
@@ -162,11 +162,11 @@ const Settings = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Timezone</label>
+              <label className="block text-sm font-medium text-gray-700">Timezone</label>
               <select
                 value={settings.organization.timezone}
                 onChange={(e) => handleSettingChange('organization', 'timezone', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]: [&>option]:"
               >
                 <option value="America/New_York">Eastern Time</option>
                 <option value="America/Chicago">Central Time</option>
@@ -182,8 +182,8 @@ const Settings = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Email Notifications</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Receive email updates about your account</p>
+                <h3 className="text-sm font-medium text-gray-700">Email Notifications</h3>
+                <p className="text-sm text-gray-500">Receive email updates about your account</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -197,8 +197,8 @@ const Settings = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Low Balance Alerts</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Get notified when your balance is low</p>
+                <h3 className="text-sm font-medium text-gray-700">Low Balance Alerts</h3>
+                <p className="text-sm text-gray-500">Get notified when your balance is low</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -212,8 +212,8 @@ const Settings = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Budget Alerts</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Get notified about budget updates</p>
+                <h3 className="text-sm font-medium text-gray-700">Budget Alerts</h3>
+                <p className="text-sm text-gray-500">Get notified about budget updates</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -227,8 +227,8 @@ const Settings = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Transaction Alerts</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Get notified about new transactions</p>
+                <h3 className="text-sm font-medium text-gray-700">Transaction Alerts</h3>
+                <p className="text-sm text-gray-500">Get notified about new transactions</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -249,8 +249,8 @@ const Settings = () => {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Two-Factor Authentication</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Add an extra layer of security to your account</p>
+                <h3 className="text-sm font-medium text-gray-700">Two-Factor Authentication</h3>
+                <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -263,11 +263,11 @@ const Settings = () => {
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Session Timeout (minutes)</label>
+              <label className="block text-sm font-medium text-gray-700">Session Timeout (minutes)</label>
               <select
                 value={settings.security.sessionTimeout}
                 onChange={(e) => handleSettingChange('security', 'sessionTimeout', parseInt(e.target.value))}
-                className="mt-1 block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                className="mt-1 block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]: [&>option]:"
               >
                 <option value="5">5 minutes</option>
                 <option value="15">15 minutes</option>
@@ -278,8 +278,8 @@ const Settings = () => {
             </div>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="flex-1">
-                <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300">Require Approval for Large Transactions</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">Get approval for transactions above a certain amount</p>
+                <h3 className="text-sm font-medium text-gray-700">Require Approval for Large Transactions</h3>
+                <p className="text-sm text-gray-500">Get approval for transactions above a certain amount</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -312,8 +312,8 @@ const Settings = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Settings</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage your account and preferences</p>
+          <h1 className="text-2xl font-bold text-gray-800">Settings</h1>
+          <p className="text-sm text-gray-500 mt-1">Manage your account and preferences</p>
         </div>
         {activeTab !== 'profile' && activeTab !== 'database' && activeTab !== 'bank-sync' && activeTab !== 'branding' && (
           <button
@@ -348,13 +348,13 @@ const Settings = () => {
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-gray-200">
         {/* Mobile: Dropdown selector */}
         <div className="sm:hidden mb-4">
           <select
             value={activeTab}
             onChange={(e) => setActiveTab(e.target.value)}
-            className="block w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+            className="block w-full rounded-md border border-gray-300 bg-white text-gray-900 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 [&>option]: [&>option]:"
           >
             {[
               { key: 'profile', label: 'Profile' },
@@ -388,8 +388,8 @@ const Settings = () => {
               onClick={() => setActiveTab(tab.key)}
               className={`${
                 activeTab === tab.key
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
               } flex items-center whitespace-nowrap py-3 px-1 border-b-2 font-medium text-sm transition-colors`}
             >
               <span className="mr-2">{tab.icon}</span>
@@ -400,7 +400,7 @@ const Settings = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
         {renderTabContent()}
       </div>
     </div>

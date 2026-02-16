@@ -115,10 +115,10 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 shadow-lg shadow-emerald-500/30 mb-5">
           <CheckCircle className="w-10 h-10 text-white" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+        <h3 className="text-2xl font-bold text-gray-900 mb-2">
           Payment Successful!
         </h3>
-        <p className="text-gray-600 dark:text-gray-400">
+        <p className="text-gray-600">
           Thank you for your payment. You will receive a confirmation email shortly.
         </p>
       </div>
@@ -128,7 +128,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Payment Element - only shows the selected payment method type */}
-      <div className="bg-slate-50 dark:bg-gray-700/50 p-4 rounded-xl border border-[var(--brand-border)]">
+      <div className="bg-slate-50 p-4 rounded-xl border border-[var(--brand-border)]">
         <PaymentElement
           options={{
             layout: 'accordion',
@@ -143,18 +143,18 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           type="checkbox"
           checked={savePaymentMethod}
           onChange={(e) => onSaveToggle(e.target.checked)}
-          className="w-5 h-5 text-blue-600 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 rounded-md focus:ring-blue-500 focus:ring-2 focus:ring-offset-0 transition-colors cursor-pointer"
+          className="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded-md focus:ring-blue-500 focus:ring-2 focus:ring-offset-0 transition-colors cursor-pointer"
         />
-        <span className="text-sm text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-white transition-colors">
+        <span className="text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
           Save this payment method for future payments
         </span>
       </label>
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-xl p-4 flex items-start gap-3">
-          <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-red-800 dark:text-red-200">{errorMessage}</p>
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" />
+          <p className="text-sm text-red-800">{errorMessage}</p>
         </div>
       )}
 
@@ -164,7 +164,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
           type="button"
           onClick={onCancel}
           disabled={isProcessing}
-          className="flex-1 px-4 py-3.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+          className="flex-1 px-4 py-3.5 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
         >
           Cancel
         </button>
@@ -185,7 +185,7 @@ const CheckoutForm: React.FC<CheckoutFormProps> = ({
       </div>
 
       {/* Security Notice */}
-      <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
         <ShieldCheck className="w-4 h-4 text-emerald-500" />
         <span>Secured by Stripe. Your payment information is encrypted and secure.</span>
       </div>
@@ -510,14 +510,14 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center z-50 p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-lg sm:max-w-2xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl max-w-lg sm:max-w-2xl w-full max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
         {/* Mobile drag handle */}
         <div className="sm:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         {/* Header with gradient */}
-        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-700 dark:via-blue-600 dark:to-indigo-700 px-6 py-5 sm:rounded-t-2xl">
+        <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
@@ -543,54 +543,54 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
         <div className="px-6 py-6">
           {/* Payment Summary */}
           <div className="surface-card overflow-hidden mb-6">
-            <div className="bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-700/50 dark:to-blue-900/20 p-4 sm:p-5">
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 sm:p-5">
               <div className="flex items-center gap-3 mb-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 dark:bg-blue-900/50">
-                  <ShieldCheck className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+                  <ShieldCheck className="w-5 h-5 text-blue-600" />
                 </div>
-                <h3 className="font-semibold text-gray-900 dark:text-white">Payment Summary</h3>
+                <h3 className="font-semibold text-gray-900">Payment Summary</h3>
               </div>
               <div className="space-y-2.5 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Member:</span>
-                  <span className="font-medium text-gray-900 dark:text-white">{memberDues.member_name}</span>
+                  <span className="text-gray-600">Member:</span>
+                  <span className="font-medium text-gray-900">{memberDues.member_name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 dark:text-gray-400">Base Amount:</span>
-                  <span className="text-gray-900 dark:text-white">{formatCurrency(memberDues.base_amount)}</span>
+                  <span className="text-gray-600">Base Amount:</span>
+                  <span className="text-gray-900">{formatCurrency(memberDues.base_amount)}</span>
                 </div>
                 {memberDues.late_fee > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Late Fee:</span>
-                    <span className="text-red-600 dark:text-red-400">{formatCurrency(memberDues.late_fee)}</span>
+                    <span className="text-gray-600">Late Fee:</span>
+                    <span className="text-red-600">{formatCurrency(memberDues.late_fee)}</span>
                   </div>
                 )}
                 {memberDues.adjustments !== 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Adjustments:</span>
-                    <span className={memberDues.adjustments > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400'}>
+                    <span className="text-gray-600">Adjustments:</span>
+                    <span className={memberDues.adjustments > 0 ? 'text-red-600' : 'text-green-600'}>
                       {memberDues.adjustments > 0 ? '+' : ''}{formatCurrency(Math.abs(memberDues.adjustments))}
                     </span>
                   </div>
                 )}
                 {memberDues.amount_paid > 0 && (
                   <div className="flex justify-between">
-                    <span className="text-gray-600 dark:text-gray-400">Already Paid:</span>
-                    <span className="text-green-600 dark:text-green-400">-{formatCurrency(memberDues.amount_paid)}</span>
+                    <span className="text-gray-600">Already Paid:</span>
+                    <span className="text-green-600">-{formatCurrency(memberDues.amount_paid)}</span>
                   </div>
                 )}
                 <div className="pt-3 mt-3 border-t border-[var(--brand-border)] flex justify-between">
-                  <span className="font-semibold text-gray-900 dark:text-white">
+                  <span className="font-semibold text-gray-900">
                     {isPartialPayment ? 'Outstanding Balance:' : 'Dues Amount:'}
                   </span>
-                  <span className="font-bold text-gray-900 dark:text-white">
+                  <span className="font-bold text-gray-900">
                     {formatCurrency(memberDues.balance)}
                   </span>
                 </div>
                 {isPartialPayment && (
                   <div className="pt-2 flex justify-between">
-                    <span className="font-semibold text-blue-600 dark:text-blue-400">Payment Amount:</span>
-                    <span className="font-bold text-blue-600 dark:text-blue-400">
+                    <span className="font-semibold text-blue-600">Payment Amount:</span>
+                    <span className="font-bold text-blue-600">
                       {formatCurrency(paymentAmount)}
                     </span>
                   </div>
@@ -598,22 +598,22 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                 {/* Fee Breakdown */}
                 <div className="pt-3 mt-1">
                   {paymentMethodType === 'us_bank_account' ? (
-                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-900/30 dark:to-green-900/30 rounded-xl p-4 border border-emerald-200 dark:border-emerald-800">
+                    <div className="bg-gradient-to-r from-emerald-50 to-green-50 rounded-xl p-4 border border-emerald-200">
                       <div className="flex items-center justify-center gap-2">
-                        <Sparkles className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
-                        <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+                        <Sparkles className="w-5 h-5 text-emerald-600" />
+                        <p className="text-lg font-bold text-emerald-600">
                           No Processing Fees!
                         </p>
                       </div>
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 text-center">
+                      <p className="text-xs text-emerald-600 mt-1 text-center">
                         Bank transfer is the recommended payment method
                       </p>
                     </div>
                   ) : (
-                    <div className="bg-slate-50 dark:bg-gray-700/50 rounded-xl p-3">
+                    <div className="bg-slate-50 rounded-xl p-3">
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600 dark:text-gray-400 text-sm">Card Processing Fee:</span>
-                        <span className="text-gray-900 dark:text-white font-medium">
+                        <span className="text-gray-600 text-sm">Card Processing Fee:</span>
+                        <span className="text-gray-900 font-medium">
                           {formatCurrency(PaymentService.calculateStripeFee(
                             installmentCheckoutMode && selectedInstallmentPlan
                               ? Math.round((paymentAmount / selectedInstallmentPlan) * 100) / 100
@@ -622,18 +622,18 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                           ))}
                         </span>
                       </div>
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-2 text-center font-medium">
+                      <p className="text-xs text-emerald-600 mt-2 text-center font-medium">
                         Switch to Bank Account (ACH) to avoid fees
                       </p>
                     </div>
                   )}
                 </div>
                 {/* Total */}
-                <div className="pt-4 mt-2 border-t-2 border-blue-200 dark:border-blue-800 flex justify-between items-center">
-                  <span className="font-semibold text-gray-900 dark:text-white">
+                <div className="pt-4 mt-2 border-t-2 border-blue-200 flex justify-between items-center">
+                  <span className="font-semibold text-gray-900">
                     {installmentCheckoutMode && selectedInstallmentPlan ? 'First Payment:' : 'Total to Pay:'}
                   </span>
-                  <span className="font-bold text-2xl text-blue-600 dark:text-blue-400">
+                  <span className="font-bold text-2xl text-blue-600">
                     {formatCurrency(PaymentService.calculateTotalCharge(
                       installmentCheckoutMode && selectedInstallmentPlan
                         ? Math.round((paymentAmount / selectedInstallmentPlan) * 100) / 100
@@ -643,12 +643,12 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                   </span>
                 </div>
                 {installmentCheckoutMode && selectedInstallmentPlan && (
-                  <div className="mt-2 text-xs text-purple-600 dark:text-purple-400 text-center font-medium">
+                  <div className="mt-2 text-xs text-purple-600 text-center font-medium">
                     {selectedInstallmentPlan - 1} additional payments of {formatCurrency(paymentAmount / selectedInstallmentPlan)} scheduled before deadline
                   </div>
                 )}
                 {isPartialPayment && !installmentCheckoutMode && (
-                  <div className="mt-2 text-xs text-blue-600 dark:text-blue-400 text-center font-medium">
+                  <div className="mt-2 text-xs text-blue-600 text-center font-medium">
                     Remaining balance after payment: {formatCurrency(memberDues.balance - paymentAmount)}
                   </div>
                 )}
@@ -662,24 +662,24 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
               {!showInstallmentOption ? (
                 <button
                   onClick={() => setShowInstallmentOption(true)}
-                  className="group w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 border-2 border-purple-200 dark:border-purple-700 rounded-xl hover:border-purple-400 dark:hover:border-purple-500 hover:shadow-md transition-all duration-200"
+                  className="group w-full flex items-center justify-between p-4 bg-gradient-to-r from-purple-50 to-indigo-50 border-2 border-purple-200 rounded-xl hover:border-purple-400 hover:shadow-md transition-all duration-200"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-purple-100 text-purple-600 group-hover:scale-105 transition-transform">
                       <Calendar className="w-5 h-5" />
                     </div>
                     <div className="text-left">
-                      <p className="font-semibold text-gray-900 dark:text-white">Pay in Installments</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                      <p className="font-semibold text-gray-900">Pay in Installments</p>
+                      <p className="text-xs text-gray-600">
                         Split into {installmentEligibility.allowed_plans.join(' or ')} payments before deadline
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-purple-500 dark:text-purple-400 group-hover:translate-x-0.5 transition-transform" />
+                  <ChevronRight className="w-5 h-5 text-purple-500 group-hover:translate-x-0.5 transition-transform" />
                 </button>
               ) : (
                 <div className="surface-card overflow-hidden">
-                  <div className="bg-gradient-to-r from-purple-500 to-indigo-600 dark:from-purple-600 dark:to-indigo-700 px-5 py-4">
+                  <div className="bg-gradient-to-r from-purple-500 to-indigo-600 px-5 py-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white/20 backdrop-blur-sm">
@@ -699,7 +699,7 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                   <div className="p-5 space-y-5">
                     {/* Plan Selection */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      <label className="block text-sm font-medium text-gray-700 mb-3">
                         Select Payment Plan
                       </label>
                       <div className="grid grid-cols-2 gap-3">
@@ -710,13 +710,13 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                             onClick={() => setSelectedInstallmentPlan(plan)}
                             className={`p-4 rounded-xl border-2 transition-all duration-200 text-center hover:shadow-md ${
                               selectedInstallmentPlan === plan
-                                ? 'border-purple-500 bg-purple-50 dark:bg-purple-900/30 shadow-md'
-                                : 'border-[var(--brand-border)] bg-white dark:bg-gray-700/50 hover:border-purple-300'
+                                ? 'border-purple-500 bg-purple-50 shadow-md'
+                                : 'border-[var(--brand-border)] bg-white hover:border-purple-300'
                             }`}
                           >
-                            <p className="font-bold text-lg text-gray-900 dark:text-white">{plan}</p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400">Payments</p>
-                            <p className="text-sm font-semibold text-purple-600 dark:text-purple-400 mt-2">
+                            <p className="font-bold text-lg text-gray-900">{plan}</p>
+                            <p className="text-xs text-gray-500">Payments</p>
+                            <p className="text-sm font-semibold text-purple-600 mt-2">
                               {formatCurrency(memberDues.balance / plan)} each
                             </p>
                           </button>
@@ -726,8 +726,8 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
 
                     {/* Payment Schedule Preview */}
                     {selectedInstallmentPlan && deadlineInfo?.deadline && (
-                      <div className="bg-slate-50 dark:bg-gray-700/50 rounded-xl p-4">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                      <div className="bg-slate-50 rounded-xl p-4">
+                        <p className="text-sm font-medium text-gray-700 mb-3">
                           Payment Schedule
                         </p>
                         <div className="space-y-2">
@@ -737,15 +737,15 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                             new Date(deadlineInfo.deadline)
                           ).map((date, idx) => (
                             <div key={idx} className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600 dark:text-gray-400">
+                              <span className="text-gray-600">
                                 Payment {idx + 1}
                               </span>
                               <div className="flex items-center gap-2">
-                                <span className="font-medium text-gray-900 dark:text-white">
+                                <span className="font-medium text-gray-900">
                                   {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </span>
                                 {idx === selectedInstallmentPlan - 1 && (
-                                  <span className="text-xs bg-purple-100 dark:bg-purple-900/50 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded-full font-medium">
+                                  <span className="text-xs bg-purple-100 text-purple-600 px-2 py-0.5 rounded-full font-medium">
                                     Deadline
                                   </span>
                                 )}
@@ -759,13 +759,13 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                     {/* Payment Method Selection - only show if saved methods exist */}
                     {savedMethods.length > 0 ? (
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
                           Payment Method (for auto-pay)
                         </label>
                         <select
                           value={selectedInstallmentMethod}
                           onChange={(e) => setSelectedInstallmentMethod(e.target.value)}
-                          className="w-full p-3 border border-[var(--brand-border)] rounded-xl bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-shadow"
+                          className="w-full p-3 border border-[var(--brand-border)] rounded-xl bg-white text-gray-900 focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-shadow"
                         >
                           <option value="">Select a saved payment method</option>
                           {savedMethods.map(method => (
@@ -776,8 +776,8 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                         </select>
                       </div>
                     ) : (
-                      <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
-                        <div className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
+                      <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                        <div className="flex items-center gap-2 text-purple-800">
                           <CreditCard className="w-5 h-5" />
                           <p className="text-sm font-medium">Your payment method will be saved during checkout for future payments</p>
                         </div>
@@ -785,7 +785,7 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                     )}
 
                     {/* Info */}
-                    <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4 text-sm text-blue-800 dark:text-blue-200">
+                    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-blue-800">
                       <p>Your first payment will be charged today. Remaining payments will be automatically charged according to the schedule above, with the final payment due on the deadline.</p>
                     </div>
 
@@ -836,14 +836,14 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
 
           {/* Active Installment Plan Notice */}
           {activePlan && !paymentComplete && (
-            <div className="mb-6 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mr-3" />
+                <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
                 <div>
-                  <p className="font-medium text-green-800 dark:text-green-200">
+                  <p className="font-medium text-green-800">
                     Active Installment Plan
                   </p>
-                  <p className="text-sm text-green-600 dark:text-green-300">
+                  <p className="text-sm text-green-600">
                     {activePlan.installments_paid} of {activePlan.num_installments} payments completed.
                     Next payment: {activePlan.next_payment_date}
                   </p>
@@ -855,7 +855,7 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
           {/* Saved Payment Methods */}
           {savedMethods.length > 0 && !paymentComplete && !showInstallmentOption && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Saved Payment Methods</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Saved Payment Methods</h3>
               <div className="space-y-2">
                 {savedMethods.map((method) => (
                   <button
@@ -864,15 +864,15 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                     disabled={isLoading}
                     className={`group w-full flex items-center justify-between p-4 rounded-xl border-2 transition-all duration-200 hover:shadow-md ${
                       selectedSavedMethod === method.stripe_payment_method_id
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                        : 'border-[var(--brand-border)] hover:border-blue-300 dark:hover:border-blue-700 bg-white dark:bg-gray-700/50'
+                        ? 'border-blue-500 bg-blue-50 shadow-md'
+                        : 'border-[var(--brand-border)] hover:border-blue-300 bg-white'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`flex h-10 w-10 items-center justify-center rounded-xl transition-transform duration-200 group-hover:scale-105 ${
                         method.type === 'card'
-                          ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
-                          : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
+                          ? 'bg-blue-100 text-blue-600'
+                          : 'bg-emerald-100 text-emerald-600'
                       }`}>
                         {method.type === 'card' ? (
                           <CreditCard className="w-5 h-5" />
@@ -881,23 +881,23 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                         )}
                       </div>
                       <div className="text-left">
-                        <p className="font-medium text-gray-900 dark:text-white">
+                        <p className="font-medium text-gray-900">
                           {method.brand} ****{method.last4}
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500">
                           {method.type === 'card' ? 'Credit/Debit Card' : 'Bank Account'}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {method.is_default && (
-                        <span className="text-xs bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 px-2.5 py-1 rounded-full font-medium">
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full font-medium">
                           Default
                         </span>
                       )}
                       <button
                         onClick={(e) => handleDeleteSavedMethod(e, method.stripe_payment_method_id)}
-                        className="p-1.5 text-gray-400 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                         title="Remove payment method"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -910,14 +910,14 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                   disabled={isLoading}
                   className={`group w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition-all duration-200 ${
                     !usingSavedMethod
-                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                      : 'border-gray-300 dark:border-gray-600 hover:border-blue-400 dark:hover:border-blue-600 bg-gray-50/50 dark:bg-gray-700/30'
+                      ? 'border-blue-500 bg-blue-50'
+                      : 'border-gray-300 hover:border-blue-400 bg-gray-50/50'
                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600 dark:group-hover:bg-blue-900/50 dark:group-hover:text-blue-400 transition-colors">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-100 text-gray-500 group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
                     <CreditCard className="w-5 h-5" />
                   </div>
-                  <span className="font-medium text-gray-700 dark:text-gray-300">Use a new payment method</span>
+                  <span className="font-medium text-gray-700">Use a new payment method</span>
                 </button>
               </div>
             </div>
@@ -926,29 +926,29 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
           {/* Payment Methods Info - only show when using new method */}
           {(!usingSavedMethod || savedMethods.length === 0) && !paymentComplete && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-3">Choose Payment Method</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">Choose Payment Method</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <button
                   type="button"
                   onClick={() => setPaymentMethodType('card')}
                   className={`group relative rounded-xl p-4 border-2 transition-all duration-200 text-left hover:shadow-md hover:-translate-y-0.5 ${
                     paymentMethodType === 'card'
-                      ? 'border-blue-500 dark:border-blue-400 bg-blue-50 dark:bg-blue-900/30 shadow-md'
-                      : 'border-[var(--brand-border)] bg-white dark:bg-gray-700/50 hover:border-blue-300 dark:hover:border-blue-600'
+                      ? 'border-blue-500 bg-blue-50 shadow-md'
+                      : 'border-[var(--brand-border)] bg-white hover:border-blue-300'
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-110 ${
                       paymentMethodType === 'card'
                         ? 'bg-blue-500 text-white'
-                        : 'bg-blue-100 dark:bg-blue-900/50 text-blue-600 dark:text-blue-400'
+                        : 'bg-blue-100 text-blue-600'
                     }`}>
                       <CreditCard className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Credit/Debit Card</h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Instant processing</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">
+                      <h4 className="font-semibold text-gray-900">Credit/Debit Card</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">Instant processing</p>
+                      <p className="text-xs text-gray-600 mt-1 font-medium">
                         Fee: {formatCurrency(PaymentService.calculateStripeFee(paymentAmount, 'card'))}
                       </p>
                     </div>
@@ -959,8 +959,8 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                   onClick={() => setPaymentMethodType('us_bank_account')}
                   className={`group relative rounded-xl p-4 border-2 transition-all duration-200 text-left hover:shadow-md hover:-translate-y-0.5 ${
                     paymentMethodType === 'us_bank_account'
-                      ? 'border-emerald-500 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-900/30 shadow-md'
-                      : 'border-[var(--brand-border)] bg-white dark:bg-gray-700/50 hover:border-emerald-300 dark:hover:border-emerald-600'
+                      ? 'border-emerald-500 bg-emerald-50 shadow-md'
+                      : 'border-[var(--brand-border)] bg-white hover:border-emerald-300'
                   }`}
                 >
                   {/* Recommended badge */}
@@ -974,14 +974,14 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                     <div className={`flex h-11 w-11 items-center justify-center rounded-xl transition-all duration-200 group-hover:scale-110 ${
                       paymentMethodType === 'us_bank_account'
                         ? 'bg-emerald-500 text-white'
-                        : 'bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400'
+                        : 'bg-emerald-100 text-emerald-600'
                     }`}>
                       <Building2 className="w-5 h-5" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-semibold text-gray-900 dark:text-white">Bank Account (ACH)</h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">3-5 business days</p>
-                      <p className="text-xs text-emerald-600 dark:text-emerald-400 mt-1 font-bold">
+                      <h4 className="font-semibold text-gray-900">Bank Account (ACH)</h4>
+                      <p className="text-xs text-gray-500 mt-0.5">3-5 business days</p>
+                      <p className="text-xs text-emerald-600 mt-1 font-bold">
                         No fees!
                       </p>
                     </div>
@@ -997,10 +997,10 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-400 to-green-600 shadow-lg shadow-emerald-500/30 mb-5">
                 <CheckCircle className="w-10 h-10 text-white" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-2xl font-bold text-gray-900 mb-2">
                 Payment Successful!
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-gray-600">
                 Thank you for your payment. You will receive a confirmation email shortly.
               </p>
             </div>
@@ -1012,25 +1012,25 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
               {isLoading ? (
                 <div className="flex items-center justify-center py-16">
                   <div className="text-center">
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 dark:bg-blue-900/30 mb-4">
-                      <div className="animate-spin rounded-full h-8 w-8 border-3 border-blue-200 dark:border-blue-800 border-t-blue-600 dark:border-t-blue-400"></div>
+                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-50 mb-4">
+                      <div className="animate-spin rounded-full h-8 w-8 border-3 border-blue-200 border-t-blue-600"></div>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-400 font-medium">Initializing secure payment...</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">This may take a moment</p>
+                    <p className="text-gray-600 font-medium">Initializing secure payment...</p>
+                    <p className="text-xs text-gray-500 mt-1">This may take a moment</p>
                   </div>
                 </div>
               ) : error ? (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-5">
+                <div className="bg-red-50 border border-red-200 rounded-xl p-5">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/50">
-                      <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400" />
+                    <div className="flex-shrink-0 flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
+                      <AlertCircle className="w-5 h-5 text-red-600" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-red-900 dark:text-red-200 mb-1">Payment Error</h3>
-                      <p className="text-sm text-red-700 dark:text-red-300 mb-4">{error}</p>
+                      <h3 className="font-semibold text-red-900 mb-1">Payment Error</h3>
+                      <p className="text-sm text-red-700 mb-4">{error}</p>
                       <button
                         onClick={createPaymentIntent}
-                        className="px-4 py-2.5 bg-red-600 dark:bg-red-700 text-white rounded-lg hover:bg-red-700 dark:hover:bg-red-800 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md"
+                        className="px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all duration-200 text-sm font-medium shadow-sm hover:shadow-md"
                       >
                         Try Again
                       </button>
@@ -1041,14 +1041,14 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
                 <>
                   {/* Installment Mode Banner */}
                   {installmentCheckoutMode && selectedInstallmentPlan && (
-                    <div className="mb-4 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-xl p-4">
+                    <div className="mb-4 bg-purple-50 border border-purple-200 rounded-xl p-4">
                       <div className="flex items-center gap-3">
-                        <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                        <Calendar className="w-5 h-5 text-purple-600" />
                         <div>
-                          <p className="font-medium text-purple-900 dark:text-purple-100">
+                          <p className="font-medium text-purple-900">
                             Setting up {selectedInstallmentPlan}-Payment Plan
                           </p>
-                          <p className="text-sm text-purple-700 dark:text-purple-300">
+                          <p className="text-sm text-purple-700">
                             Complete this first payment to activate your installment plan
                           </p>
                         </div>
