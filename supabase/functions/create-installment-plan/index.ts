@@ -317,6 +317,7 @@ serve(async (req) => {
     let paymentIntentClientSecret: string | null = null
     let totalCharge: number = 0
     let stripeFee: number = 0
+    const responseData: Record<string, unknown> = {}
 
     if (skipFirstPayment) {
       // First payment was already processed via Stripe Checkout
@@ -349,6 +350,7 @@ serve(async (req) => {
 
     } else {
       // Standard flow - create Stripe payment intent for the first installment
+      // Confirm server-side with saved payment method (same as regular saved-method flow)
       stripeFee = calculateStripeFee(firstPayment.amount, savedMethod.type)
       totalCharge = calculateTotalCharge(firstPayment.amount, savedMethod.type)
       const platformFee = Math.round(firstPayment.amount * PLATFORM_FEE_PERCENTAGE * 100) / 100
@@ -356,15 +358,15 @@ serve(async (req) => {
         ? firstPayment.amount - stripeFee - platformFee
         : firstPayment.amount - platformFee
 
-      // Create Stripe PaymentIntent
+      // Create Stripe PaymentIntent - confirm immediately with saved method
       const paymentIntentParams: Stripe.PaymentIntentCreateParams = {
         amount: Math.round(totalCharge * 100), // Convert to cents
         currency: 'usd',
         customer: memberDues.user_profiles.stripe_customer_id,
         payment_method: stripe_payment_method_id,
         payment_method_types: [savedMethod.type],
-        confirm: false, // Let frontend confirm
-        setup_future_usage: 'off_session', // Important for future auto-charges
+        confirm: true,
+        off_session: true,
         transfer_data: {
           destination: stripeAccount.stripe_account_id,
           amount: Math.round(chapterReceives * 100)
@@ -384,7 +386,10 @@ serve(async (req) => {
       const paymentIntent = await stripe.paymentIntents.create(paymentIntentParams)
       paymentIntentClientSecret = paymentIntent.client_secret
 
-      // Store payment intent in database
+      // Determine status based on PaymentIntent result
+      const piStatus = paymentIntent.status
+
+      // Store payment intent in database with actual status
       await supabaseAdmin
         .from('payment_intents')
         .insert({
@@ -399,42 +404,94 @@ serve(async (req) => {
           total_charge: totalCharge,
           net_amount: chapterReceives,
           payment_method_type: savedMethod.type,
-          status: 'pending'
+          status: piStatus === 'succeeded' ? 'succeeded' : piStatus === 'processing' ? 'processing' : 'pending'
         })
 
-      // Update the first installment payment with the Stripe PI ID
-      await supabaseAdmin
-        .from('installment_payments')
-        .update({
-          stripe_payment_intent_id: paymentIntent.id,
-          status: 'processing'
-        })
-        .eq('id', firstPayment.id)
+      if (piStatus === 'succeeded') {
+        // Payment succeeded immediately — mark first installment as paid
+        await supabaseAdmin
+          .from('installment_payments')
+          .update({
+            stripe_payment_intent_id: paymentIntent.id,
+            status: 'paid',
+            paid_at: new Date().toISOString()
+          })
+          .eq('id', firstPayment.id)
+
+        await supabaseAdmin
+          .from('installment_plans')
+          .update({
+            installments_paid: 1,
+            next_payment_date: payments?.[1]?.scheduled_date || null
+          })
+          .eq('id', planId)
+
+        await supabaseAdmin
+          .from('member_dues')
+          .update({
+            amount_paid: memberDues.amount_paid + firstPayment.amount,
+            balance: memberDues.balance - firstPayment.amount
+          })
+          .eq('id', member_dues_id)
+
+        responseData.payment_complete = true
+      } else if (piStatus === 'processing') {
+        // ACH — mark installment as processing
+        await supabaseAdmin
+          .from('installment_payments')
+          .update({
+            stripe_payment_intent_id: paymentIntent.id,
+            status: 'processing'
+          })
+          .eq('id', firstPayment.id)
+
+        responseData.payment_processing = true
+      } else if (piStatus === 'requires_action') {
+        // 3DS verification needed — frontend must handle
+        await supabaseAdmin
+          .from('installment_payments')
+          .update({
+            stripe_payment_intent_id: paymentIntent.id,
+            status: 'processing'
+          })
+          .eq('id', firstPayment.id)
+
+        responseData.requires_action = true
+      } else {
+        // Unexpected status — update installment and let frontend handle
+        await supabaseAdmin
+          .from('installment_payments')
+          .update({
+            stripe_payment_intent_id: paymentIntent.id,
+            status: 'processing'
+          })
+          .eq('id', firstPayment.id)
+      }
     }
 
     // Format schedule for response
+    const firstPaymentPaid = skipFirstPayment || responseData.payment_complete === true
     const schedule = payments?.map(p => ({
       installment_number: p.installment_number,
       amount: p.amount,
       scheduled_date: p.scheduled_date,
-      status: skipFirstPayment && p.installment_number === 1 ? 'paid' : (p.installment_number === 1 ? 'processing' : 'scheduled')
+      status: firstPaymentPaid && p.installment_number === 1 ? 'paid' : (p.installment_number === 1 ? 'processing' : 'scheduled')
     }))
 
-    const responseData: Record<string, unknown> = {
-      success: true,
-      plan_id: planId,
-      total_amount: totalAmount,
-      num_installments: num_installments,
-      installment_amount: baseAmount,
-      first_payment_amount: firstPaymentAmount,
-      payment_method_type: savedMethod.type,
-      schedule: schedule,
-      skip_first_payment: skipFirstPayment,
-      deadline_date: deadline
-    }
+    // Build response
+    responseData.success = true
+    responseData.plan_id = planId
+    responseData.total_amount = totalAmount
+    responseData.num_installments = num_installments
+    responseData.installment_amount = baseAmount
+    responseData.first_payment_amount = firstPaymentAmount
+    responseData.payment_method_type = savedMethod.type
+    responseData.schedule = schedule
+    responseData.skip_first_payment = skipFirstPayment
+    responseData.deadline_date = deadline
 
-    // Only include payment intent data if we created one
-    if (!skipFirstPayment && paymentIntentClientSecret) {
+    // Include payment intent data for 3DS/requires_action flow
+    if (!skipFirstPayment && paymentIntentClientSecret && responseData.requires_action) {
       responseData.first_payment_client_secret = paymentIntentClientSecret
       responseData.first_payment_total_charge = totalCharge
       responseData.stripe_fee = stripeFee

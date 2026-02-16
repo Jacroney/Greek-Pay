@@ -343,13 +343,39 @@ const StripeCheckoutModal: React.FC<StripeCheckoutModalProps> = ({
         selectedInstallmentMethod
       );
 
-      if (response.success && response.first_payment_client_secret) {
-        // Set up to process the first payment
+      if (response.error) {
+        toast.error(response.error);
+        return;
+      }
+
+      if (response.success && response.payment_complete) {
+        // Payment succeeded immediately with saved method
+        setPaymentComplete(true);
+        setShowInstallmentOption(false);
+        toast.success('Payment successful! Installment plan created.');
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 2000);
+      } else if (response.success && response.payment_processing) {
+        // ACH payment processing
+        setPaymentComplete(true);
+        setShowInstallmentOption(false);
+        toast.success('Payment is processing. Installment plan created!');
+        setTimeout(() => {
+          onSuccess();
+          onClose();
+        }, 2000);
+      } else if (response.success && response.requires_action && response.first_payment_client_secret) {
+        // 3DS verification needed — show Elements for verification
         setClientSecret(response.first_payment_client_secret);
         setShowInstallmentOption(false);
-        toast.success(`Installment plan created! Processing first payment of ${formatCurrency(response.first_payment_amount || 0)}`);
-      } else if (response.error) {
-        toast.error(response.error);
+        toast.info('Additional verification required for your payment');
+      } else if (response.success) {
+        // Fallback — plan created but unexpected payment state
+        toast.success('Installment plan created!');
+        onSuccess();
+        onClose();
       }
     } catch (err: any) {
       console.error('Error creating installment plan:', err);
