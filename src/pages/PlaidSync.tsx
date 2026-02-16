@@ -66,32 +66,32 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
       {/* Header */}
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4 flex-1">
-            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/20 rounded-lg flex items-center justify-center">
-              <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Building2 className="h-6 w-6 text-blue-600" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900">
                   {connection.institution_name || 'Unknown Institution'}
                 </h3>
                 {connection.environment === 'sandbox' ? (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 text-xs font-medium rounded">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-yellow-100 text-yellow-800 text-xs font-medium rounded">
                     <TestTube2 className="h-3 w-3" />
                     Sandbox
                   </span>
                 ) : (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 text-xs font-medium rounded">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-800 text-xs font-medium rounded">
                     <ShieldCheck className="h-3 w-3" />
                     Production
                   </span>
                 )}
               </div>
-              <div className="mt-1 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+              <div className="mt-1 flex items-center gap-4 text-sm text-gray-500">
                 <span>{connection.account_count} account(s)</span>
                 <span>•</span>
                 <span className="flex items-center gap-1">
@@ -100,7 +100,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
                 </span>
               </div>
               <div className="mt-2">
-                <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                <span className="text-2xl font-bold text-gray-900">
                   {formatCurrency(connection.total_balance)}
                 </span>
               </div>
@@ -112,7 +112,7 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
             <button
               onClick={() => onSync(connection.id)}
               disabled={isSyncing}
-              className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
               title="Sync transactions"
             >
               <RefreshCw className={`h-5 w-5 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -120,14 +120,14 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
             <button
               onClick={() => onDelete(connection.id)}
               disabled={isSyncing}
-              className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors disabled:opacity-50"
+              className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
               title="Remove connection"
             >
               <Trash2 className="h-5 w-5" />
             </button>
             <button
               onClick={handleExpand}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
               title="View accounts"
             >
               {expanded ? (
@@ -142,16 +142,16 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
 
       {/* Expanded Accounts Section */}
       {expanded && (
-        <div className="border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/50 p-6">
+        <div className="border-t border-gray-200 bg-gray-50 p-6">
           {loadingAccounts ? (
             <div className="text-center py-4">
               <RefreshCw className="h-6 w-6 animate-spin mx-auto text-gray-400" />
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+              <p className="text-sm text-gray-500 mt-2">
                 Loading accounts...
               </p>
             </div>
           ) : accounts.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400 py-4">
+            <p className="text-center text-gray-500 py-4">
               No accounts found
             </p>
           ) : (
@@ -159,25 +159,25 @@ const ConnectionCard: React.FC<ConnectionCardProps> = ({
               {accounts.map((account) => (
                 <div
                   key={account.id}
-                  className="bg-white dark:bg-gray-800 rounded-lg p-4 flex items-center justify-between"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
                     <CreditCard className="h-5 w-5 text-gray-400" />
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">
+                      <p className="font-medium text-gray-900">
                         {account.account_name}
                       </p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         {account.account_subtype} ••{account.mask}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-gray-900 dark:text-white">
+                    <p className="font-semibold text-gray-900">
                       {formatCurrency(account.current_balance)}
                     </p>
                     {account.available_balance !== null && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <p className="text-sm text-gray-500">
                         Available: {formatCurrency(account.available_balance)}
                       </p>
                     )}
@@ -274,10 +274,10 @@ export function PlaidSync() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-3xl font-bold text-gray-900">
               Bank Account Sync
             </h1>
-            <p className="mt-2 text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-gray-600">
               Connect your bank accounts and automatically sync transactions
             </p>
           </div>
@@ -307,31 +307,31 @@ export function PlaidSync() {
 
       {/* Connections List */}
       {connections.length === 0 ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-12">
+        <div className="bg-white rounded-lg shadow-lg p-12">
           <div className="text-center">
-            <div className="mx-auto w-24 h-24 bg-blue-100 dark:bg-blue-900/20 rounded-full flex items-center justify-center mb-6">
-              <Building2 className="h-12 w-12 text-blue-600 dark:text-blue-400" />
+            <div className="mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-6">
+              <Building2 className="h-12 w-12 text-blue-600" />
             </div>
 
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
               No Banks Connected
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto mb-8">
+            <p className="text-gray-600 max-w-md mx-auto mb-8">
               Connect your bank account to automatically import transactions and track
               your balance in real-time.
             </p>
 
             <PlaidLink onSuccess={loadData} showEnvironmentToggle={true} />
 
-            <div className="bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg p-4 max-w-lg mx-auto mt-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 max-w-lg mx-auto mt-8">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
                 <div className="text-left">
-                  <p className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                  <p className="text-sm font-medium text-blue-900 mb-1">
                     Secure & Read-Only Access
                   </p>
-                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                  <p className="text-sm text-blue-700">
                     We use Plaid to securely connect to your bank with read-only
                     access. We can never move money or access your login credentials.
                   </p>

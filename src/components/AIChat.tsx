@@ -117,20 +117,20 @@ export const AIChat: React.FC<AIChatProps> = ({
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center">
             <Bot className="w-16 h-16 text-blue-500 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
               AI Financial Advisor
             </h3>
             
             {/* Demo Mode Notice */}
             {isDemoModeEnabled() && (
-              <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg max-w-md">
+              <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg max-w-md">
                 <div className="flex items-start gap-2">
-                  <Info className="w-4 h-4 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
+                  <Info className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-amber-800 dark:text-amber-300 mb-1">
+                    <p className="text-sm font-medium text-amber-800 mb-1">
                       Demo Mode
                     </p>
-                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                    <p className="text-xs text-amber-700">
                       This AI advisor is using pre-written responses for demonstration purposes. 
                       The real version makes live API calls to provide personalized financial insights.
                     </p>
@@ -139,15 +139,15 @@ export const AIChat: React.FC<AIChatProps> = ({
               </div>
             )}
             
-            <p className="text-gray-600 dark:text-gray-400 max-w-md">
+            <p className="text-gray-600 max-w-md">
               Ask me anything about your chapter's finances, budgets, expenses, or get advice on
               financial management!
             </p>
             <div className="mt-6 space-y-2">
-              <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <p className="text-sm font-medium text-gray-700">
                 Try asking:
               </p>
-              <div className="space-y-1 text-sm text-gray-600 dark:text-gray-400">
+              <div className="space-y-1 text-sm text-gray-600">
                 <p>• "How much have we spent on events this month?"</p>
                 <p>• "Are we on track with our budget?"</p>
                 <p>• "What are our biggest expenses?"</p>
@@ -163,8 +163,8 @@ export const AIChat: React.FC<AIChatProps> = ({
             className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {message.role === 'assistant' && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-                <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                <Bot className="w-5 h-5 text-blue-600" />
               </div>
             )}
 
@@ -172,7 +172,7 @@ export const AIChat: React.FC<AIChatProps> = ({
               className={`max-w-3xl rounded-lg px-4 py-3 ${
                 message.role === 'user'
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                  : 'bg-gray-100 text-gray-900'
               }`}
             >
               <p className="text-sm whitespace-pre-wrap">{message.content}</p>
@@ -184,8 +184,8 @@ export const AIChat: React.FC<AIChatProps> = ({
             </div>
 
             {message.role === 'user' && (
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
-                <User className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
+                <User className="w-5 h-5 text-gray-600" />
               </div>
             )}
           </div>
@@ -193,11 +193,11 @@ export const AIChat: React.FC<AIChatProps> = ({
 
         {isLoading && (
           <div className="flex gap-3 justify-start">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
-              <Bot className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <Bot className="w-5 h-5 text-blue-600" />
             </div>
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg px-4 py-3">
-              <Loader className="w-5 h-5 animate-spin text-gray-600 dark:text-gray-400" />
+            <div className="bg-gray-100 rounded-lg px-4 py-3">
+              <Loader className="w-5 h-5 animate-spin text-gray-600" />
             </div>
           </div>
         )}
@@ -206,7 +206,7 @@ export const AIChat: React.FC<AIChatProps> = ({
       </div>
 
       {/* Input Area */}
-      <div className="border-t border-gray-200 dark:border-gray-700 p-4">
+      <div className="border-t border-gray-200 p-4">
         <div className="flex gap-2">
           <textarea
             ref={inputRef}
@@ -214,7 +214,7 @@ export const AIChat: React.FC<AIChatProps> = ({
             onChange={(e) => setInputMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask me anything about your finances..."
-            className="flex-1 resize-none rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-3 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 resize-none rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows={1}
             disabled={isLoading}
           />
@@ -226,7 +226,7 @@ export const AIChat: React.FC<AIChatProps> = ({
             <Send className="w-5 h-5" />
           </button>
         </div>
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        <p className="mt-2 text-xs text-gray-500">
           Press Enter to send, Shift+Enter for new line
         </p>
       </div>

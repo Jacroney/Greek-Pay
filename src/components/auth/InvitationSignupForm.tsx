@@ -109,18 +109,18 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
           <img
             src="/GreekPay-logo-transparent.png"
             alt="Greek Pay Logo"
-            className="w-full h-full object-contain block dark:hidden"
+            className="w-full h-full object-contain block"
           />
           <img
             src="/GreekPay-logo-transparent.png"
             alt="Greek Pay Logo"
-            className="w-full h-full object-contain hidden dark:block invert"
+            className="w-full h-full object-contain hidden invert"
           />
         </div>
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-3xl font-bold text-gray-900">
           Welcome, {invitationData.first_name}!
         </h2>
-        <p className="mt-2 text-gray-600 dark:text-gray-400">
+        <p className="mt-2 text-gray-600">
           {chapterName
             ? `You've been invited to join ${chapterName}`
             : 'Set your password to join your chapter'}
@@ -129,13 +129,13 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
 
       <form
         onSubmit={handleSubmit}
-        className="space-y-6 bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700"
+        className="space-y-6 bg-white p-8 rounded-2xl shadow-xl border border-gray-100"
       >
         {/* Email (read-only) */}
         <div>
           <label
             htmlFor="email"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             Email Address
           </label>
@@ -160,8 +160,8 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
               type="email"
               value={invitationData.email}
               readOnly
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
-                       bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300
+              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg
+                       bg-gray-50 text-gray-600
                        cursor-not-allowed"
             />
           </div>
@@ -171,7 +171,7 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
         <div>
           <label
             htmlFor="password"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             Create Password
           </label>
@@ -198,10 +198,10 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full pl-10 pr-10 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+              className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                       dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                       transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500"
+                       placeholder-gray-400
+                       transition-all duration-200 hover:border-gray-400"
               placeholder="At least 6 characters"
             />
             <button
@@ -242,7 +242,7 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
         <div>
           <label
             htmlFor="confirmPassword"
-            className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            className="block text-sm font-medium text-gray-700 mb-2"
           >
             Confirm Password
           </label>
@@ -269,18 +269,18 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
-              className="w-full pl-10 pr-3 py-3 border border-gray-300 dark:border-gray-600 rounded-lg
+              className="w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg
                        focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-                       dark:bg-gray-700 dark:text-white placeholder-gray-400 dark:placeholder-gray-500
-                       transition-all duration-200 hover:border-gray-400 dark:hover:border-gray-500"
+                       placeholder-gray-400
+                       transition-all duration-200 hover:border-gray-400"
               placeholder="Re-enter your password"
             />
           </div>
         </div>
 
         {error && (
-          <div className="rounded-lg bg-red-50 dark:bg-red-900/30 p-3">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <div className="rounded-lg bg-red-50 p-3">
+            <p className="text-sm text-red-600">{error}</p>
           </div>
         )}
 
@@ -289,7 +289,7 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
           disabled={isLoading}
           className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white
                    bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-                   disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-500 dark:hover:bg-blue-600"
+                   disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? (
             <>
@@ -305,7 +305,7 @@ export const InvitationSignupForm: React.FC<InvitationSignupFormProps> = ({
       <div className="mt-6 text-center">
         <button
           onClick={() => navigate('/signin')}
-          className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+          className="text-sm text-blue-600 hover:text-blue-500"
         >
           Already have an account? Sign in
         </button>

@@ -70,8 +70,8 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8">
         {/* Progress Indicator */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
@@ -93,10 +93,10 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
             ))}
           </div>
           <div className="mt-4 text-center">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 className="text-2xl font-bold text-gray-900">
               Welcome to Greek Pay! Let's get you set up.
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-gray-600 mt-2">
               Step {currentStep} of 3 - This will only take a few minutes
             </p>
           </div>
@@ -105,12 +105,12 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
         {/* Step 1: Chapter Information */}
         {currentStep === 1 && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-gray-900">
               Chapter Information
             </h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Chapter Name
               </label>
               <input
@@ -122,21 +122,21 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Treasurer Email
               </label>
               <input
                 type="email"
                 value={setupData.chapterInfo.treasurerEmail}
                 onChange={(e) => updateChapterInfo('treasurerEmail', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                         focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                         focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Meeting Time
                 </label>
                 <input
@@ -144,13 +144,13 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
                   placeholder="e.g., Mondays 7:00 PM"
                   value={setupData.chapterInfo.meetingTime}
                   onChange={(e) => updateChapterInfo('meetingTime', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                           focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Meeting Location
                 </label>
                 <input
@@ -158,14 +158,14 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
                   placeholder="e.g., Student Union Room 201"
                   value={setupData.chapterInfo.meetingLocation}
                   onChange={(e) => updateChapterInfo('meetingLocation', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                           focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Semester Dues Amount
               </label>
               <div className="relative">
@@ -175,8 +175,8 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
                   step="0.01"
                   value={setupData.chapterInfo.semesterDues}
                   onChange={(e) => updateChapterInfo('semesterDues', parseFloat(e.target.value))}
-                  className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg
+                           focus:ring-2 focus:ring-blue-500"
                 />
               </div>
             </div>
@@ -186,17 +186,17 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
         {/* Step 2: Payment Methods */}
         {currentStep === 2 && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-gray-900">
               Payment Methods
             </h2>
 
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-gray-600">
               Select which payment methods your chapter accepts for dues:
             </p>
 
             <div className="grid grid-cols-2 gap-4">
               {['Venmo', 'Zelle', 'Cash', 'Check', 'Bank Transfer', 'PayPal'].map((method) => (
-                <label key={method} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+                <label key={method} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50">
                   <input
                     type="checkbox"
                     checked={setupData.chapterInfo.paymentMethods.includes(method)}
@@ -211,16 +211,16 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
                     }}
                     className="h-4 w-4 text-blue-600 rounded focus:ring-blue-500"
                   />
-                  <span className="text-gray-900 dark:text-white">{method}</span>
+                  <span className="text-gray-900">{method}</span>
                 </label>
               ))}
             </div>
 
-            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-lg">
-              <h3 className="font-medium text-blue-900 dark:text-blue-100 mb-2">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h3 className="font-medium text-blue-900 mb-2">
                 💡 Pro Tip
               </h3>
-              <p className="text-sm text-blue-700 dark:text-blue-200">
+              <p className="text-sm text-blue-700">
                 Digital payment methods like Venmo and Zelle make it easier to track payments automatically.
                 You can always add more payment methods later in Settings.
               </p>
@@ -231,19 +231,19 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
         {/* Step 3: Admin Preferences */}
         {currentStep === 3 && (
           <div className="space-y-6">
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-semibold text-gray-900">
               Admin Preferences
             </h2>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Fiscal Year Start
               </label>
               <select
                 value={setupData.adminPreferences.fiscalYearStart}
                 onChange={(e) => updateAdminPreferences('fiscalYearStart', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                         focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                         focus:ring-2 focus:ring-blue-500"
               >
                 <option value="January">January</option>
                 <option value="July">July</option>
@@ -252,7 +252,7 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Default Expense Categories
               </label>
               <div className="space-y-2">
@@ -266,8 +266,8 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
                         newCategories[index] = e.target.value;
                         updateAdminPreferences('defaultCategories', newCategories);
                       }}
-                      className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                               focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg
+                               focus:ring-2 focus:ring-blue-500"
                     />
                     <button
                       onClick={() => {
@@ -291,11 +291,11 @@ export const FirstTimeSetup: React.FC<{ onComplete: () => void }> = ({ onComplet
               </div>
             </div>
 
-            <div className="bg-green-50 dark:bg-green-900 p-4 rounded-lg">
-              <h3 className="font-medium text-green-900 dark:text-green-100 mb-2">
+            <div className="bg-green-50 p-4 rounded-lg">
+              <h3 className="font-medium text-green-900 mb-2">
                 🎉 You're all set!
               </h3>
-              <p className="text-sm text-green-700 dark:text-green-200">
+              <p className="text-sm text-green-700">
                 Your financial management system is ready to use. You can always update these settings later.
               </p>
             </div>

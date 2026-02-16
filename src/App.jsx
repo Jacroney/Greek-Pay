@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import { Analytics } from '@vercel/analytics/react';
-import { ThemeProvider } from './context/ThemeContext';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ChapterProvider } from './context/ChapterContext';
 import { ChapterThemeProvider } from './context/ChapterThemeContext';
@@ -34,10 +33,9 @@ import { enableDemoMode } from './demo/demoMode';
 
 function App() {
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <ChapterProvider>
-          <ChapterThemeProvider>
+    <AuthProvider>
+      <ChapterProvider>
+        <ChapterThemeProvider>
             <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -92,7 +90,6 @@ function App() {
           </ChapterThemeProvider>
         </ChapterProvider>
       </AuthProvider>
-    </ThemeProvider>
   );
 }
 
@@ -116,10 +113,10 @@ const ProtectedAppRoutes = () => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <p className="text-sm text-slate-500 dark:text-slate-300">Loading application…</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+          <p className="text-sm text-[var(--brand-text-subdued)]">Loading application…</p>
         </div>
       </div>
     );
@@ -127,10 +124,10 @@ const ProtectedAppRoutes = () => {
 
   if (!profile && user && !loadingTimeout) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)]">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600"></div>
-          <p className="text-sm text-slate-500">Loading profile…</p>
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-primary"></div>
+          <p className="text-sm text-[var(--brand-text-subdued)]">Loading profile…</p>
           <p className="text-xs text-slate-400">This is taking longer than usual…</p>
         </div>
       </div>
@@ -139,11 +136,11 @@ const ProtectedAppRoutes = () => {
 
   if (loadingTimeout && user && !profile) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] p-4 dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] p-4">
         <div className="max-w-md text-center">
           <div className="mb-4 text-5xl">⚠️</div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-slate-100">Profile loading failed</h2>
-          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
+          <h2 className="text-xl font-semibold text-[var(--brand-text)]">Profile loading failed</h2>
+          <p className="mt-2 text-sm text-[var(--brand-text-subdued)]">
             There was an issue loading your profile. This may be due to database permissions.
           </p>
           <button
@@ -174,7 +171,7 @@ const ProtectedAppRoutes = () => {
   if (hasAdminAccess) {
     return (
       <Routes>
-        <Route path="" element={<MainLayout basePath="/demo" />}>
+        <Route path="" element={<MainLayout />}>
           <Route index element={<Dashboard />} />
           <Route path="transactions" element={<Transactions />} />
           <Route path="recurring" element={<RecurringTransactions />} />
@@ -200,14 +197,14 @@ const ProtectedAppRoutes = () => {
 
 const DemoRoutes = () => {
   // Enable demo mode when demo routes are accessed
-  React.useEffect(() => {
+  useEffect(() => {
     enableDemoMode();
   }, []);
 
   return (
     <FinancialProvider>
       <Routes>
-        <Route path="" element={<MainLayout />}>
+        <Route path="" element={<MainLayout basePath="/demo" />}>
           <Route index element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="transactions" element={<Transactions />} />

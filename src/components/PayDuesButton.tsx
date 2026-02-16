@@ -173,7 +173,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
       case 'primary':
         return `${baseStyles} px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 disabled:shadow-none disabled:hover:translate-y-0`;
       case 'secondary':
-        return `${baseStyles} px-4 py-2.5 bg-white dark:bg-gray-700 text-blue-600 dark:text-blue-400 border-2 border-blue-500 dark:border-blue-500 rounded-xl hover:bg-blue-50 dark:hover:bg-gray-600 hover:border-blue-600 dark:hover:border-blue-400`;
+        return `${baseStyles} px-4 py-2.5 bg-white text-blue-600 border-2 border-blue-500 rounded-xl hover:bg-blue-50 hover:border-blue-600`;
       case 'small':
         return `${baseStyles} px-3 py-1.5 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md`;
       default:
@@ -213,11 +213,11 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
             buttonClass: 'from-green-500 to-emerald-500 shadow-green-500/25',
             title: `${paymentType} is processing`,
             message: 'Bank transfers typically take 3-5 business days to complete.',
-            bgClass: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700',
-            iconBgClass: 'bg-green-100 dark:bg-green-900/50',
-            iconClass: 'text-green-600 dark:text-green-400',
-            textClass: 'text-green-800 dark:text-green-200',
-            subtextClass: 'text-green-700 dark:text-green-300',
+            bgClass: 'bg-green-50 border-green-200',
+            iconBgClass: 'bg-green-100',
+            iconClass: 'text-green-600',
+            textClass: 'text-green-800',
+            subtextClass: 'text-green-700',
           };
         case 'requires_action':
           return {
@@ -225,11 +225,11 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
             buttonClass: 'from-yellow-500 to-amber-500 shadow-yellow-500/25',
             title: 'Bank verification needed',
             message: 'Check your email for bank verification instructions. You\'ll need to enter a code from your bank statement to complete payment.',
-            bgClass: 'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700',
-            iconBgClass: 'bg-yellow-100 dark:bg-yellow-900/50',
-            iconClass: 'text-yellow-600 dark:text-yellow-400',
-            textClass: 'text-yellow-800 dark:text-yellow-200',
-            subtextClass: 'text-yellow-700 dark:text-yellow-300',
+            bgClass: 'bg-yellow-50 border-yellow-200',
+            iconBgClass: 'bg-yellow-100',
+            iconClass: 'text-yellow-600',
+            textClass: 'text-yellow-800',
+            subtextClass: 'text-yellow-700',
           };
         default: // 'pending'
           return {
@@ -237,11 +237,11 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
             buttonClass: 'from-amber-500 to-orange-500 shadow-amber-500/25',
             title: `${paymentType} is pending`,
             message: 'Your payment is being processed.',
-            bgClass: 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-700',
-            iconBgClass: 'bg-amber-100 dark:bg-amber-900/50',
-            iconClass: 'text-amber-600 dark:text-amber-400',
-            textClass: 'text-amber-800 dark:text-amber-200',
-            subtextClass: 'text-amber-700 dark:text-amber-300',
+            bgClass: 'bg-amber-50 border-amber-200',
+            iconBgClass: 'bg-amber-100',
+            iconClass: 'text-amber-600',
+            textClass: 'text-amber-800',
+            subtextClass: 'text-amber-700',
           };
       }
     };
@@ -277,18 +277,18 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
       <div className="space-y-3">
         <button
           disabled
-          className={`font-semibold transition-all duration-200 flex items-center justify-center px-6 py-3.5 bg-gray-400 dark:bg-gray-600 text-white rounded-xl cursor-not-allowed ${className}`}
+          className={`font-semibold transition-all duration-200 flex items-center justify-center px-6 py-3.5 bg-gray-400 text-white rounded-xl cursor-not-allowed ${className}`}
           title={error}
         >
           <Lock className={`mr-2 ${getIconSize()}`} />
           Pay Online
         </button>
         {variant !== 'small' && (
-          <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 rounded-xl p-4 flex items-start gap-3">
-            <div className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-100 dark:bg-yellow-900/50">
-              <AlertCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-400" />
+          <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex items-start gap-3">
+            <div className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-lg bg-yellow-100">
+              <AlertCircle className="w-4 h-4 text-yellow-600" />
             </div>
-            <p className="text-sm text-yellow-800 dark:text-yellow-200">{error}</p>
+            <p className="text-sm text-yellow-800">{error}</p>
           </div>
         )}
       </div>
@@ -317,13 +317,13 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
               onClick={() => setPaymentMode('full')}
               className={`w-full p-3 rounded-lg border-2 transition-all duration-200 text-left ${
                 paymentMode === 'full'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="font-medium text-gray-900 dark:text-white">Pay Full Balance</span>
-                <span className="font-bold text-blue-600 dark:text-blue-400">
+                <span className="font-medium text-gray-900">Pay Full Balance</span>
+                <span className="font-bold text-blue-600">
                   ${memberDues.balance.toFixed(2)}
                 </span>
               </div>
@@ -334,20 +334,20 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
               onClick={() => setPaymentMode('custom')}
               className={`w-full p-3 rounded-lg border-2 transition-all duration-200 text-left ${
                 paymentMode === 'custom'
-                  ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30'
-                  : 'border-gray-200 dark:border-gray-700 hover:border-blue-300'
+                  ? 'border-blue-500 bg-blue-50'
+                  : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-gray-500" />
-                <span className="font-medium text-gray-900 dark:text-white">Pay Custom Amount</span>
+                <span className="font-medium text-gray-900">Pay Custom Amount</span>
               </div>
             </button>
 
             {/* Custom Amount Input */}
             {paymentMode === 'custom' && (
               <div className="pt-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
                   Enter amount ($1.00 - ${memberDues.balance.toFixed(2)})
                 </label>
                 <div className="relative">
@@ -360,11 +360,11 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
                     placeholder="0.00"
-                    className="w-full pl-7 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-7 pr-4 py-2.5 border border-gray-300 rounded-lg bg-white text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 {customAmount && parseFloat(customAmount) > 0 && parseFloat(customAmount) < memberDues.balance && (
-                  <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                  <p className="mt-1 text-xs text-gray-500">
                     Remaining after payment: ${(memberDues.balance - parseFloat(customAmount)).toFixed(2)}
                   </p>
                 )}
@@ -373,8 +373,8 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
 
             {/* Flexible Plan Deadline Info */}
             {hasFlexiblePlan && memberDues.flexible_plan_deadline && (
-              <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-3">
-                <p className="text-xs text-purple-800 dark:text-purple-200">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                <p className="text-xs text-purple-800">
                   <span className="font-semibold">Flexible Payment Plan</span> - Pay any amount until{' '}
                   {new Date(memberDues.flexible_plan_deadline).toLocaleDateString('en-US', {
                     month: 'long',

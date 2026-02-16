@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabaseClient';
+import { isDemoModeEnabled } from '../utils/env';
 
 export const SupabaseConnectionTest: React.FC = () => {
   const [testResult, setTestResult] = useState<string>('');
   const [isTesting, setIsTesting] = useState(false);
 
   const testConnection = async () => {
+    if (isDemoModeEnabled()) {
+      setTestResult('✅ Demo mode — no real connection needed.');
+      return;
+    }
+
     setIsTesting(true);
     setTestResult('Testing connection...');
 

@@ -63,7 +63,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
             placeholder="Search pages or actions (⌘K)"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            className="focus-ring w-full rounded-lg border border-transparent bg-[var(--brand-panel)] px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 dark:text-slate-100"
+            className="focus-ring w-full rounded-lg border border-transparent bg-[var(--brand-panel)] px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400"
           />
         </div>
 
@@ -82,7 +82,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                       navigate(route.path);
                       onClose();
                     }}
-                    className="focus-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="focus-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-slate-700 transition-colors hover:bg-slate-100"
                   >
                     {route.label}
                     <span className="text-xs text-slate-400">↵</span>
@@ -102,7 +102,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({ isOpen, onClose,
                       onAction(item.action);
                       onClose();
                     }}
-                    className="focus-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-slate-700 transition-colors hover:bg-slate-100 dark:text-slate-200 dark:hover:bg-slate-800"
+                    className="focus-ring flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-slate-700 transition-colors hover:bg-slate-100"
                   >
                     {item.label}
                     <span className="text-xs text-slate-400">⇧↵</span>

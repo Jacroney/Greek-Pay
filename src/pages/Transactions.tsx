@@ -7,6 +7,7 @@ import { CSVService } from '../services/csvService';
 import { TransactionService } from '../services/transactionService';
 import { ExpenseService } from '../services/expenseService';
 import { supabase } from '../services/supabaseClient';
+import { isDemoModeEnabled } from '../utils/env';
 
 // Sorting types
 type SortField = 'date' | 'amount' | 'description' | 'category' | 'source' | 'type';
@@ -142,6 +143,11 @@ const Transactions: React.FC = () => {
 
   // Handle recategorize all transactions
   const handleRecategorizeAll = async () => {
+    if (isDemoModeEnabled()) {
+      toast.success('Transactions recategorized! (Demo)');
+      return;
+    }
+
     if (!currentChapter?.id) {
       toast.error('No chapter selected');
       return;
@@ -300,16 +306,16 @@ const Transactions: React.FC = () => {
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div>
             <span className="surface-pill">Operations</span>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+            <h1 className="mt-2 text-3xl font-semibold text-slate-900">
               Transactions
             </h1>
-            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+            <p className="mt-1 text-sm text-slate-600">
               Import, categorise, and monitor every movement of cash for your chapter.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <button
-              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-amber-700/40 dark:bg-gray-800 dark:text-amber-300 dark:hover:bg-gray-700"
+              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-medium text-amber-700 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={handleRecategorizeAll}
               disabled={isRecategorizing || expenses.length === 0}
               title="Re-run auto-categorization on all transactions"
@@ -327,7 +333,7 @@ const Transactions: React.FC = () => {
               {isRecategorizing ? 'Recategorizing...' : 'Recategorize All'}
             </button>
             <button
-              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-white px-4 py-2.5 text-sm font-medium text-sky-700 transition-colors hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-sky-700/40 dark:bg-gray-800 dark:text-sky-300 dark:hover:bg-gray-700"
+              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-sky-200 bg-white px-4 py-2.5 text-sm font-medium text-sky-700 transition-colors hover:bg-sky-50 disabled:cursor-not-allowed disabled:opacity-50"
               onClick={() => {
                 const periodName = selectedPeriod?.name.replace(/\s+/g, '-').toLowerCase() || 'all';
                 // Convert ExpenseDetail to Transaction format for CSV export
@@ -355,7 +361,7 @@ const Transactions: React.FC = () => {
               Export CSV
             </button>
             <button
-              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 dark:border-blue-700/40 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700"
+              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2.5 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100"
               onClick={() => setShowImportModal(true)}
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -385,13 +391,13 @@ const Transactions: React.FC = () => {
                 className={`focus-ring rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   selectedPeriodId === period.id
                     ? 'border-[var(--brand-primary)] bg-[var(--brand-primary-soft)] text-[var(--brand-primary)]'
-                    : 'border-[var(--brand-border)] bg-white text-slate-600 hover:bg-slate-100 dark:bg-gray-800 dark:text-slate-300'
+                    : 'border-[var(--brand-border)] bg-white text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 <span className="font-medium">{period.name}</span>
                 <p className="text-xs text-slate-500">
                   {period.type} • {period.fiscal_year}
-                  {period.is_current && <span className="ml-1 text-emerald-600 dark:text-emerald-400">(Current)</span>}
+                  {period.is_current && <span className="ml-1 text-emerald-600">(Current)</span>}
                 </p>
               </button>
             ))
@@ -401,25 +407,25 @@ const Transactions: React.FC = () => {
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <div className="surface-panel p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500">Transactions</p>
-            <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">{filteredExpenses.length}</p>
+            <p className="mt-2 text-2xl font-semibold text-slate-900">{filteredExpenses.length}</p>
             <p className="text-xs text-slate-500">
               {periodTotals.expenseCount} expenses • {periodTotals.incomeCount} income
             </p>
           </div>
           <div className="surface-panel p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500">Net movement</p>
-            <p className={`mt-2 text-2xl font-semibold ${periodTotals.total >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+            <p className={`mt-2 text-2xl font-semibold ${periodTotals.total >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
               {formatCurrency(periodTotals.total)}
             </p>
             <p className="text-xs text-slate-500">
-              <span className="text-emerald-600 dark:text-emerald-400">+{formatCurrency(periodTotals.incomeTotal)}</span>
+              <span className="text-emerald-600">+{formatCurrency(periodTotals.incomeTotal)}</span>
               {' / '}
               <span className="text-rose-500">-{formatCurrency(periodTotals.expenseTotal)}</span>
             </p>
           </div>
           <div className="surface-panel p-4">
             <p className="text-xs uppercase tracking-wide text-slate-500">Highest category</p>
-            <p className="mt-2 text-sm font-semibold text-slate-700 dark:text-slate-200">
+            <p className="mt-2 text-sm font-semibold text-slate-700">
               {
                 Object.entries(periodTotals.byCategory)
                   .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))[0]?.[0] || '—'
@@ -434,7 +440,7 @@ const Transactions: React.FC = () => {
               placeholder="Search description, category, source..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="focus-ring mt-2 w-full rounded-lg border border-[var(--brand-border)] bg-white px-3 py-2 text-sm text-slate-700 dark:bg-gray-800 dark:text-slate-200"
+              className="focus-ring mt-2 w-full rounded-lg border border-[var(--brand-border)] bg-white px-3 py-2 text-sm text-slate-700"
             />
           </div>
         </div>
@@ -445,7 +451,7 @@ const Transactions: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 p-4 backdrop-blur-sm animate-fadeIn">
           <div className="surface-card relative w-full max-w-lg max-h-[90vh] overflow-y-auto p-4 sm:p-6 animate-pop">
             <button
-              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600"
               onClick={() => {
                 setShowImportModal(false);
                 setCsvData([]);
@@ -459,7 +465,7 @@ const Transactions: React.FC = () => {
             >
               ✕
             </button>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Import Transactions from CSV</h2>
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Import Transactions from CSV</h2>
             {importStep === 'upload' && (
               <>
                 <input
@@ -493,7 +499,7 @@ const Transactions: React.FC = () => {
                     file:bg-blue-50 file:text-blue-700
                     hover:file:bg-blue-100"
                 />
-                <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                <div className="text-sm text-gray-600 mt-2">
                   <p>Supported formats: CSV files with headers</p>
                   <p>Required fields: Date, Amount, Description</p>
                 </div>
@@ -502,15 +508,15 @@ const Transactions: React.FC = () => {
 
             {importStep === 'mapping' && (
               <>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Map CSV Fields</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Map CSV Fields</h3>
                 <div className="space-y-3 mb-4">
                   {['date', 'amount', 'description', 'category'].map(field => (
                     <div key={field} className="flex items-center space-x-3">
-                      <label className="w-20 text-sm font-medium text-gray-700 dark:text-gray-300 capitalize">{field}:</label>
+                      <label className="w-20 text-sm font-medium text-gray-700 capitalize">{field}:</label>
                       <select
                         value={fieldMapping[field] || ''}
                         onChange={(e) => setFieldMapping(prev => ({ ...prev, [field]: e.target.value }))}
-                        className="flex-1 rounded border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white px-2 py-1 text-sm [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                        className="flex-1 rounded border border-gray-300 bg-white text-gray-900 px-2 py-1 text-sm [&>option]: [&>option]:"
                         required={field !== 'category'}
                       >
                         <option value="">Select field...</option>
@@ -523,7 +529,7 @@ const Transactions: React.FC = () => {
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                     onClick={() => setImportStep('upload')}
                   >
                     Back
@@ -551,7 +557,7 @@ const Transactions: React.FC = () => {
 
             {importStep === 'duplicates' && duplicateResults && (
               <>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Duplicate Detection Results</h3>
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Duplicate Detection Results</h3>
                 <div className="space-y-4 mb-4">
                   <div className="bg-green-50 p-3 rounded border">
                     <h4 className="font-medium text-green-800">✅ Unique Transactions: {duplicateResults.unique.length}</h4>
@@ -591,7 +597,7 @@ const Transactions: React.FC = () => {
                 
                 <div className="flex space-x-2">
                   <button
-                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                     onClick={() => setImportStep('mapping')}
                   >
                     Back
@@ -608,25 +614,25 @@ const Transactions: React.FC = () => {
 
             {importStep === 'preview' && (
               <>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Preview Transactions ({duplicateResults?.unique.length || 0})</h3>
-                <div className="max-h-64 overflow-y-auto border border-gray-300 dark:border-gray-600 rounded mb-4">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">Preview Transactions ({duplicateResults?.unique.length || 0})</h3>
+                <div className="max-h-64 overflow-y-auto border border-gray-300 rounded mb-4">
                   <table className="min-w-full text-xs">
-                    <thead className="bg-gray-50 dark:bg-gray-700">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-2 py-1 text-left text-gray-700 dark:text-gray-300">Date</th>
-                        <th className="px-2 py-1 text-left text-gray-700 dark:text-gray-300">Description</th>
-                        <th className="px-2 py-1 text-left text-gray-700 dark:text-gray-300">Category</th>
-                        <th className="px-2 py-1 text-left text-gray-700 dark:text-gray-300">Amount</th>
+                        <th className="px-2 py-1 text-left text-gray-700">Date</th>
+                        <th className="px-2 py-1 text-left text-gray-700">Description</th>
+                        <th className="px-2 py-1 text-left text-gray-700">Category</th>
+                        <th className="px-2 py-1 text-left text-gray-700">Amount</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200 dark:divide-gray-600">
+                    <tbody className="divide-y divide-gray-200">
                       {(duplicateResults?.unique || []).slice(0, 10).map((tx: Transaction, idx: number) => (
-                        <tr key={idx} className="text-gray-900 dark:text-gray-200">
+                        <tr key={idx} className="text-gray-900">
                           <td className="px-2 py-1">{formatDate(new Date(tx.date))}</td>
                           <td className="px-2 py-1">{tx.description}</td>
                           <td className="px-2 py-1">{tx.category}</td>
                           <td className="px-2 py-1 font-medium">
-                            <span className={tx.amount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}>
+                            <span className={tx.amount >= 0 ? 'text-green-600' : 'text-red-600'}>
                               {formatCurrency(tx.amount)}
                             </span>
                           </td>
@@ -635,7 +641,7 @@ const Transactions: React.FC = () => {
                     </tbody>
                   </table>
                   {(duplicateResults?.unique.length || 0) > 10 && (
-                    <div className="text-gray-500 dark:text-gray-400 text-xs px-2 py-1 bg-gray-50 dark:bg-gray-700">
+                    <div className="text-gray-500 text-xs px-2 py-1 bg-gray-50">
                       ...and {(duplicateResults?.unique.length || 0) - 10} more transactions
                     </div>
                   )}
@@ -643,7 +649,7 @@ const Transactions: React.FC = () => {
 
                 <div className="flex space-x-2">
                   <button
-                    className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-50 dark:hover:bg-gray-700"
+                    className="px-4 py-2 text-sm border border-gray-300 text-gray-700 rounded hover:bg-gray-50"
                     onClick={() => setImportStep('duplicates')}
                   >
                     Back
@@ -704,25 +710,25 @@ const Transactions: React.FC = () => {
       {/* Period Summary */}
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="surface-card p-6">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <h2 className="text-lg font-semibold text-slate-900">
             {selectedPeriod ? `${selectedPeriod.name} Summary` : 'Period Summary'}
           </h2>
-          <div className="mt-4 space-y-3 text-sm text-slate-600 dark:text-slate-300">
+          <div className="mt-4 space-y-3 text-sm text-slate-600">
             <div className="flex items-center justify-between">
               <span>Total transactions</span>
-              <span className="font-semibold text-slate-900 dark:text-slate-100">{filteredExpenses.length}</span>
+              <span className="font-semibold text-slate-900">{filteredExpenses.length}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total income</span>
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">+{formatCurrency(periodTotals.incomeTotal)}</span>
+              <span className="font-semibold text-emerald-600">+{formatCurrency(periodTotals.incomeTotal)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span>Total expenses</span>
               <span className="font-semibold text-rose-500">-{formatCurrency(periodTotals.expenseTotal)}</span>
             </div>
-            <div className="flex items-center justify-between border-t border-slate-200 dark:border-slate-700 pt-2">
+            <div className="flex items-center justify-between border-t border-slate-200 pt-2">
               <span className="font-medium">Net amount</span>
-              <span className={`font-semibold ${periodTotals.total >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+              <span className={`font-semibold ${periodTotals.total >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
                 {formatCurrency(periodTotals.total)}
               </span>
             </div>
@@ -730,14 +736,14 @@ const Transactions: React.FC = () => {
         </div>
 
         <div className="surface-card p-6">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Category breakdown</h2>
-          <div className="mt-4 space-y-2 max-h-40 overflow-y-auto text-sm text-slate-600 dark:text-slate-300">
+          <h2 className="text-lg font-semibold text-slate-900">Category breakdown</h2>
+          <div className="mt-4 space-y-2 max-h-40 overflow-y-auto text-sm text-slate-600">
             {Object.entries(periodTotals.byCategory)
               .sort(([, a], [, b]) => Math.abs(b) - Math.abs(a))
               .map(([category, amount]) => (
                 <div key={category} className="flex items-center justify-between gap-3">
                   <span className="truncate capitalize">{category}</span>
-                  <span className={`font-medium ${amount >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-500'}`}>
+                  <span className={`font-medium ${amount >= 0 ? 'text-emerald-600' : 'text-rose-500'}`}>
                     {formatCurrency(amount)}
                   </span>
                 </div>
@@ -750,19 +756,19 @@ const Transactions: React.FC = () => {
       <div className="surface-card overflow-hidden">
         {/* Mobile Card View */}
         <div className="sm:hidden">
-          <div className="divide-y divide-gray-200 dark:divide-gray-700">
+          <div className="divide-y divide-gray-200">
             {filteredExpenses.map((expense) => (
-              <div key={expense.id} className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 ${expense.transaction_type === 'income' ? 'bg-emerald-50/30 dark:bg-emerald-900/10' : ''}`}>
+              <div key={expense.id} className={`p-4 hover:bg-gray-50 ${expense.transaction_type === 'income' ? 'bg-emerald-50/30' : ''}`}>
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                    <p className="text-sm font-medium text-gray-900 truncate">
                       {expense.description}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       {formatDate(new Date(expense.transaction_date))} •{' '}
                       <button
                         onClick={() => setEditingTransactionId(editingTransactionId === expense.id ? null : expense.id)}
-                        className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
+                        className="inline-flex items-center gap-1 text-blue-600 hover:underline"
                       >
                         {expense.category_name}
                         <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -770,13 +776,13 @@ const Transactions: React.FC = () => {
                         </svg>
                       </button>
                       {editingTransactionId === expense.id && (
-                        <div ref={categoryDropdownRef} className="absolute left-4 mt-1 z-10 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 max-h-48 overflow-y-auto">
+                        <div ref={categoryDropdownRef} className="absolute left-4 mt-1 z-10 w-48 bg-white rounded-lg shadow-lg border border-gray-200 max-h-48 overflow-y-auto">
                           {categories.map((cat) => (
                             <button
                               key={cat.id}
                               onClick={() => handleCategoryChange(expense.id, cat.id, cat.name)}
-                              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 ${
-                                cat.name === expense.category_name ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' : 'text-gray-700 dark:text-gray-300'
+                              className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 ${
+                                cat.name === expense.category_name ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
                               }`}
                             >
                               {cat.name}
@@ -789,19 +795,19 @@ const Transactions: React.FC = () => {
                     <div className="flex gap-2 mt-2">
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         expense.transaction_type === 'income'
-                          ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
+                          ? 'bg-emerald-100 text-emerald-800'
                           : expense.transaction_type === 'transfer'
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                          : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300'
+                          ? 'bg-blue-100 text-blue-800'
+                          : 'bg-rose-100 text-rose-800'
                       }`}>
                         {expense.transaction_type || 'expense'}
                       </span>
                       <span className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                         expense.source === 'PLAID'
-                          ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300'
+                          ? 'bg-indigo-100 text-indigo-800'
                           : expense.source === 'CSV_IMPORT'
-                          ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
-                          : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                          ? 'bg-amber-100 text-amber-800'
+                          : 'bg-gray-100 text-gray-800'
                       }`}>
                         {expense.source === 'PLAID' ? 'Bank' :
                          expense.source === 'CSV_IMPORT' ? 'Import' :
@@ -812,15 +818,15 @@ const Transactions: React.FC = () => {
                   </div>
                   <div className="text-right ml-2">
                     <span className={`text-sm font-medium ${
-                      expense.transaction_type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      expense.transaction_type === 'income' ? 'text-emerald-600' : 'text-rose-600'
                     }`}>
                       {expense.transaction_type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(expense.amount))}
                     </span>
                     <div className="mt-1">
                       <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                        expense.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                        expense.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                        expense.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        expense.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
                       }`}>
                         {expense.status}
                       </span>
@@ -834,91 +840,91 @@ const Transactions: React.FC = () => {
 
         {/* Desktop Table View */}
         <div className="hidden sm:block overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('date')}
                 >
                   <div className="flex items-center gap-1">
                     Date
                     {sortField === 'date' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('description')}
                 >
                   <div className="flex items-center gap-1">
                     Description
                     {sortField === 'description' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('category')}
                 >
                   <div className="flex items-center gap-1">
                     Category
                     {sortField === 'category' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('type')}
                 >
                   <div className="flex items-center gap-1">
                     Type
                     {sortField === 'type' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('source')}
                 >
                   <div className="flex items-center gap-1">
                     Source
                     {sortField === 'source' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
                 <th
-                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+                  className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort('amount')}
                 >
                   <div className="flex items-center gap-1">
                     Amount
                     {sortField === 'amount' && (
-                      <span className="text-blue-600 dark:text-blue-400">{sortDirection === 'asc' ? '▲' : '▼'}</span>
+                      <span className="text-blue-600">{sortDirection === 'asc' ? '▲' : '▼'}</span>
                     )}
                   </div>
                 </th>
-                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                <th className="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white divide-y divide-gray-200">
               {filteredExpenses.map((expense) => (
-                <tr key={expense.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${expense.transaction_type === 'income' ? 'bg-emerald-50/30 dark:bg-emerald-900/10' : ''}`}>
-                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                <tr key={expense.id} className={`hover:bg-gray-50 ${expense.transaction_type === 'income' ? 'bg-emerald-50/30' : ''}`}>
+                  <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     {formatDate(new Date(expense.transaction_date))}
                   </td>
-                  <td className="px-4 lg:px-6 py-4 text-sm text-gray-900 dark:text-white max-w-xs truncate">
+                  <td className="px-4 lg:px-6 py-4 text-sm text-gray-900 max-w-xs truncate">
                     <span title={expense.description}>{expense.description}</span>
                   </td>
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm relative">
                     <button
                       onClick={() => setEditingTransactionId(editingTransactionId === expense.id ? null : expense.id)}
-                      className="inline-flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors group"
+                      className="inline-flex items-center gap-1.5 text-gray-500 hover:text-blue-600 transition-colors group"
                     >
                       {expense.category_name}
                       <svg className="w-3.5 h-3.5 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -926,18 +932,18 @@ const Transactions: React.FC = () => {
                       </svg>
                     </button>
                     {editingTransactionId === expense.id && (
-                      <div ref={categoryDropdownRef} className="absolute left-4 top-full mt-1 z-20 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 max-h-64 overflow-y-auto">
-                        <div className="px-3 py-2 border-b border-gray-200 dark:border-gray-700">
-                          <p className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">Select Category</p>
+                      <div ref={categoryDropdownRef} className="absolute left-4 top-full mt-1 z-20 w-56 bg-white rounded-lg shadow-xl border border-gray-200 max-h-64 overflow-y-auto">
+                        <div className="px-3 py-2 border-b border-gray-200">
+                          <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">Select Category</p>
                         </div>
                         {categories.map((cat) => (
                           <button
                             key={cat.id}
                             onClick={() => handleCategoryChange(expense.id, cat.id, cat.name)}
-                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                            className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-100 transition-colors ${
                               cat.name === expense.category_name
-                                ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 font-medium'
-                                : 'text-gray-700 dark:text-gray-300'
+                                ? 'bg-blue-50 text-blue-700 font-medium'
+                                : 'text-gray-700'
                             }`}
                           >
                             {cat.name === expense.category_name && (
@@ -954,10 +960,10 @@ const Transactions: React.FC = () => {
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full ${
                       expense.transaction_type === 'income'
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
+                        ? 'bg-emerald-100 text-emerald-800'
                         : expense.transaction_type === 'transfer'
-                        ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                        : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-300'
+                        ? 'bg-blue-100 text-blue-800'
+                        : 'bg-rose-100 text-rose-800'
                     }`}>
                       {expense.transaction_type || 'expense'}
                     </span>
@@ -965,12 +971,12 @@ const Transactions: React.FC = () => {
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm">
                     <span className={`px-2 py-1 inline-flex text-xs leading-4 font-medium rounded-full ${
                       expense.source === 'PLAID'
-                        ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300'
+                        ? 'bg-indigo-100 text-indigo-800'
                         : expense.source === 'CSV_IMPORT'
-                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+                        ? 'bg-amber-100 text-amber-800'
                         : expense.source === 'RECURRING'
-                        ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-                        : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
+                        ? 'bg-purple-100 text-purple-800'
+                        : 'bg-gray-100 text-gray-800'
                     }`}>
                       {expense.source === 'PLAID' ? '🏦 Bank' :
                        expense.source === 'CSV_IMPORT' ? '📄 Import' :
@@ -980,15 +986,15 @@ const Transactions: React.FC = () => {
                     </span>
                   </td>
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <span className={expense.transaction_type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}>
+                    <span className={expense.transaction_type === 'income' ? 'text-emerald-600' : 'text-rose-600'}>
                       {expense.transaction_type === 'income' ? '+' : '-'}{formatCurrency(Math.abs(expense.amount))}
                     </span>
                   </td>
                   <td className="px-4 lg:px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                      ${expense.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' :
-                        expense.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' :
-                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}>
+                      ${expense.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        expense.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'}`}>
                       {expense.status}
                     </span>
                   </td>
@@ -1002,15 +1008,15 @@ const Transactions: React.FC = () => {
         {filteredExpenses.length === 0 && !expensesLoading && (
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">📊</div>
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No transactions found</h3>
-            <p className="text-gray-500 dark:text-gray-400">Try adjusting your search or select a different period.</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No transactions found</h3>
+            <p className="text-gray-500">Try adjusting your search or select a different period.</p>
           </div>
         )}
         {/* Loading state */}
         {expensesLoading && (
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-500 dark:text-gray-400">Loading transactions...</p>
+            <p className="text-gray-500">Loading transactions...</p>
           </div>
         )}
       </div>

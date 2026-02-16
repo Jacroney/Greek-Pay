@@ -201,19 +201,19 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700">
-          <p className="font-semibold text-gray-900 dark:text-white">{data.date}</p>
-          <p className={`text-sm ${data.balance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+        <div className="bg-white p-3 rounded-lg shadow-lg border border-gray-200">
+          <p className="font-semibold text-gray-900">{data.date}</p>
+          <p className={`text-sm ${data.balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             Balance: {formatCurrency(data.balance)}
           </p>
           <div className="flex gap-2 mt-1">
             {data.isActual && (
-              <span className="text-xs px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded">
+              <span className="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">
                 Actual
               </span>
             )}
             {data.isRecurring && (
-              <span className="text-xs px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 rounded">
+              <span className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded">
                 Recurring
               </span>
             )}
@@ -225,24 +225,24 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
   };
 
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 border border-gray-200 dark:border-gray-700 ${className}`}>
+    <div className={`bg-white rounded-xl shadow-sm p-6 border border-gray-200 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+          <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
             Cash Flow Forecast
             {willGoNegative && (
               <AlertCircle className="w-5 h-5 text-red-500" />
             )}
           </h3>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-sm text-gray-500">
             Projected balance based on actual and recurring transactions
           </p>
         </div>
         <button
           onClick={loadForecast}
           disabled={loading}
-          className="p-2 text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white transition-colors"
+          className="p-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -257,7 +257,7 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
             className={`px-3 py-1 text-sm rounded-lg transition-colors ${
               daysAhead === days
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
             {days} Days
@@ -268,26 +268,26 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
       {/* Metrics */}
       <div className="grid grid-cols-3 gap-4 mb-6">
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Current</p>
-          <p className={`text-lg font-bold ${currentBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <p className="text-xs text-gray-500 mb-1">Current</p>
+          <p className={`text-lg font-bold ${currentBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatCurrency(currentBalance)}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Projected ({daysAhead}d)</p>
-          <p className={`text-lg font-bold ${futureBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+          <p className="text-xs text-gray-500 mb-1">Projected ({daysAhead}d)</p>
+          <p className={`text-lg font-bold ${futureBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
             {formatCurrency(futureBalance)}
           </p>
         </div>
         <div className="text-center">
-          <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Change</p>
+          <p className="text-xs text-gray-500 mb-1">Change</p>
           <div className="flex items-center justify-center gap-1">
             {changeAmount >= 0 ? (
               <TrendingUp className="w-4 h-4 text-green-500" />
             ) : (
               <TrendingDown className="w-4 h-4 text-red-500" />
             )}
-            <p className={`text-lg font-bold ${changeAmount >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <p className={`text-lg font-bold ${changeAmount >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               {changeAmount >= 0 ? '+' : ''}{formatCurrency(changeAmount)}
             </p>
           </div>
@@ -296,14 +296,14 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
 
       {/* Warning Alert */}
       {willGoNegative && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-red-900 dark:text-red-200">
+              <p className="font-semibold text-red-900">
                 Negative Balance Warning
               </p>
-              <p className="text-sm text-red-700 dark:text-red-300 mt-1">
+              <p className="text-sm text-red-700 mt-1">
                 Your projected balance will go negative (lowest: {formatCurrency(minBalance)}) in the next {daysAhead} days.
               </p>
             </div>
@@ -318,7 +318,7 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
         </div>
       ) : chartData.length === 0 ? (
         <div className="h-64 flex items-center justify-center">
-          <p className="text-gray-500 dark:text-gray-400">No forecast data available</p>
+          <p className="text-gray-500">No forecast data available</p>
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
@@ -360,7 +360,7 @@ const CashFlowForecastCard: React.FC<CashFlowForecastCardProps> = ({ className =
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-center gap-6 mt-4 text-xs text-gray-600 dark:text-gray-400">
+      <div className="flex items-center justify-center gap-6 mt-4 text-xs text-gray-600">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-blue-500" />
           <span>Actual Data</span>

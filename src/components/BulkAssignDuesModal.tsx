@@ -4,6 +4,8 @@ import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import { DuesConfiguration } from '../services/types';
 import { YEAR_OPTIONS, DUES_FIELD_BY_YEAR, YearValue } from '../utils/yearUtils';
+import { isDemoModeEnabled } from '../utils/env';
+import { demoStore } from '../demo/demoStore';
 
 // Year options for bulk assign - includes "All" option
 const BULK_YEAR_OPTIONS = [
@@ -83,6 +85,29 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
   const handlePreview = async () => {
     setIsPreviewing(true);
     try {
+      if (isDemoModeEnabled()) {
+        const demoMembers = demoStore.getState().members;
+        let filtered = demoMembers;
+        if (selectedYear !== 'all') {
+          filtered = filtered.filter(m => m.year === selectedYear);
+        }
+        if (selectedStatus !== 'all') {
+          filtered = filtered.filter(m => m.status?.toLowerCase() === selectedStatus);
+        }
+        setPreview({
+          count: filtered.length,
+          members: filtered.map(m => ({
+            id: m.id,
+            email: m.email,
+            full_name: m.name,
+            year: m.year,
+            status: m.status || 'active'
+          }))
+        });
+        setIsPreviewing(false);
+        return;
+      }
+
       let query = supabase
         .from('user_profiles')
         .select('id, email, full_name, year, status')
@@ -131,6 +156,14 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
     setIsProcessing(true);
 
     try {
+      if (isDemoModeEnabled()) {
+        const count = preview?.count || 0;
+        toast.success(`Assigned dues to ${count} members. Skipped 0. (Demo)`);
+        onSuccess?.();
+        onClose();
+        return;
+      }
+
       // Call the RPC function to bulk assign dues
       const { data, error } = await supabase.rpc('bulk_assign_dues', {
         p_chapter_id: chapterId,
@@ -164,10 +197,10 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
-      <div className="w-full max-w-lg rounded-lg bg-white dark:bg-gray-800 shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="w-full max-w-lg rounded-lg bg-white shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between border-b border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900">
             Bulk Assign Dues
           </h3>
           <button
@@ -184,14 +217,14 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
           <div className="space-y-4">
             {/* Year Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <GraduationCap className="inline w-4 h-4 mr-1" />
                 Member Year
               </label>
               <select
                 value={selectedYear}
                 onChange={(e) => handleYearChange(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 {BULK_YEAR_OPTIONS.map((option) => {
                   const yearAmount = option.value === 'all' ? config?.default_dues : getAmountForYear(option.value);
@@ -206,14 +239,14 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
 
             {/* Status Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <UserCheck className="inline w-4 h-4 mr-1" />
                 Member Status
               </label>
               <select
                 value={selectedStatus}
                 onChange={(e) => handleStatusChange(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               >
                 {STATUS_OPTIONS.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -225,7 +258,7 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
 
             {/* Amount */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <DollarSign className="inline w-4 h-4 mr-1" />
                 Amount *
               </label>
@@ -237,13 +270,13 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
                 min="0"
                 step="0.01"
                 placeholder="0.00"
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
             </div>
 
             {/* Due Date */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Calendar className="inline w-4 h-4 mr-1" />
                 Due Date
               </label>
@@ -251,7 +284,7 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
                 type="date"
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-gray-900 dark:text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
             </div>
 
@@ -260,7 +293,7 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
               type="button"
               onClick={handlePreview}
               disabled={isPreviewing}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center justify-center gap-2"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
             >
               <Users className="w-4 h-4" />
               {isPreviewing ? 'Loading...' : 'Preview Members'}
@@ -268,17 +301,17 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
 
             {/* Preview Results */}
             {preview && (
-              <div className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 bg-gray-50 dark:bg-gray-700/50">
+              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                 <div className="flex items-center gap-2 mb-3">
-                  <Users className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <Users className="w-5 h-5 text-indigo-600" />
+                  <span className="font-medium text-gray-900">
                     {preview.count} member{preview.count !== 1 ? 's' : ''} will be assigned dues
                   </span>
                 </div>
                 {preview.count > 0 && (
                   <div className="max-h-40 overflow-y-auto space-y-1">
                     {preview.members.map((member) => (
-                      <div key={member.id} className="text-sm text-gray-600 dark:text-gray-300 flex justify-between">
+                      <div key={member.id} className="text-sm text-gray-600 flex justify-between">
                         <span>{member.full_name || member.email}</span>
                         <span className="text-gray-400">{member.year ? `Year ${member.year}` : ''}</span>
                       </div>
@@ -286,7 +319,7 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
                   </div>
                 )}
                 {preview.count === 0 && (
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-gray-500">
                     No members match the selected filters.
                   </p>
                 )}
@@ -300,7 +333,7 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isProcessing}
-              className="flex-1 rounded-lg border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
             >
               Cancel
             </button>

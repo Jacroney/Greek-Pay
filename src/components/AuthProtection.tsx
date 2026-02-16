@@ -13,7 +13,7 @@ const AuthProtection: React.FC<AuthProtectionProps> = ({ children }) => {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] dark:bg-gray-900">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)]">
         <LoadingSpinner />
       </div>
     );

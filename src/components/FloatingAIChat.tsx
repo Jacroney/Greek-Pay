@@ -41,12 +41,12 @@ export const FloatingAIChat: React.FC = () => {
       {/* Chat Window */}
       {isOpen && (
         <div
-          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-white dark:bg-gray-900 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 transition-all ${
+          className={`fixed bottom-6 right-6 z-50 flex flex-col bg-white rounded-lg shadow-2xl border border-gray-200 transition-all ${
             isMinimized ? 'h-14 w-80' : 'h-[600px] w-96'
           }`}
         >
           {/* Header */}
-          <div className="flex items-center justify-between border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 rounded-t-lg">
+          <div className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-blue-500 to-blue-600 px-4 py-3 rounded-t-lg">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-5 w-5 text-white" />
               <h3 className="text-sm font-semibold text-white">AI Financial Advisor</h3>
@@ -88,7 +88,7 @@ export const FloatingAIChat: React.FC = () => {
           {isMinimized && (
             <button
               onClick={restoreChat}
-              className="flex-1 flex items-center justify-center text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="flex-1 flex items-center justify-center text-sm text-gray-600 hover:text-gray-900"
             >
               Click to restore
             </button>

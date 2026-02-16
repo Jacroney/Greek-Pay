@@ -119,13 +119,13 @@ const AuthPage: React.FC = () => {
   // Show invitation error
   if (invitationError) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] px-4 dark:bg-gray-900">
-        <div className="max-w-md rounded-2xl bg-white p-8 shadow-lg dark:bg-gray-800">
+      <div className="flex min-h-screen items-center justify-center bg-[var(--brand-surface)] px-4">
+        <div className="max-w-md rounded-2xl bg-white p-8 shadow-lg">
           <div className="mb-4 text-center text-5xl">⚠️</div>
-          <h1 className="mb-2 text-center text-2xl font-bold text-gray-900 dark:text-white">
+          <h1 className="mb-2 text-center text-2xl font-bold text-gray-900">
             Invitation Issue
           </h1>
-          <p className="mb-6 text-center text-gray-600 dark:text-gray-400">{invitationError}</p>
+          <p className="mb-6 text-center text-gray-600">{invitationError}</p>
           <button
             onClick={() => navigate('/signin', { replace: true })}
             className="w-full rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-700"
@@ -140,7 +140,7 @@ const AuthPage: React.FC = () => {
   // Show invitation signup form when valid invitation token
   if (invitationToken && invitationData) {
     return (
-      <div className="min-h-screen bg-[var(--brand-surface)] px-4 py-12 text-slate-900 sm:px-6 lg:px-8 dark:bg-gray-900 dark:text-slate-100">
+      <div className="min-h-screen bg-[var(--brand-surface)] px-4 py-12 text-slate-900 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-6xl">
           <div className="flex justify-center">
             <InvitationSignupForm
@@ -155,19 +155,19 @@ const AuthPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--brand-surface)] px-4 py-12 text-slate-900 sm:px-6 lg:px-8 dark:bg-gray-900 dark:text-slate-100">
+    <div className="min-h-screen bg-[var(--brand-surface)] px-4 py-12 text-slate-900 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="grid gap-12 lg:grid-cols-[1.2fr,1fr] lg:items-center">
           <div className="space-y-6">
             <span className="surface-pill">Welcome back</span>
             <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">Sign in to manage your chapter finances.</h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
+            <p className="text-sm text-slate-600">
               Access real-time dashboards, automate bank imports, and keep members in sync. Your credentials work across every chapter you manage.
             </p>
             <div className="space-y-4">
-              <div className="space-y-3 rounded-2xl border border-[var(--brand-border)] bg-white p-6 shadow-sm dark:bg-gray-800">
-                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Want to try before signing in?</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+              <div className="space-y-3 rounded-2xl border border-[var(--brand-border)] bg-white p-6 shadow-sm">
+                <h2 className="text-sm font-semibold text-slate-800">Want to try before signing in?</h2>
+                <p className="text-sm text-slate-600">
                   Explore GreekPay with sample data in our interactive demo. No account required.
                 </p>
                 <button
@@ -177,9 +177,9 @@ const AuthPage: React.FC = () => {
                   Launch Demo
                 </button>
               </div>
-              <div className="space-y-3 rounded-2xl border border-[var(--brand-border)] bg-white p-6 shadow-sm dark:bg-gray-800">
-                <h2 className="text-sm font-semibold text-slate-800 dark:text-slate-200">Need an invite?</h2>
-                <p className="text-sm text-slate-600 dark:text-slate-400">
+              <div className="space-y-3 rounded-2xl border border-[var(--brand-border)] bg-white p-6 shadow-sm">
+                <h2 className="text-sm font-semibold text-slate-800">Need an invite?</h2>
+                <p className="text-sm text-slate-600">
                   New treasurers can request access from their executive board. Existing users can switch chapters after signing in.
                 </p>
               </div>

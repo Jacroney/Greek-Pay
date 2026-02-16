@@ -161,10 +161,10 @@ const RecurringTransactions: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 dark:text-white">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900">
             Recurring Transactions
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">
+          <p className="text-gray-500 mt-1">
             Manage automatic recurring income and expenses
           </p>
         </div>
@@ -189,11 +189,11 @@ const RecurringTransactions: React.FC = () => {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Active Recurring</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-sm text-gray-600">Active Recurring</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
                 {transactions.filter(t => t.is_active).length}
               </p>
             </div>
@@ -201,11 +201,11 @@ const RecurringTransactions: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Auto-Post Enabled</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-sm text-gray-600">Auto-Post Enabled</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
                 {transactions.filter(t => t.auto_post && t.is_active).length}
               </p>
             </div>
@@ -213,11 +213,11 @@ const RecurringTransactions: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Monthly</p>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">
+              <p className="text-sm text-gray-600">Total Monthly</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">
                 {formatCurrency(
                   transactions
                     .filter(t => t.is_active && t.frequency === 'monthly')
@@ -231,11 +231,11 @@ const RecurringTransactions: React.FC = () => {
       </div>
 
       {/* Transactions Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {transactions.length === 0 ? (
           <div className="text-center py-12">
             <Repeat className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 dark:text-gray-400 mb-4">
+            <p className="text-gray-600 mb-4">
               No recurring transactions yet
             </p>
             <button
@@ -247,48 +247,48 @@ const RecurringTransactions: React.FC = () => {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="bg-gray-50 dark:bg-gray-700">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Name
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Frequency
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Next Due
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Category
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="bg-white divide-y divide-gray-200">
                 {transactions.map((transaction) => {
                   const daysUntilDue = getDaysUntilDue(transaction.next_due_date);
                   const isDue = daysUntilDue <= 0;
                   const isUpcoming = daysUntilDue > 0 && daysUntilDue <= 7;
 
                   return (
-                    <tr key={transaction.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <tr key={transaction.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-gray-900 dark:text-white">
+                            <div className="text-sm font-medium text-gray-900">
                               {transaction.name}
                             </div>
                             {transaction.description && (
-                              <div className="text-sm text-gray-500 dark:text-gray-400">
+                              <div className="text-sm text-gray-500">
                                 {transaction.description}
                               </div>
                             )}
@@ -299,28 +299,28 @@ const RecurringTransactions: React.FC = () => {
                         <span
                           className={`text-sm font-medium ${
                             transaction.amount >= 0
-                              ? 'text-green-600 dark:text-green-400'
-                              : 'text-red-600 dark:text-red-400'
+                              ? 'text-green-600'
+                              : 'text-red-600'
                           }`}
                         >
                           {formatCurrency(transaction.amount)}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {RecurringService.formatFrequency(transaction.frequency)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex flex-col">
-                          <span className="text-sm text-gray-900 dark:text-white">
+                          <span className="text-sm text-gray-900">
                             {formatDate(transaction.next_due_date)}
                           </span>
                           <span
                             className={`text-xs ${
                               isDue
-                                ? 'text-red-600 dark:text-red-400'
+                                ? 'text-red-600'
                                 : isUpcoming
-                                ? 'text-yellow-600 dark:text-yellow-400'
-                                : 'text-gray-500 dark:text-gray-400'
+                                ? 'text-yellow-600'
+                                : 'text-gray-500'
                             }`}
                           >
                             {isDue
@@ -331,7 +331,7 @@ const RecurringTransactions: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {transaction.category_name || '-'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -340,8 +340,8 @@ const RecurringTransactions: React.FC = () => {
                             onClick={() => handleToggleActive(transaction.id, transaction.is_active)}
                             className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${
                               transaction.is_active
-                                ? 'bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
                             }`}
                           >
                             {transaction.is_active ? (
@@ -358,8 +358,8 @@ const RecurringTransactions: React.FC = () => {
                             onClick={() => handleToggleAutoPost(transaction.id, transaction.auto_post)}
                             className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full ${
                               transaction.auto_post
-                                ? 'bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-600'
                             }`}
                           >
                             {transaction.auto_post ? (
@@ -378,13 +378,13 @@ const RecurringTransactions: React.FC = () => {
                         <div className="flex justify-end gap-2">
                           <button
                             onClick={() => handleEdit(transaction)}
-                            className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
+                            className="text-blue-600 hover:text-blue-900"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(transaction.id)}
-                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
+                            className="text-red-600 hover:text-red-900"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

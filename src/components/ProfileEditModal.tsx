@@ -112,14 +112,14 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
         {/* Drag handle (mobile only) */}
         <div className="sm:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 dark:from-blue-700 dark:via-blue-600 dark:to-indigo-700 px-6 py-5 sm:rounded-t-2xl">
+        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
@@ -144,18 +144,18 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-4">
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Full Name <span className="text-red-500">*</span>
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <User className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <User className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="text"
                 value={formData.full_name}
                 onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-shadow"
+                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
                 placeholder="John Doe"
                 required
                 disabled={isSubmitting}
@@ -165,18 +165,18 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
           {/* Phone Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Phone Number
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <Phone className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <Phone className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="tel"
                 value={formData.phone_number}
                 onChange={handlePhoneChange}
-                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-shadow"
+                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
                 placeholder="(555) 123-4567"
                 maxLength={14}
                 disabled={isSubmitting}
@@ -186,17 +186,17 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
           {/* Year */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Year
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <GraduationCap className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <GraduationCap className="w-4 h-4 text-gray-400" />
               </div>
               <select
                 value={formData.year}
                 onChange={(e) => setFormData({ ...formData, year: e.target.value as any })}
-                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white appearance-none bg-white transition-shadow [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none bg-white transition-shadow [&>option]: [&>option]:"
                 disabled={isSubmitting}
               >
                 <option value="">Select year</option>
@@ -209,18 +209,18 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
           {/* Major */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Major
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <BookOpen className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <BookOpen className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="text"
                 value={formData.major}
                 onChange={(e) => setFormData({ ...formData, major: e.target.value })}
-                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-shadow"
+                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
                 placeholder="Computer Science"
                 disabled={isSubmitting}
               />
@@ -229,18 +229,18 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
 
           {/* Position */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Position
             </label>
             <div className="relative">
               <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                <Award className="w-4 h-4 text-gray-400 dark:text-gray-500" />
+                <Award className="w-4 h-4 text-gray-400" />
               </div>
               <input
                 type="text"
                 value={formData.position}
                 onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white transition-shadow"
+                className="w-full pl-10 pr-3 py-2.5 border border-[var(--brand-border)] rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow"
                 placeholder="Member, Social Chair, etc."
                 disabled={isSubmitting}
               />
@@ -253,7 +253,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation font-medium"
+              className="flex-1 px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation font-medium"
             >
               Cancel
             </button>

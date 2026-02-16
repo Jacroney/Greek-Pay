@@ -111,22 +111,22 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
         />
 
         {/* Modal */}
-        <div className="relative bg-white dark:bg-gray-800 rounded-xl shadow-xl max-w-md w-full p-6 z-10">
+        <div className="relative bg-white rounded-xl shadow-xl max-w-md w-full p-6 z-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-4">
             <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-gray-900">
                 Installment Settings
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500">
                 {memberDues.member_name}
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+              <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
@@ -137,10 +137,10 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
           ) : (
             <>
               {/* Dues Info */}
-              <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600 dark:text-gray-400">Balance Due:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">
+                  <span className="text-gray-600">Balance Due:</span>
+                  <span className="font-semibold text-gray-900">
                     {formatCurrency(memberDues.balance)}
                   </span>
                 </div>
@@ -150,10 +150,10 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
               <div className="mb-6">
                 <label className="flex items-center justify-between cursor-pointer">
                   <div>
-                    <span className="font-medium text-gray-900 dark:text-white">
+                    <span className="font-medium text-gray-900">
                       Allow Installment Payments
                     </span>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                    <p className="text-sm text-gray-500">
                       Member can split dues into multiple payments
                     </p>
                   </div>
@@ -161,7 +161,7 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
                     type="button"
                     onClick={() => setIsEligible(!isEligible)}
                     className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                      isEligible ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                      isEligible ? 'bg-blue-600' : 'bg-gray-300'
                     }`}
                   >
                     <span
@@ -176,7 +176,7 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
               {/* Plan Options */}
               {isEligible && (
                 <div className="mb-6">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
                     Available Payment Plans
                   </label>
                   <div className="space-y-2">
@@ -187,25 +187,25 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
                         onClick={() => handlePlanToggle(plan)}
                         className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
                           allowedPlans.includes(plan)
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                            : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                            ? 'border-blue-500 bg-blue-50'
+                            : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                             allowedPlans.includes(plan)
                               ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300 dark:border-gray-500'
+                              : 'border-gray-300'
                           }`}>
                             {allowedPlans.includes(plan) && (
                               <Check className="w-3 h-3 text-white" />
                             )}
                           </div>
                           <div className="text-left">
-                            <span className="font-medium text-gray-900 dark:text-white">
+                            <span className="font-medium text-gray-900">
                               {plan} Payments
                             </span>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <p className="text-sm text-gray-500">
                               {formatCurrency(installmentAmount(plan))}/month
                             </p>
                           </div>
@@ -219,7 +219,7 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
 
               {/* Notes */}
               <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Notes (optional)
                 </label>
                 <textarea
@@ -227,20 +227,20 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder="Add any notes about this member's eligibility..."
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           bg-white dark:bg-gray-700 text-gray-900 dark:text-white
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg
+                           bg-white text-gray-900
                            placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               {/* Info Box */}
               {isEligible && (
-                <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mb-6">
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6">
                   <div className="flex gap-2">
-                    <CreditCard className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-                    <div className="text-sm text-blue-800 dark:text-blue-200">
+                    <CreditCard className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-blue-800">
                       <p className="font-medium">Auto-charge enabled</p>
-                      <p className="text-blue-600 dark:text-blue-300">
+                      <p className="text-blue-600">
                         Member must save a payment method. Payments will be automatically charged monthly.
                       </p>
                     </div>
@@ -254,8 +254,8 @@ const InstallmentEligibilityModal: React.FC<InstallmentEligibilityModalProps> = 
                   type="button"
                   onClick={onClose}
                   disabled={loading}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
-                           text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg
+                           text-gray-700 hover:bg-gray-50
                            transition-colors disabled:opacity-50"
                 >
                   Cancel

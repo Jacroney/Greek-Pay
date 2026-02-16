@@ -124,7 +124,7 @@ export const AIAdvisor: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
+          <p className="text-gray-600 text-lg">
             Please select a chapter to use the AI advisor
           </p>
         </div>
@@ -135,19 +135,19 @@ export const AIAdvisor: React.FC = () => {
   return (
     <div className="h-[calc(100vh-4rem)] flex">
       {/* Sidebar - Conversation List */}
-      <div className="w-80 border-r border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 flex flex-col">
+      <div className="w-80 border-r border-gray-200 bg-white flex flex-col">
         {/* Header */}
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="p-4 border-b border-gray-200">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-blue-600" />
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h2 className="text-lg font-semibold text-gray-900">
                 AI Advisor
               </h2>
             </div>
             <button
               onClick={() => setShowKBStats(!showKBStats)}
-              className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+              className="p-2 text-gray-500 hover:text-gray-700 rounded-lg hover:bg-gray-100 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
               title="Knowledge Base Info"
             >
               <Database className="w-4 h-4" />
@@ -156,15 +156,15 @@ export const AIAdvisor: React.FC = () => {
 
           {/* Knowledge Base Stats */}
           {showKBStats && (
-            <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="mb-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-blue-900 dark:text-blue-100">
+                <span className="text-xs font-medium text-blue-900">
                   Knowledge Base
                 </span>
                 <button
                   onClick={() => handleGenerateEmbeddings(true)}
                   disabled={generatingEmbeddings}
-                  className="p-1 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 disabled:opacity-50 disabled:cursor-not-allowed rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+                  className="p-1 text-blue-600 hover:text-blue-700 disabled:opacity-50 disabled:cursor-not-allowed rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
                   title="Refresh knowledge base"
                 >
                   <RefreshCw className={`w-3 h-3 ${generatingEmbeddings ? 'animate-spin' : ''}`} />
@@ -172,7 +172,7 @@ export const AIAdvisor: React.FC = () => {
               </div>
               {knowledgeBaseStats ? (
                 <>
-                  <div className="text-xs text-blue-800 dark:text-blue-200 space-y-1">
+                  <div className="text-xs text-blue-800 space-y-1">
                     <div className="flex justify-between">
                       <span>Total Items:</span>
                       <span className="font-semibold">{knowledgeBaseStats.total}</span>
@@ -184,7 +184,7 @@ export const AIAdvisor: React.FC = () => {
                       </div>
                     ))}
                     {knowledgeBaseStats.last_updated && (
-                      <div className="text-xs text-blue-600 dark:text-blue-300 pt-1 mt-1 border-t border-blue-200 dark:border-blue-700">
+                      <div className="text-xs text-blue-600 pt-1 mt-1 border-t border-blue-200">
                         Updated: {new Date(knowledgeBaseStats.last_updated).toLocaleDateString()}
                       </div>
                     )}
@@ -192,7 +192,7 @@ export const AIAdvisor: React.FC = () => {
                 </>
               ) : (
                 <div className="text-center py-2">
-                  <p className="text-xs text-blue-800 dark:text-blue-200 mb-2">
+                  <p className="text-xs text-blue-800 mb-2">
                     No knowledge base found
                   </p>
                   <button
@@ -219,22 +219,22 @@ export const AIAdvisor: React.FC = () => {
         {/* Conversations List */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+            <div className="p-4 text-center text-gray-500">
               Loading conversations...
             </div>
           ) : conversations.length === 0 ? (
-            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
+            <div className="p-4 text-center text-gray-500">
               <p>No conversations yet.</p>
               <p className="text-sm mt-2">Start a new conversation to begin!</p>
             </div>
           ) : (
-            <div className="divide-y divide-gray-200 dark:divide-gray-700">
+            <div className="divide-y divide-gray-200">
               {conversations.map((conv) => (
                 <div
                   key={conv.id}
-                  className={`p-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 ${
+                  className={`p-4 cursor-pointer hover:bg-gray-50 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 ${
                     selectedConversation === conv.id
-                      ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-600'
+                      ? 'bg-blue-50 border-l-4 border-blue-600'
                       : ''
                   }`}
                   tabIndex={0}
@@ -249,13 +249,13 @@ export const AIAdvisor: React.FC = () => {
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                      <p className="text-sm font-medium text-gray-900 truncate">
                         {conv.title || 'New conversation'}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {formatDate(conv.last_message_at)}
                       </p>
-                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                      <p className="text-xs text-gray-400 mt-1">
                         {conv.message_count} messages
                       </p>
                     </div>
@@ -264,7 +264,7 @@ export const AIAdvisor: React.FC = () => {
                         e.stopPropagation();
                         handleDeleteConversation(conv.id);
                       }}
-                      className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                      className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100 p-1 text-red-600 hover:bg-red-50 rounded transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                       title="Delete conversation"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -278,7 +278,7 @@ export const AIAdvisor: React.FC = () => {
       </div>
 
       {/* Main Chat Area */}
-      <div className="flex-1 bg-gray-50 dark:bg-gray-900">
+      <div className="flex-1 bg-gray-50">
         <AIChat
           key={selectedConversation}
           conversationId={selectedConversation}

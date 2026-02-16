@@ -402,11 +402,11 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      paid: { bg: 'bg-green-100 dark:bg-green-900', text: 'text-green-800 dark:text-green-200', icon: CheckCircle },
-      pending: { bg: 'bg-yellow-100 dark:bg-yellow-900', text: 'text-yellow-800 dark:text-yellow-200', icon: AlertCircle },
-      overdue: { bg: 'bg-red-100 dark:bg-red-900', text: 'text-red-800 dark:text-red-200', icon: AlertCircle },
-      partial: { bg: 'bg-blue-100 dark:bg-blue-900', text: 'text-blue-800 dark:text-blue-200', icon: TrendingUp },
-      waived: { bg: 'bg-gray-100 dark:bg-gray-700', text: 'text-gray-800 dark:text-gray-200', icon: CheckCircle }
+      paid: { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle },
+      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: AlertCircle },
+      overdue: { bg: 'bg-red-100', text: 'text-red-800', icon: AlertCircle },
+      partial: { bg: 'bg-blue-100', text: 'text-blue-800', icon: TrendingUp },
+      waived: { bg: 'bg-gray-100', text: 'text-gray-800', icon: CheckCircle }
     };
 
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
@@ -425,8 +425,8 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Dues Management</h2>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <h2 className="text-2xl font-bold text-gray-900">Dues Management</h2>
+          <p className="text-sm text-gray-600 mt-1">
             Configure and track member dues by year with automated late fees
           </p>
         </div>
@@ -454,7 +454,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
       {/* Stripe Connect Setup Section */}
       <div>
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
           <DollarSign className="w-5 h-5 mr-2" />
           Online Payment Setup
         </h3>
@@ -463,22 +463,22 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
       {/* Current Configuration Info */}
       {currentConfig && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
           <div className="flex items-start justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Current Period: {currentConfig.period_name} {currentConfig.fiscal_year}
               </h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Due Date:</span>
-                  <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                  <span className="text-gray-600">Due Date:</span>
+                  <span className="ml-2 font-medium text-gray-900">
                     {currentConfig.due_date ? new Date(currentConfig.due_date).toLocaleDateString() : 'Not set'}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Late Fees:</span>
-                  <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                  <span className="text-gray-600">Late Fees:</span>
+                  <span className="ml-2 font-medium text-gray-900">
                     {currentConfig.late_fee_enabled ?
                       `$${currentConfig.late_fee_amount}${currentConfig.late_fee_type === 'percentage' ? '%' : ''}` :
                       'Disabled'
@@ -486,8 +486,8 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600 dark:text-gray-400">Grace Period:</span>
-                  <span className="ml-2 font-medium text-gray-900 dark:text-white">
+                  <span className="text-gray-600">Grace Period:</span>
+                  <span className="ml-2 font-medium text-gray-900">
                     {currentConfig.late_fee_grace_days} days
                   </span>
                 </div>
@@ -498,9 +498,9 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                 setEditingConfig(currentConfig);
                 setShowConfigModal(true);
               }}
-              className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
+              className="p-2 hover:bg-blue-100 rounded-lg transition-colors"
             >
-              <Edit2 className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+              <Edit2 className="w-4 h-4 text-blue-600" />
             </button>
           </div>
         </div>
@@ -509,20 +509,20 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       {/* Statistics */}
       {stats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Total Members</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">{stats.total_members}</p>
+                <p className="text-sm text-gray-600">Total Members</p>
+                <p className="text-3xl font-bold text-gray-900">{stats.total_members}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Payment Rate</p>
+                <p className="text-sm text-gray-600">Payment Rate</p>
                 <p className="text-3xl font-bold text-green-600">{stats.payment_rate}%</p>
                 <p className="text-xs text-gray-500 mt-1">{stats.members_paid} paid</p>
               </div>
@@ -530,11 +530,11 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Collected</p>
-                <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                <p className="text-sm text-gray-600">Collected</p>
+                <p className="text-3xl font-bold text-gray-900">
                   {formatCurrency(stats.total_collected)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -545,10 +545,10 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
             </div>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 dark:text-gray-400">Outstanding</p>
+                <p className="text-sm text-gray-600">Outstanding</p>
                 <p className="text-3xl font-bold text-red-600">
                   {formatCurrency(stats.total_outstanding)}
                 </p>
@@ -562,7 +562,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
       {/* Actions */}
       {currentConfig && (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+        <div className="bg-white rounded-lg shadow p-4">
           <div className="flex flex-wrap gap-3">
             <button
               onClick={() => setShowBulkAssignModal(true)}
@@ -609,7 +609,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       )}
 
       {/* Filters */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-white rounded-lg shadow p-4">
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <input
@@ -617,13 +617,13 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
               placeholder="Search members..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
             />
           </div>
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+            className="px-3 py-2 border border-gray-300 rounded-lg"
           >
             <option value="all">All Years</option>
             {YEAR_OPTIONS.map(({ value, label }) => (
@@ -633,7 +633,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+            className="px-3 py-2 border border-gray-300 rounded-lg"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -649,7 +649,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                 setFilterYear('all');
                 setFilterStatus('all');
               }}
-              className="px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300"
+              className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800"
             >
               Clear Filters
             </button>
@@ -658,43 +658,43 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       </div>
 
       {/* Member Dues Table */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Year</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Base</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Late Fee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Paid</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Balance</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Base</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Late Fee</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="bg-white divide-y divide-gray-200">
               {filteredDues.map((dues) => (
-                <tr key={dues.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                <tr key={dues.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">{dues.member_name}</div>
+                    <div className="text-sm font-medium text-gray-900">{dues.member_name}</div>
                     <div className="text-xs text-gray-500">{dues.member_email}</div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {getYearLabel(dues.member_year)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {formatCurrency(dues.base_amount)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {dues.late_fee > 0 ? (
                       <span className="text-red-600 font-medium">{formatCurrency(dues.late_fee)}</span>
                     ) : (
                       <span className="text-gray-400">-</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {formatCurrency(dues.total_amount)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
@@ -734,7 +734,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                       <button
                         onClick={() => openPaymentModal(dues)}
                         disabled={dues.balance <= 0 || isDemo}
-                        className="px-3 py-1.5 bg-gray-600 dark:bg-gray-700 text-white text-xs rounded hover:bg-gray-700 dark:hover:bg-gray-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-1.5 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         title="Record manual payment (admin only)"
                       >
                         Record
@@ -769,7 +769,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
           {filteredDues.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500">
                 {currentConfig ? 'No dues assigned yet. Click "Auto-Assign Dues" to get started.' : 'Please create a dues configuration first.'}
               </p>
             </div>
@@ -810,20 +810,20 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       {/* Payment Modal */}
       {showPaymentModal && selectedMemberDues && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
-            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">
               Record Payment
             </h3>
-            <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded">
-              <p className="text-sm text-gray-600 dark:text-gray-400">Member:</p>
-              <p className="font-medium text-gray-900 dark:text-white">{selectedMemberDues.member_name}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">Outstanding Balance:</p>
+            <div className="mb-4 p-3 bg-gray-50 rounded">
+              <p className="text-sm text-gray-600">Member:</p>
+              <p className="font-medium text-gray-900">{selectedMemberDues.member_name}</p>
+              <p className="text-sm text-gray-600 mt-2">Outstanding Balance:</p>
               <p className="text-lg font-bold text-red-600">{formatCurrency(selectedMemberDues.balance)}</p>
             </div>
 
             <form onSubmit={handleRecordPayment} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Amount *
                 </label>
                 <div className="relative">
@@ -832,7 +832,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                     type="number"
                     value={paymentAmount}
                     onChange={(e) => setPaymentAmount(e.target.value)}
-                    className="w-full pl-8 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg"
                     min="0.01"
                     step="0.01"
                     max={selectedMemberDues.balance}
@@ -842,13 +842,13 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Method
                 </label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
                   <option value="Cash">Cash</option>
                   <option value="Check">Check</option>
@@ -861,39 +861,39 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Payment Date
                 </label>
                 <input
                   type="date"
                   value={paymentDate}
                   onChange={(e) => setPaymentDate(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   required
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Reference # (optional)
                 </label>
                 <input
                   type="text"
                   value={paymentReference}
                   onChange={(e) => setPaymentReference(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   placeholder="Check #, Transaction ID, etc."
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Notes (optional)
                 </label>
                 <textarea
                   value={paymentNotes}
                   onChange={(e) => setPaymentNotes(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg dark:bg-gray-700 dark:text-white"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                   rows={2}
                 />
               </div>
@@ -905,7 +905,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
                     setShowPaymentModal(false);
                     resetPaymentForm();
                   }}
-                  className="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg"
                   disabled={isProcessing}
                 >
                   Cancel

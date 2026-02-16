@@ -16,9 +16,9 @@ interface ChapterThemeContextType {
 }
 
 const DEFAULT_THEME: ChapterTheme = {
-  primaryColor: '#3B82F6', // blue-500
-  secondaryColor: '#1E40AF', // blue-800
-  accentColor: '#60A5FA', // blue-400
+  primaryColor: '#5266eb', // Mercury blue
+  secondaryColor: '#3d4fd6', // Mercury blue-dark
+  accentColor: '#778fef', // Mercury blue-light
   greekLetters: '',
   logoUrl: null,
 };

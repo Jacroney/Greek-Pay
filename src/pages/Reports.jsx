@@ -227,7 +227,7 @@ const Reports = () => {
   if (isLoading) {
     return (
       <div className="surface-card flex h-64 items-center justify-center">
-        <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-300">
+        <div className="flex items-center gap-2 text-sm text-slate-500">
           <span className="h-4 w-4 animate-spin rounded-full border-2 border-slate-300 border-t-blue-500" />
           Loading insights…
         </div>
@@ -240,15 +240,15 @@ const Reports = () => {
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <span className="surface-pill">Insights</span>
-          <h1 className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          <h1 className="mt-2 text-3xl font-semibold text-slate-900">
             Financial reports
           </h1>
-          <p className="mt-2 max-w-xl text-sm text-slate-600 dark:text-slate-400">
+          <p className="mt-2 max-w-xl text-sm text-slate-600">
             Adjust the range to compare spend, income, and dues metrics across your chapter.
           </p>
         </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="flex overflow-hidden rounded-xl border border-[var(--brand-border)] bg-white text-xs font-medium text-slate-600 dark:bg-gray-800">
+          <div className="flex overflow-hidden rounded-xl border border-[var(--brand-border)] bg-white text-xs font-medium text-slate-600">
             {['overview', 'spending', 'dues'].map((option) => (
               <button
                 key={option}
@@ -256,7 +256,7 @@ const Reports = () => {
                   className={`px-4 py-2 capitalize transition-colors ${
                   reportView === option
                     ? 'bg-[var(--brand-primary-soft)] text-[var(--brand-primary)]'
-                    : 'hover:bg-slate-100 dark:hover:bg-gray-700'
+                    : 'hover:bg-slate-100'
                 }`}
               >
                 {option}
@@ -266,7 +266,7 @@ const Reports = () => {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="focus-ring rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm text-slate-700 dark:bg-gray-800 dark:text-slate-200"
+            className="focus-ring rounded-xl border border-[var(--brand-border)] bg-white px-4 py-2 text-sm text-slate-700"
           >
             <option value="week">Last 7 days</option>
             <option value="month">Last 30 days</option>
@@ -276,14 +276,14 @@ const Reports = () => {
           <div className="flex gap-2">
             <button
               onClick={exportToCSV}
-              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100 dark:border-emerald-700/40 dark:bg-gray-800 dark:text-emerald-300 dark:hover:bg-gray-700"
+              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-2 text-sm font-medium text-emerald-700 transition-colors hover:bg-emerald-100"
             >
               Export CSV
             </button>
             <button
               onClick={exportToPDF}
               disabled={isExporting}
-              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-700/40 dark:bg-gray-800 dark:text-blue-300 dark:hover:bg-gray-700"
+              className="focus-ring inline-flex items-center gap-2 rounded-lg border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 transition-colors hover:bg-blue-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isExporting ? 'Exporting…' : 'Export PDF'}
             </button>
@@ -294,14 +294,14 @@ const Reports = () => {
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <div className="surface-card p-5">
           <p className="text-xs uppercase tracking-wide text-slate-500">Total income</p>
-          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          <p className="mt-2 text-3xl font-semibold text-slate-900">
             {formatterCurrency(Math.round(metrics.totalIncome))}
           </p>
           <p className="mt-1 text-xs text-slate-500">From {metrics.filtered.length} transactions</p>
         </div>
         <div className="surface-card p-5">
           <p className="text-xs uppercase tracking-wide text-slate-500">Total expenses</p>
-          <p className="mt-2 text-3xl font-semibold text-rose-600 dark:text-rose-400">
+          <p className="mt-2 text-3xl font-semibold text-rose-600">
             {formatterCurrency(Math.round(metrics.totalExpenses))}
           </p>
           <p className="mt-1 text-xs text-slate-500">All outgoing spend</p>
@@ -310,7 +310,7 @@ const Reports = () => {
           <p className="text-xs uppercase tracking-wide text-slate-500">Net income</p>
           <p
             className={`mt-2 text-3xl font-semibold ${
-              metrics.netIncome >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+              metrics.netIncome >= 0 ? 'text-emerald-600' : 'text-rose-600'
             }`}
           >
             {formatterCurrency(Math.round(metrics.netIncome))}
@@ -319,7 +319,7 @@ const Reports = () => {
         </div>
         <div className="surface-card p-5">
           <p className="text-xs uppercase tracking-wide text-slate-500">Dues collection</p>
-          <p className="mt-2 text-3xl font-semibold text-slate-900 dark:text-slate-100">
+          <p className="mt-2 text-3xl font-semibold text-slate-900">
             {metrics.duesCollectionRate.toFixed(1)}%
           </p>
           <p className="mt-1 text-xs text-slate-500">
@@ -335,8 +335,8 @@ const Reports = () => {
               <div className="surface-card p-6">
                 <div className="mb-4 flex items-center justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Monthly performance</h2>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <h2 className="text-lg font-semibold text-slate-900">Monthly performance</h2>
+                    <p className="text-sm text-slate-500">
                       Compare income and expenses side by side.
                     </p>
                   </div>
@@ -366,19 +366,19 @@ const Reports = () => {
               </div>
               <div className="surface-card p-6">
                 <div className="mb-4 flex items-center justify-between">
-                  <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Top expense categories</h2>
+                  <h2 className="text-lg font-semibold text-slate-900">Top expense categories</h2>
                   <span className="text-xs text-slate-500">Share of total spend</span>
                 </div>
                 <div className="space-y-4">
                   {metrics.topCategories.map(({ category, value }) => (
                     <div key={category} className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-slate-800 dark:text-slate-200 capitalize">{category}</p>
+                        <p className="text-sm font-medium text-slate-800 capitalize">{category}</p>
                         <p className="text-xs text-slate-500">
                           {metrics.totalExpenses > 0 ? ((value / metrics.totalExpenses) * 100).toFixed(1) : '0.0'}% of spend
                         </p>
                       </div>
-                      <p className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                      <p className="text-sm font-semibold text-slate-700">
                         {formatterCurrency(Math.round(value))}
                       </p>
                     </div>
@@ -388,7 +388,7 @@ const Reports = () => {
             </div>
 
             <div className="surface-card p-6">
-              <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Dues collection snapshot</h2>
+              <h2 className="mb-4 text-lg font-semibold text-slate-900">Dues collection snapshot</h2>
               <div className="grid gap-6 lg:grid-cols-2">
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
@@ -404,15 +404,15 @@ const Reports = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-panel)] px-4 py-3 text-sm">
-                    <p className="font-medium text-slate-800 dark:text-slate-200">Paid members</p>
+                    <p className="font-medium text-slate-800">Paid members</p>
                     <p className="text-slate-500">{metrics.paidMembers} members current on dues</p>
                   </div>
                   <div className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-panel)] px-4 py-3 text-sm">
-                    <p className="font-medium text-slate-800 dark:text-slate-200">Outstanding</p>
+                    <p className="font-medium text-slate-800">Outstanding</p>
                     <p className="text-slate-500">{metrics.unpaidMembers} members awaiting payment</p>
                   </div>
                   <div className="rounded-lg border border-[var(--brand-border)] bg-[var(--brand-panel)] px-4 py-3 text-sm">
-                    <p className="font-medium text-slate-800 dark:text-slate-200">Collection rate</p>
+                    <p className="font-medium text-slate-800">Collection rate</p>
                     <p className="text-slate-500">Up to {metrics.duesCollectionRate.toFixed(1)}% for this period</p>
                   </div>
                 </div>
@@ -424,7 +424,7 @@ const Reports = () => {
         {reportView === 'spending' && (
           <div className="surface-card p-6 space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Budget utilisation</h2>
+              <h2 className="text-lg font-semibold text-slate-900">Budget utilisation</h2>
               <span className="text-xs text-slate-500">Top 5 budgets</span>
             </div>
             <div className="space-y-4">
@@ -433,13 +433,13 @@ const Reports = () => {
               )}
               {metrics.budgetProgress.map((budget) => (
                 <div key={budget.name} className="space-y-2">
-                  <div className="flex justify-between text-sm font-medium text-slate-700 dark:text-slate-200">
+                  <div className="flex justify-between text-sm font-medium text-slate-700">
                     <span>{budget.name}</span>
                     <span>
                       {formatterCurrency(budget.spent)} / {formatterCurrency(budget.allocated)}
                     </span>
                   </div>
-                  <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700">
+                  <div className="h-2 rounded-full bg-slate-200">
                     <div
                       className={`h-2 rounded-full ${budget.progress > 90 ? 'bg-rose-500' : 'bg-blue-500'}`}
                       style={{ width: `${budget.progress}%` }}
@@ -454,11 +454,11 @@ const Reports = () => {
         {reportView === 'dues' && (
           <div className="grid gap-6 lg:grid-cols-2">
             <div className="surface-card p-6">
-              <h2 className="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Member breakdown</h2>
-              <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+              <h2 className="mb-4 text-lg font-semibold text-slate-900">Member breakdown</h2>
+              <div className="space-y-3 text-sm text-slate-600">
                 <div className="flex items-center justify-between">
                   <span>Members current on dues</span>
-                  <span className="font-medium text-emerald-600 dark:text-emerald-400">{metrics.paidMembers}</span>
+                  <span className="font-medium text-emerald-600">{metrics.paidMembers}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Members owing</span>
@@ -466,18 +466,18 @@ const Reports = () => {
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Collection rate</span>
-                  <span className="font-medium text-slate-900 dark:text-slate-100">
+                  <span className="font-medium text-slate-900">
                     {metrics.duesCollectionRate.toFixed(1)}%
                   </span>
                 </div>
               </div>
             </div>
             <div className="surface-card p-6">
-              <h2 className="mb-2 text-lg font-semibold text-slate-900 dark:text-slate-100">Calls to action</h2>
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <h2 className="mb-2 text-lg font-semibold text-slate-900">Calls to action</h2>
+              <p className="text-sm text-slate-500">
                 Target communications to close out the remaining balances.
               </p>
-              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-600 dark:text-slate-300">
+              <ul className="mt-4 list-disc space-y-2 pl-5 text-sm text-slate-600">
                 <li>Send reminders to members with outstanding balances.</li>
                 <li>Highlight upcoming due dates in your chapter announcements.</li>
                 <li>Promote preferred payment methods for faster reconciliation.</li>

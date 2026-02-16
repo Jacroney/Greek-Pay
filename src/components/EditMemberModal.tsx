@@ -156,24 +156,24 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black bg-opacity-50 p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
         {/* Drag handle (mobile only) */}
         <div className="sm:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
             Edit Member
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors active:scale-95 touch-manipulation"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors active:scale-95 touch-manipulation"
             disabled={isSubmitting}
             aria-label="Close"
           >
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
 
@@ -181,14 +181,14 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4">
           {/* Full Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Full Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.full_name}
               onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="John Doe"
               required
               disabled={isSubmitting}
@@ -197,20 +197,20 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="john@example.com"
               required
               disabled={isSubmitting}
             />
             {formData.email !== member.email && (
-              <p className="mt-1 text-xs text-amber-600 dark:text-amber-400">
+              <p className="mt-1 text-xs text-amber-600">
                 Note: Changing email may affect the member's login
               </p>
             )}
@@ -218,14 +218,14 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Phone Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Phone Number
             </label>
             <input
               type="tel"
               value={formData.phone_number}
               onChange={handlePhoneChange}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="(555) 123-4567"
               maxLength={14}
               disabled={isSubmitting}
@@ -234,13 +234,13 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Year */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Year
             </label>
             <select
               value={formData.year}
               onChange={(e) => setFormData({ ...formData, year: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 [&>option]: [&>option]:"
               disabled={isSubmitting}
             >
               <option value="">Select year</option>
@@ -252,14 +252,14 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Major */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Major
             </label>
             <input
               type="text"
               value={formData.major}
               onChange={(e) => setFormData({ ...formData, major: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="Computer Science"
               disabled={isSubmitting}
             />
@@ -267,14 +267,14 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Position */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Position
             </label>
             <input
               type="text"
               value={formData.position}
               onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder="President, Treasurer, etc."
               disabled={isSubmitting}
             />
@@ -282,13 +282,13 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
 
           {/* Status */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Status
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value as any })}
-              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 [&>option]: [&>option]:"
               disabled={isSubmitting}
             >
               <option value="">Select status</option>
@@ -302,13 +302,13 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
           {/* Role - Only visible to admins */}
           {currentUserRole === 'admin' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Role
               </label>
               <select
                 value={formData.role}
                 onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white [&>option]:dark:text-white [&>option]:dark:bg-gray-700"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 [&>option]: [&>option]:"
                 disabled={isSubmitting}
               >
                 <option value="">Select role</option>
@@ -317,7 +317,7 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
                 <option value="treasurer">Treasurer</option>
                 <option value="member">Member</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              <p className="mt-1 text-xs text-gray-500">
                 Only admins can change member roles
               </p>
             </div>
@@ -329,7 +329,7 @@ const EditMemberModal: React.FC<EditMemberModalProps> = ({
               type="button"
               onClick={onClose}
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+              className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
             >
               Cancel
             </button>

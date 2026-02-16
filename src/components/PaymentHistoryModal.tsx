@@ -109,14 +109,14 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-2xl max-h-[92vh] sm:max-h-[90vh] overflow-y-auto animate-slideUp sm:animate-none">
         {/* Drag handle (mobile only) */}
         <div className="sm:hidden flex justify-center pt-3 pb-2">
-          <div className="w-12 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full"></div>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-purple-600 via-violet-500 to-indigo-600 dark:from-purple-700 dark:via-violet-600 dark:to-indigo-700 px-6 py-5 sm:rounded-t-2xl">
+        <div className="bg-gradient-to-r from-purple-600 via-violet-500 to-indigo-600 px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
@@ -147,22 +147,22 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
             // Loading State
             <div className="flex items-center justify-center py-16">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-50 dark:bg-purple-900/30 mb-4">
-                  <div className="animate-spin rounded-full h-7 w-7 border-3 border-purple-200 dark:border-purple-800 border-t-purple-600 dark:border-t-purple-400"></div>
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-50 mb-4">
+                  <div className="animate-spin rounded-full h-7 w-7 border-3 border-purple-200 border-t-purple-600"></div>
                 </div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">Loading payment history...</p>
+                <p className="text-sm text-gray-600 font-medium">Loading payment history...</p>
               </div>
             </div>
           ) : payments.length === 0 ? (
             // Empty State
             <div className="text-center py-16">
-              <div className="mx-auto h-20 w-20 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/30 dark:to-indigo-900/30 flex items-center justify-center mb-5 border border-purple-100 dark:border-purple-800/50">
-                <FileText className="h-9 w-9 text-purple-400 dark:text-purple-500" />
+              <div className="mx-auto h-20 w-20 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center mb-5 border border-purple-100">
+                <FileText className="h-9 w-9 text-purple-400" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 No payment history yet
               </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">
+              <p className="text-sm text-gray-500 max-w-xs mx-auto">
                 When you make dues payments, they will appear here for your records.
               </p>
             </div>
@@ -171,22 +171,22 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
             <>
               {/* Summary Card */}
               <div className="surface-card overflow-hidden mb-6">
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 p-4 sm:p-5">
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 sm:p-5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100 dark:bg-purple-900/50">
-                        <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
+                        <Clock className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                        <p className="text-sm font-semibold text-gray-900">
                           Total Payments Made
                         </p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                        <p className="text-xs text-gray-500">
                           {payments.length} payment{payments.length !== 1 ? 's' : ''} recorded
                         </p>
                       </div>
                     </div>
-                    <p className="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                    <p className="text-2xl font-bold text-purple-600">
                       {formatCurrency(totalPaid)}
                     </p>
                   </div>
@@ -198,40 +198,40 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
                 {payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="border border-[var(--brand-border)] rounded-xl p-4 hover:bg-slate-50 dark:hover:bg-gray-700/50 transition-all duration-200 hover:shadow-sm"
+                    className="border border-[var(--brand-border)] rounded-xl p-4 hover:bg-slate-50 transition-all duration-200 hover:shadow-sm"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                          <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
+                          <span className="text-lg sm:text-xl font-bold text-gray-900">
                             {formatCurrency(payment.amount)}
                           </span>
                           {payment.payment_method && (
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium w-fit ${
                               isStripePayment(payment.payment_method)
-                                ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200'
-                                : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200'
+                                ? 'bg-blue-100 text-blue-800'
+                                : 'bg-gray-100 text-gray-800'
                             }`}>
                               {getPaymentIcon(payment)}
                               {getPaymentMethodDisplay(payment)}
                             </span>
                           )}
                         </div>
-                        <div className="mt-2 text-sm text-gray-600 dark:text-gray-400 space-y-0.5">
+                        <div className="mt-2 text-sm text-gray-600 space-y-0.5">
                           <p>
                             <span className="font-medium">Date:</span> {formatDate(payment.payment_date)}
                           </p>
                           {payment.stripe_charge_id && (
                             <p className="truncate flex items-center gap-1">
                               <span className="font-medium">Stripe ID:</span>
-                              <code className="text-xs font-mono bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded">
+                              <code className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded">
                                 {payment.stripe_charge_id.substring(0, 20)}...
                               </code>
                               <a
                                 href={`https://dashboard.stripe.com/payments/${payment.stripe_charge_id}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center text-blue-600 dark:text-blue-400 hover:underline"
+                                className="inline-flex items-center text-blue-600 hover:underline"
                                 title="View in Stripe Dashboard"
                               >
                                 <ExternalLink className="w-3 h-3" />
@@ -245,7 +245,7 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
                           )}
                           {payment.reconciled && (
                             <p className="flex items-center gap-1">
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
                                 Reconciled
                               </span>
                               {payment.reconciled_at && (
@@ -262,7 +262,7 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
                           )}
                         </div>
                       </div>
-                      <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400">
+                      <div className="flex-shrink-0 flex items-center justify-center h-10 w-10 rounded-full bg-green-100 text-green-600">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                         </svg>
@@ -276,10 +276,10 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
         </div>
 
         {/* Footer */}
-        <div className="border-t border-[var(--brand-border)] p-4 sm:p-6 bg-slate-50/50 dark:bg-gray-800/50">
+        <div className="border-t border-[var(--brand-border)] p-4 sm:p-6 bg-slate-50/50">
           <button
             onClick={onClose}
-            className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-600 transition-all active:scale-[0.99] touch-manipulation font-medium"
+            className="w-full px-4 py-3 bg-gray-100 text-gray-700 rounded-xl hover:bg-gray-200 transition-all active:scale-[0.99] touch-manipulation font-medium"
           >
             Close
           </button>
