@@ -8,14 +8,15 @@
   :root {
     --toast-bg: #363636;
     --toast-text: #fff;
-    --brand-primary: #5266eb;
-    --brand-primary-soft: #eef1fd;
+    --brand-primary: #4F46E5;
+    --brand-primary-dark: #4338CA;
+    --brand-primary-soft: #EEF2FF;
     --brand-emerald: #059669;
-    --brand-surface: #fbfcfd;
+    --brand-surface: #F8FAFC;
     --brand-panel: #ffffff;
-    --brand-border: rgba(211, 214, 219, 0.5);
-    --brand-text: #272735;
-    --brand-text-subdued: #535461;
+    --brand-border: #E2E8F0;
+    --brand-text: #0F172A;
+    --brand-text-subdued: #475569;
   }
 
   body {
