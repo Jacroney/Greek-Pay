@@ -187,9 +187,11 @@ const Demo: React.FC = () => {
           </div>
 
           {/* CTA Section */}
-          <div className="rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-500 to-purple-500 p-8 text-center text-white shadow-xl">
-            <h2 className="text-2xl font-semibold">Ready to Explore?</h2>
-            <p className="mt-2 text-sm text-blue-100">
+          <div className="rounded-3xl border border-[var(--brand-border)] bg-white p-8 text-center shadow-sm">
+            <h2 className="text-2xl font-semibold" style={{ color: '#0b1120' }}>
+              Ready to Explore?
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
               You'll be redirected to the dashboard where you can navigate through all features.
               <br />
               Look for the blue demo banner at the top to exit anytime.
@@ -198,13 +200,13 @@ const Demo: React.FC = () => {
               <button
                 onClick={handleStartDemo}
                 disabled={isStarting}
-                className="inline-flex items-center justify-center rounded-full bg-white px-8 py-3 text-base font-semibold text-blue-600 shadow-lg transition-transform hover:-translate-y-0.5 hover:shadow-xl disabled:opacity-75 disabled:hover:translate-y-0"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--brand-primary)] px-8 py-3 text-base font-semibold text-white shadow-sm transition-transform hover:-translate-y-0.5 disabled:opacity-75 disabled:hover:translate-y-0"
               >
                 {isStarting ? 'Starting Demo...' : 'Start Demo'}
               </button>
               <button
                 onClick={handleBackToHome}
-                className="inline-flex items-center justify-center rounded-full border border-white/60 px-8 py-3 text-base font-semibold text-white transition-colors hover:bg-white/10"
+                className="inline-flex items-center justify-center rounded-full border border-[var(--brand-border)] bg-white px-8 py-3 text-base font-semibold text-slate-700 transition-colors hover:border-[var(--brand-primary)] hover:text-[var(--brand-primary)]"
               >
                 Back to Home
               </button>

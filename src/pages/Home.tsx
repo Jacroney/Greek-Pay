@@ -290,8 +290,8 @@ const Home: React.FC = () => {
             <div className="grid gap-6 md:grid-cols-3">
               {benefits.map((benefit) => (
                 <div key={benefit.title} className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md">
-                  <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-[var(--brand-primary-soft)] text-[var(--brand-primary)]">
-                    {benefit.icon}
+                  <div className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                    Core feature
                   </div>
                   <h3 className="mt-4 text-lg font-semibold" style={{ color: '#0b1120' }}>
                     {benefit.title}
