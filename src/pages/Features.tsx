@@ -14,11 +14,11 @@ import {
 
 const heroFeature = {
   title: 'Executive Control Center',
-  subtitle: 'Your entire chapter’s financial health — in one intelligent view.',
+  subtitle: 'A single command center for dues, cash, and accountability.',
   bullets: [
-    'Real‑time cash position',
+    'Real‑time cash position and burn rate',
     'Upcoming dues + recurring alerts',
-    'AI‑powered financial insights'
+    'Analytics that explain what changed and why'
   ],
   cta: 'See Dashboard in Action'
 };
@@ -26,32 +26,32 @@ const heroFeature = {
 const coreFeatures = [
   {
     title: 'Transactions',
-    subtitle: 'All transactions. Zero chaos.',
-    bullets: ['Search & filter instantly', 'CSV + manual entries', 'Clean audit trail'],
+    subtitle: 'Every transaction, automatically organized.',
+    bullets: ['Bank + manual activity in one ledger', 'Inline categorization', 'Permanent audit trail'],
     icon: ClipboardDocumentCheckIcon,
     tone: 'text-blue-700 border-blue-200 bg-blue-50',
     cta: 'Explore Transactions'
   },
   {
     title: 'Budgets',
-    subtitle: 'See overspending before it happens.',
-    bullets: ['Live vs. budgeted tracking', 'Period rollups', 'Variance alerts'],
+    subtitle: 'Plan once, track live, adjust fast.',
+    bullets: ['Live vs. budgeted tracking', 'Category rollups', 'Early variance alerts'],
     icon: CurrencyDollarIcon,
     tone: 'text-emerald-700 border-emerald-200 bg-emerald-50',
     cta: 'View Budgets'
   },
   {
     title: 'Members & Dues',
-    subtitle: 'Collections that run themselves.',
-    bullets: ['Automated dues setup', 'Late fee tracking', 'Member portal'],
+    subtitle: 'Automated dues collection that pays on time.',
+    bullets: ['Smart dues schedules + reminders', 'Member portal with payment history', 'Late fees and status tracking'],
     icon: UserGroupIcon,
     tone: 'text-amber-700 border-amber-200 bg-amber-50',
     cta: 'Manage Members'
   },
   {
     title: 'Reports',
-    subtitle: 'Board‑ready in minutes.',
-    bullets: ['PDF & CSV exports', 'Dues collection rates', 'Budget health'],
+    subtitle: 'Board‑ready analysis without the spreadsheet work.',
+    bullets: ['PDF & CSV exports', 'Dues collection performance', 'Budget and cash trend views'],
     icon: ArrowTrendingUpIcon,
     tone: 'text-violet-700 border-violet-200 bg-violet-50',
     cta: 'See Reports'
@@ -62,7 +62,7 @@ const highlightFeature = {
   title: 'AI Financial Advisor',
   subtitle: 'Instant answers. Smarter decisions.',
   description:
-    'Ask questions about budgets, dues, and cash health and get fast, contextual guidance.',
+    'Ask questions about budgets, dues, and cash health to get clear explanations, trends, and next steps.',
   cta: 'Ask the AI',
   icon: SparklesIcon
 };
@@ -75,35 +75,35 @@ const utilityFeatures = [
     icon: ArrowPathIcon
   },
   {
+    title: 'Bank Sync',
+    subtitle: 'Always‑current books.',
+    bullets: ['Plaid‑powered connections', 'Continuous reconciliation', 'Fewer manual errors'],
+    icon: BanknotesIcon
+  },
+  {
     title: 'Security',
     subtitle: 'Trustworthy by default.',
     bullets: ['Role‑based access', 'Audit‑ready logs', 'Secure by design'],
-    icon: Cog6ToothIcon
-  },
-  {
-    title: 'Settings',
-    subtitle: 'Customize your chapter.',
-    bullets: ['Branding & prefs', 'Chapter controls', 'Integration settings'],
     icon: Cog6ToothIcon
   }
 ];
 
 const sellingPoints = [
   {
-    title: 'Leadership clarity',
-    description: 'Execs always know the financial state and next actions.'
+    title: 'Automated dues collection',
+    description: 'Schedules, reminders, and payment status run on autopilot.'
   },
   {
-    title: 'Operational speed',
-    description: 'Bank sync + automation replaces manual work.'
+    title: 'Data‑driven decisions',
+    description: 'Trends, variances, and cash health are visible instantly.'
   },
   {
-    title: 'Member‑friendly payments',
-    description: 'Simpler dues collection improves compliance.'
+    title: 'Faster board reporting',
+    description: 'PDF/CSV outputs are ready in minutes, not weekends.'
   },
   {
-    title: 'Audit‑ready reporting',
-    description: 'Board‑grade exports in minutes, not days.'
+    title: 'Less admin overhead',
+    description: 'Bank sync + workflows replace spreadsheet upkeep.'
   }
 ];
 
@@ -166,11 +166,11 @@ const Features: React.FC = () => {
                   Product Features
                 </span>
                 <h1 className="mt-4 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-                  Powerful financial oversight for chapter leaders.
+                  Built for modern treasurers, not spreadsheets.
                 </h1>
                 <p className="mt-4 text-lg text-slate-600">
-                  GreekPay brings dues, budgets, transactions, reporting, and member management into one trusted
-                  workspace—so leaders stay clear, fast, and audit‑ready.
+                  GreekPay unifies dues, budgets, bank sync, reporting, and members in one workspace—replacing
+                  spreadsheets and scattered tools with real‑time clarity.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <button
@@ -242,12 +242,12 @@ const Features: React.FC = () => {
         <section className="bg-[var(--brand-surface)]">
           <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
             <div className="mb-8 text-center">
-              <h2 className="text-3xl font-semibold text-slate-950">
-                Everything you need to run chapter finances
-              </h2>
-              <p className="mt-2 text-sm text-slate-600">
-                Clean, modern tools built for treasurers and executive boards.
-              </p>
+                <h2 className="text-3xl font-semibold text-slate-950">
+                  The complete GreekPay toolkit
+                </h2>
+                <p className="mt-2 text-sm text-slate-600">
+                  Purpose‑built modules for treasurers, execs, and alumni oversight.
+                </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
               {coreFeatures.map((feature) => {
@@ -341,10 +341,10 @@ const Features: React.FC = () => {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-semibold" style={{ color: '#0b1120' }}>
-                    Why it sells
+                    Why GreekPay wins
                   </h2>
                   <p className="text-sm text-slate-600">
-                    GreekPay makes chapter treasury professional, transparent, and effortless.
+                    Built for fraternity finance workflows—not generic small‑business software or spreadsheets.
                   </p>
                 </div>
                 <button
@@ -363,6 +363,26 @@ const Features: React.FC = () => {
                     <p className="mt-2 text-sm text-slate-600">{point.description}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-8 grid gap-4 lg:grid-cols-2">
+                <div className="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Compared to generic finance tools</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                    GreekPay is built for dues cycles, member rosters, and chapter governance—not SMB accounting.
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    You get the exact workflows fraternities need without unnecessary complexity.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Compared to Google Sheets</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                    Automated dues, live bank sync, and instant reporting replace manual entry and version chaos.
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Less risk, fewer errors, and real accountability for boards and members.
+                  </p>
+                </div>
               </div>
             </div>
           </div>

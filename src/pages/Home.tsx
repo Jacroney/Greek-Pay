@@ -45,13 +45,7 @@ const outcomes = [
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
-  const demoRoutes = [
-    '/demo/dashboard',
-    '/demo/transactions',
-    '/demo/budgets',
-    '/demo/members',
-    '/demo/reports'
-  ];
+  const demoRoute = '/demo/dashboard';
   const demoNav = ['Dashboard', 'Transactions', 'Budgets', 'Members', 'Reports'];
   const demoNavStyles = [
     'border-blue-200 text-blue-700',
@@ -60,12 +54,10 @@ const Home: React.FC = () => {
     'border-amber-200 text-amber-700',
     'border-violet-200 text-violet-700'
   ];
-  const [demoRouteIndex, setDemoRouteIndex] = useState(0);
+  const demoRouteIndex = 0;
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const demoFrameRef = useRef<HTMLDivElement | null>(null);
-  const scrollAnimationRef = useRef<number | null>(null);
-  const scrollDelayRef = useRef<number | null>(null);
   const demoBaseWidth = 1440;
   const demoBaseHeight = 900;
   const [demoScale, setDemoScale] = useState(1);
@@ -107,52 +99,7 @@ const Home: React.FC = () => {
   const handleIframeLoad = () => {
     if (typeof window === 'undefined') return;
     const iframe = iframeRef.current;
-    const win = iframe?.contentWindow;
-    const doc = iframe?.contentDocument;
-
-    if (!win || !doc) return;
-    win.scrollTo(0, 0);
-
-    if (scrollAnimationRef.current) {
-      window.cancelAnimationFrame(scrollAnimationRef.current);
-    }
-    if (scrollDelayRef.current) {
-      window.clearTimeout(scrollDelayRef.current);
-    }
-
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) return;
-
-    const docElement = doc.documentElement;
-    const body = doc.body;
-    const scrollHeight = Math.max(docElement.scrollHeight, body?.scrollHeight ?? 0);
-    const maxScroll = Math.max(scrollHeight - win.innerHeight, 0);
-    const delayMs = 7000;
-    const durationMs = 20000;
-
-    const advanceRoute = () => {
-      setDemoRouteIndex((prev) => (prev + 1) % demoRoutes.length);
-    };
-
-    if (maxScroll === 0) {
-      scrollDelayRef.current = window.setTimeout(advanceRoute, delayMs);
-      return;
-    }
-
-    const step = (now: number, startTime: number) => {
-      const progress = Math.min((now - startTime) / durationMs, 1);
-      win.scrollTo(0, maxScroll * progress);
-      if (progress < 1) {
-        scrollAnimationRef.current = window.requestAnimationFrame((next) => step(next, startTime));
-      } else {
-        advanceRoute();
-      }
-    };
-
-    scrollDelayRef.current = window.setTimeout(() => {
-      const startTime = window.performance.now();
-      scrollAnimationRef.current = window.requestAnimationFrame((now) => step(now, startTime));
-    }, delayMs);
+    iframe?.contentWindow?.scrollTo(0, 0);
   };
 
   return (
@@ -245,10 +192,10 @@ const Home: React.FC = () => {
                 </div>
                 <div ref={demoFrameRef} className="relative aspect-[16/9] overflow-hidden bg-slate-900">
                   <iframe
-                    key={demoRoutes[demoRouteIndex]}
-                    src={demoRoutes[demoRouteIndex]}
+                    key={demoRoute}
+                    src={demoRoute}
                     title="GreekPay demo preview"
-                    className="pointer-events-none absolute left-1/2 top-0 origin-top"
+                    className="absolute left-1/2 top-0 origin-top"
                     loading="lazy"
                     referrerPolicy="no-referrer"
                     ref={iframeRef}
@@ -263,7 +210,7 @@ const Home: React.FC = () => {
                 </div>
               </div>
               <p className="mt-3 text-center text-xs text-slate-500">
-                Live demo preview rotates automatically.
+                Interactive demo preview — scroll and click to explore.
               </p>
             </div>
             <div className="mt-10 rounded-2xl border border-[var(--brand-border)] bg-white p-5 shadow-sm">
