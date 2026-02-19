@@ -90,20 +90,20 @@ const utilityFeatures = [
 
 const sellingPoints = [
   {
-    title: 'Leadership clarity',
-    description: 'Execs always know the financial state and next actions.'
+    title: 'Automated dues collection',
+    description: 'Schedules, reminders, and payment status run on autopilot.'
   },
   {
-    title: 'Operational speed',
-    description: 'Bank sync + automation replaces manual work.'
+    title: 'Data‑driven decisions',
+    description: 'Trends, variances, and cash health are visible instantly.'
   },
   {
-    title: 'Member‑friendly payments',
-    description: 'Simpler dues collection improves compliance.'
+    title: 'Faster board reporting',
+    description: 'PDF/CSV outputs are ready in minutes, not weekends.'
   },
   {
-    title: 'Audit‑ready reporting',
-    description: 'Board‑grade exports in minutes, not days.'
+    title: 'Less admin overhead',
+    description: 'Bank sync + workflows replace spreadsheet upkeep.'
   }
 ];
 
@@ -341,10 +341,10 @@ const Features: React.FC = () => {
               <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
                 <div className="space-y-2">
                   <h2 className="text-3xl font-semibold" style={{ color: '#0b1120' }}>
-                    Why it sells
+                    Why GreekPay wins
                   </h2>
                   <p className="text-sm text-slate-600">
-                    GreekPay makes chapter treasury professional, transparent, and effortless.
+                    Built for fraternity finance workflows—not generic small‑business software or spreadsheets.
                   </p>
                 </div>
                 <button
@@ -363,6 +363,26 @@ const Features: React.FC = () => {
                     <p className="mt-2 text-sm text-slate-600">{point.description}</p>
                   </div>
                 ))}
+              </div>
+              <div className="mt-8 grid gap-4 lg:grid-cols-2">
+                <div className="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Compared to generic finance tools</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                    GreekPay is built for dues cycles, member rosters, and chapter governance—not SMB accounting.
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    You get the exact workflows fraternities need without unnecessary complexity.
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-[var(--brand-border)] bg-white p-5">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Compared to Google Sheets</p>
+                  <p className="mt-2 text-sm font-semibold text-slate-900">
+                    Automated dues, live bank sync, and instant reporting replace manual entry and version chaos.
+                  </p>
+                  <p className="mt-2 text-sm text-slate-600">
+                    Less risk, fewer errors, and real accountability for boards and members.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
