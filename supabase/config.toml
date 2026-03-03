@@ -342,6 +342,10 @@ verify_jwt = false
 verify_jwt = false
 # Schedule: 0 5 * * * (daily at 5 AM UTC / midnight EST)
 
+[functions.process-installment-payments]
+verify_jwt = false
+# Schedule: 0 8 * * * (daily at 8 AM UTC / 3 AM EST)
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

@@ -101,7 +101,7 @@ serve(async (req) => {
           <title>Welcome to ${displayChapterName} - GreekPay</title>
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+          <div style="background: linear-gradient(135deg, #5266eb 0%, #3d4fd6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 28px;">GreekPay</h1>
             <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">${displayChapterName}</p>
           </div>
@@ -126,7 +126,7 @@ serve(async (req) => {
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${invitationUrl}"
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 style="background: #5266eb;
                         color: white;
                         padding: 16px 32px;
                         text-decoration: none;
@@ -134,14 +134,14 @@ serve(async (req) => {
                         font-weight: 600;
                         font-size: 16px;
                         display: inline-block;
-                        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);">
+                        box-shadow: 0 4px 6px rgba(82, 102, 235, 0.25);">
                 Create Your Account
               </a>
             </div>
 
             <p style="font-size: 14px; color: #999; border-top: 1px solid #e1e4e8; padding-top: 20px; margin-top: 40px;">
               Or copy and paste this link into your browser:<br>
-              <a href="${invitationUrl}" style="color: #667eea; word-break: break-all;">${invitationUrl}</a>
+              <a href="${invitationUrl}" style="color: #5266eb; word-break: break-all;">${invitationUrl}</a>
             </p>
 
             <p style="font-size: 14px; color: #999; margin-top: 30px;">

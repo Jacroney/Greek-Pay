@@ -116,7 +116,215 @@ serve(async (req) => {
     let processed = 0
     let succeeded = 0
     let failed = 0
+    let processing = 0
     const errors: string[] = []
+
+    // Helper: charge a single installment payment and handle the result
+    async function chargeInstallmentPayment(payment: any, isRetry: boolean): Promise<'succeeded' | 'processing' | 'failed'> {
+      const plan = payment.installment_plans
+      const label = isRetry ? `retry` : `installment ${payment.installment_number}`
+
+      console.log(`Processing ${label} for plan ${plan.id}`)
+
+      // Get member's Stripe customer ID
+      const { data: memberProfile } = await supabaseAdmin
+        .from('user_profiles')
+        .select('stripe_customer_id, email, full_name')
+        .eq('id', plan.member_id)
+        .single()
+
+      if (!memberProfile?.stripe_customer_id) {
+        throw new Error('Member has no Stripe customer ID')
+      }
+
+      // Get chapter's Stripe account
+      const { data: stripeAccount } = await supabaseAdmin
+        .from('stripe_connected_accounts')
+        .select('stripe_account_id, charges_enabled')
+        .eq('chapter_id', plan.chapter_id)
+        .single()
+
+      if (!stripeAccount?.charges_enabled) {
+        throw new Error('Chapter Stripe account not enabled')
+      }
+
+      // Calculate fees
+      const amountToCharge = payment.total_amount // Includes any late fees from previous failures
+      const stripeFee = calculateStripeFee(amountToCharge, plan.payment_method_type)
+      const totalCharge = calculateTotalCharge(amountToCharge, plan.payment_method_type)
+      const platformFee = Math.round(amountToCharge * PLATFORM_FEE_PERCENTAGE * 100) / 100
+      const chapterReceives = plan.payment_method_type === 'us_bank_account'
+        ? amountToCharge - stripeFee - platformFee
+        : amountToCharge - platformFee
+
+      // Create and confirm Stripe PaymentIntent (off_session)
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: Math.round(totalCharge * 100),
+        currency: 'usd',
+        customer: memberProfile.stripe_customer_id,
+        payment_method: plan.stripe_payment_method_id,
+        payment_method_types: [plan.payment_method_type],
+        off_session: true, // Important: auto-charge without customer present
+        confirm: true, // Confirm immediately
+        transfer_data: {
+          destination: stripeAccount.stripe_account_id,
+          amount: Math.round(chapterReceives * 100)
+        },
+        metadata: {
+          member_dues_id: plan.member_dues_id,
+          member_id: plan.member_id,
+          chapter_id: plan.chapter_id,
+          installment_plan_id: plan.id,
+          installment_payment_id: payment.id,
+          installment_number: String(payment.installment_number),
+          payment_method_type: plan.payment_method_type,
+          type: 'installment_auto'
+        }
+      })
+
+      if (paymentIntent.status === 'succeeded') {
+        // Payment succeeded immediately
+        console.log(`Payment succeeded for ${label}`)
+
+        // Store payment intent record
+        const { data: piRecord } = await supabaseAdmin
+          .from('payment_intents')
+          .insert({
+            chapter_id: plan.chapter_id,
+            member_dues_id: plan.member_dues_id,
+            member_id: plan.member_id,
+            stripe_payment_intent_id: paymentIntent.id,
+            amount: amountToCharge,
+            stripe_fee: stripeFee,
+            platform_fee: platformFee,
+            total_charge: totalCharge,
+            net_amount: chapterReceives,
+            payment_method_type: plan.payment_method_type,
+            status: 'succeeded',
+            succeeded_at: new Date().toISOString()
+          })
+          .select('id')
+          .single()
+
+        // Record the installment payment success
+        await supabaseAdmin.rpc('record_installment_payment', {
+          p_installment_payment_id: payment.id,
+          p_stripe_payment_intent_id: paymentIntent.id,
+          p_payment_intent_id: piRecord?.id || null
+        })
+
+        // Record dues payment
+        await supabaseAdmin
+          .from('dues_payments')
+          .insert({
+            member_dues_id: plan.member_dues_id,
+            member_id: plan.member_id,
+            chapter_id: plan.chapter_id,
+            amount: amountToCharge,
+            payment_method: plan.payment_method_type === 'us_bank_account' ? 'ACH' : 'Credit Card',
+            payment_date: today,
+            reference_number: paymentIntent.id,
+            notes: `Installment ${payment.installment_number} of ${plan.num_installments || '?'} (auto-charged)`
+          })
+
+        // Update member dues balance
+        const { data: currentDues } = await supabaseAdmin
+          .from('member_dues')
+          .select('balance, amount_paid, total_amount')
+          .eq('id', plan.member_dues_id)
+          .single()
+
+        if (currentDues) {
+          const newAmountPaid = currentDues.amount_paid + amountToCharge
+          const newBalance = Math.max(0, currentDues.total_amount - newAmountPaid)
+          const newStatus = newBalance <= 0 ? 'paid' : 'partial'
+
+          await supabaseAdmin
+            .from('member_dues')
+            .update({
+              amount_paid: newAmountPaid,
+              balance: newBalance,
+              status: newStatus,
+              paid_date: newBalance <= 0 ? today : null
+            })
+            .eq('id', plan.member_dues_id)
+        }
+
+        // Queue success notification email
+        await supabaseAdmin
+          .from('email_queue')
+          .insert({
+            to_email: memberProfile.email,
+            to_name: memberProfile.full_name,
+            template_type: 'installment_payment_success',
+            template_data: {
+              member_name: memberProfile.full_name,
+              installment_number: payment.installment_number,
+              amount: amountToCharge,
+              remaining_installments: (plan.num_installments || 0) - payment.installment_number
+            },
+            chapter_id: plan.chapter_id
+          })
+
+        return 'succeeded'
+      } else if (paymentIntent.status === 'processing') {
+        // ACH payment — takes 3-5 days to settle. Store record and let webhook handle final confirmation.
+        console.log(`Payment processing (ACH) for ${label}`)
+
+        await supabaseAdmin
+          .from('payment_intents')
+          .insert({
+            chapter_id: plan.chapter_id,
+            member_dues_id: plan.member_dues_id,
+            member_id: plan.member_id,
+            stripe_payment_intent_id: paymentIntent.id,
+            amount: amountToCharge,
+            stripe_fee: stripeFee,
+            platform_fee: platformFee,
+            total_charge: totalCharge,
+            net_amount: chapterReceives,
+            payment_method_type: plan.payment_method_type,
+            status: 'processing'
+          })
+
+        // Update installment payment status to processing
+        await supabaseAdmin
+          .from('installment_payments')
+          .update({
+            stripe_payment_intent_id: paymentIntent.id,
+            status: 'processing'
+          })
+          .eq('id', payment.id)
+
+        return 'processing'
+      } else if (paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_confirmation') {
+        // Payment needs additional action — treat as failed for auto-charge
+        console.log(`Payment requires action for ${label}`)
+
+        await handlePaymentFailure(
+          supabaseAdmin,
+          payment,
+          plan,
+          memberProfile,
+          'Payment requires additional verification',
+          'requires_action'
+        )
+        return 'failed'
+      } else {
+        // Other unexpected status — mark as failed
+        console.log(`Payment status ${paymentIntent.status} for ${label}`)
+
+        await handlePaymentFailure(
+          supabaseAdmin,
+          payment,
+          plan,
+          memberProfile,
+          `Payment status: ${paymentIntent.status}`,
+          paymentIntent.status
+        )
+        return 'failed'
+      }
+    }
 
     // ========================================
     // 2. Process each due payment
@@ -125,182 +333,13 @@ serve(async (req) => {
     for (const payment of duePayments) {
       try {
         processed++
-        const plan = payment.installment_plans
-
-        console.log(`Processing installment ${payment.installment_number} for plan ${plan.id}`)
-
-        // Get member's Stripe customer ID
-        const { data: memberProfile } = await supabaseAdmin
-          .from('user_profiles')
-          .select('stripe_customer_id, email, full_name')
-          .eq('id', plan.member_id)
-          .single()
-
-        if (!memberProfile?.stripe_customer_id) {
-          throw new Error('Member has no Stripe customer ID')
-        }
-
-        // Get chapter's Stripe account
-        const { data: stripeAccount } = await supabaseAdmin
-          .from('stripe_connected_accounts')
-          .select('stripe_account_id, charges_enabled')
-          .eq('chapter_id', plan.chapter_id)
-          .single()
-
-        if (!stripeAccount?.charges_enabled) {
-          throw new Error('Chapter Stripe account not enabled')
-        }
-
-        // Calculate fees
-        const amountToCharge = payment.total_amount // Includes any late fees from previous failures
-        const stripeFee = calculateStripeFee(amountToCharge, plan.payment_method_type)
-        const totalCharge = calculateTotalCharge(amountToCharge, plan.payment_method_type)
-        const platformFee = Math.round(amountToCharge * PLATFORM_FEE_PERCENTAGE * 100) / 100
-        const chapterReceives = plan.payment_method_type === 'us_bank_account'
-          ? amountToCharge - stripeFee - platformFee
-          : amountToCharge - platformFee
-
-        // Create and confirm Stripe PaymentIntent (off_session)
-        const paymentIntent = await stripe.paymentIntents.create({
-          amount: Math.round(totalCharge * 100),
-          currency: 'usd',
-          customer: memberProfile.stripe_customer_id,
-          payment_method: plan.stripe_payment_method_id,
-          payment_method_types: [plan.payment_method_type],
-          off_session: true, // Important: auto-charge without customer present
-          confirm: true, // Confirm immediately
-          transfer_data: {
-            destination: stripeAccount.stripe_account_id,
-            amount: Math.round(chapterReceives * 100)
-          },
-          metadata: {
-            member_dues_id: plan.member_dues_id,
-            member_id: plan.member_id,
-            chapter_id: plan.chapter_id,
-            installment_plan_id: plan.id,
-            installment_payment_id: payment.id,
-            installment_number: String(payment.installment_number),
-            payment_method_type: plan.payment_method_type,
-            type: 'installment_auto'
-          }
-        })
-
-        if (paymentIntent.status === 'succeeded') {
-          // Payment succeeded
-          console.log(`Payment succeeded for installment ${payment.installment_number}`)
-
-          // Store payment intent record
-          const { data: piRecord } = await supabaseAdmin
-            .from('payment_intents')
-            .insert({
-              chapter_id: plan.chapter_id,
-              member_dues_id: plan.member_dues_id,
-              member_id: plan.member_id,
-              stripe_payment_intent_id: paymentIntent.id,
-              amount: amountToCharge,
-              stripe_fee: stripeFee,
-              platform_fee: platformFee,
-              total_charge: totalCharge,
-              net_amount: chapterReceives,
-              payment_method_type: plan.payment_method_type,
-              status: 'succeeded',
-              succeeded_at: new Date().toISOString()
-            })
-            .select('id')
-            .single()
-
-          // Record the installment payment success
-          await supabaseAdmin.rpc('record_installment_payment', {
-            p_installment_payment_id: payment.id,
-            p_stripe_payment_intent_id: paymentIntent.id,
-            p_payment_intent_id: piRecord?.id || null
-          })
-
-          // Record dues payment
-          await supabaseAdmin
-            .from('dues_payments')
-            .insert({
-              member_dues_id: plan.member_dues_id,
-              member_id: plan.member_id,
-              chapter_id: plan.chapter_id,
-              amount: amountToCharge,
-              payment_method: plan.payment_method_type === 'us_bank_account' ? 'ACH' : 'Credit Card',
-              payment_date: today,
-              reference_number: paymentIntent.id,
-              notes: `Installment ${payment.installment_number} of ${plan.num_installments || '?'} (auto-charged)`
-            })
-
-          // Update member dues balance
-          const { data: currentDues } = await supabaseAdmin
-            .from('member_dues')
-            .select('balance, amount_paid, total_amount')
-            .eq('id', plan.member_dues_id)
-            .single()
-
-          if (currentDues) {
-            const newAmountPaid = currentDues.amount_paid + amountToCharge
-            const newBalance = Math.max(0, currentDues.total_amount - newAmountPaid)
-            const newStatus = newBalance <= 0 ? 'paid' : 'partial'
-
-            await supabaseAdmin
-              .from('member_dues')
-              .update({
-                amount_paid: newAmountPaid,
-                balance: newBalance,
-                status: newStatus,
-                paid_date: newBalance <= 0 ? today : null
-              })
-              .eq('id', plan.member_dues_id)
-          }
-
-          // Queue success notification email
-          await supabaseAdmin
-            .from('email_queue')
-            .insert({
-              to_email: memberProfile.email,
-              to_name: memberProfile.full_name,
-              template_type: 'installment_payment_success',
-              template_data: {
-                member_name: memberProfile.full_name,
-                installment_number: payment.installment_number,
-                amount: amountToCharge,
-                remaining_installments: (plan.num_installments || 0) - payment.installment_number
-              },
-              chapter_id: plan.chapter_id
-            })
-
-          succeeded++
-        } else if (paymentIntent.status === 'requires_action' || paymentIntent.status === 'requires_confirmation') {
-          // Payment needs additional action - treat as failed for auto-charge
-          console.log(`Payment requires action for installment ${payment.installment_number}`)
-
-          await handlePaymentFailure(
-            supabaseAdmin,
-            payment,
-            plan,
-            memberProfile,
-            'Payment requires additional verification',
-            'requires_action'
-          )
-          failed++
-        } else {
-          // Other status - mark as failed
-          console.log(`Payment status ${paymentIntent.status} for installment ${payment.installment_number}`)
-
-          await handlePaymentFailure(
-            supabaseAdmin,
-            payment,
-            plan,
-            memberProfile,
-            `Payment status: ${paymentIntent.status}`,
-            paymentIntent.status
-          )
-          failed++
-        }
+        const result = await chargeInstallmentPayment(payment, false)
+        if (result === 'succeeded') succeeded++
+        else if (result === 'processing') processing++
+        else failed++
       } catch (error) {
         console.error(`Error processing payment ${payment.id}:`, error)
 
-        // Handle Stripe-specific errors
         const errorMessage = error instanceof Error ? error.message : 'Unknown error'
         const errorCode = (error as any)?.code || 'unknown'
 
@@ -344,7 +383,10 @@ serve(async (req) => {
           member_dues_id,
           stripe_payment_method_id,
           payment_method_type,
-          status
+          status,
+          late_fee_enabled,
+          late_fee_amount,
+          late_fee_type
         )
       `)
       .eq('status', 'failed')
@@ -352,20 +394,73 @@ serve(async (req) => {
       .lte('next_retry_at', new Date().toISOString())
       .eq('installment_plans.status', 'active')
 
+    let retried = 0
+    let retrySucceeded = 0
+    let retryFailed = 0
+    let retryProcessing = 0
+
     if (retryPayments && retryPayments.length > 0) {
       console.log(`Found ${retryPayments.length} payments to retry`)
-      // Note: Retries would follow similar logic as above
-      // For now, just log them - full retry implementation can be added
+
+      for (const payment of retryPayments) {
+        try {
+          retried++
+
+          // Reset status to scheduled so chargeInstallmentPayment can process it
+          await supabaseAdmin
+            .from('installment_payments')
+            .update({ status: 'scheduled' })
+            .eq('id', payment.id)
+
+          const result = await chargeInstallmentPayment(payment, true)
+          if (result === 'succeeded') retrySucceeded++
+          else if (result === 'processing') retryProcessing++
+          else retryFailed++
+        } catch (error) {
+          console.error(`Error retrying payment ${payment.id}:`, error)
+
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error'
+          const errorCode = (error as any)?.code || 'unknown'
+
+          try {
+            const plan = payment.installment_plans
+            const { data: memberProfile } = await supabaseAdmin
+              .from('user_profiles')
+              .select('email, full_name')
+              .eq('id', plan.member_id)
+              .single()
+
+            await handlePaymentFailure(
+              supabaseAdmin,
+              payment,
+              plan,
+              memberProfile,
+              errorMessage,
+              errorCode
+            )
+          } catch (innerError) {
+            console.error('Error handling retry failure:', innerError)
+          }
+
+          errors.push(`Retry ${payment.id}: ${errorMessage}`)
+          retryFailed++
+        }
+      }
     }
 
-    console.log(`Completed: ${processed} processed, ${succeeded} succeeded, ${failed} failed`)
+    console.log(`Completed: ${processed} processed, ${succeeded} succeeded, ${processing} processing, ${failed} failed`)
+    if (retried > 0) {
+      console.log(`Retries: ${retried} attempted, ${retrySucceeded} succeeded, ${retryProcessing} processing, ${retryFailed} failed`)
+    }
 
     return new Response(
       JSON.stringify({
         success: true,
         processed,
         succeeded,
+        processing,
         failed,
+        retries: retried > 0 ? { attempted: retried, succeeded: retrySucceeded, processing: retryProcessing, failed: retryFailed } : undefined,
         errors: errors.length > 0 ? errors : undefined
       }),
       { headers: { 'Content-Type': 'application/json' } }

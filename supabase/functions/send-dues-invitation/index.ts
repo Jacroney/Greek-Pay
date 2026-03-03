@@ -153,7 +153,7 @@ serve(async (req) => {
           <title>Dues Invitation - ${chapter.name}</title>
         </head>
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+          <div style="background: linear-gradient(135deg, #5266eb 0%, #3d4fd6 100%); padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
             <h1 style="color: white; margin: 0; font-size: 28px;">GreekPay</h1>
             <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0; font-size: 16px;">${chapter.name || 'Your Chapter'}</p>
           </div>
@@ -167,7 +167,7 @@ serve(async (req) => {
               The treasurer of ${chapter.name} has assigned you dues${memberDues.dues_configuration ? ` for <strong>${memberDues.dues_configuration.period_name} ${memberDues.dues_configuration.fiscal_year}</strong>` : ''}.
             </p>
 
-            <div style="background: #f6f8fa; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px;">
+            <div style="background: #f6f8fa; border-left: 4px solid #5266eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
               <p style="margin: 0; font-size: 14px; color: #666; text-transform: uppercase; letter-spacing: 0.5px;">Dues Amount</p>
               <p style="margin: 10px 0 0 0; font-size: 32px; color: #333; font-weight: bold;">$${(memberDues.total_amount || memberDues.amount_due || 0).toFixed(2)}</p>
               ${memberDues.due_date ? `<p style="margin: 10px 0 0 0; font-size: 14px; color: #666;">Due Date: ${new Date(memberDues.due_date).toLocaleDateString()}</p>` : ''}
@@ -182,7 +182,7 @@ serve(async (req) => {
             </div>
             ` : ''}
 
-            <div style="background: #f0f9ff; border-left: 4px solid #667eea; padding: 20px; margin: 30px 0; border-radius: 4px;">
+            <div style="background: #f0f9ff; border-left: 4px solid #5266eb; padding: 20px; margin: 30px 0; border-radius: 4px;">
               <p style="margin: 0 0 12px 0; font-size: 14px; color: #1e40af; font-weight: 600;">
                 ✅ Next Steps:
               </p>
@@ -196,7 +196,7 @@ serve(async (req) => {
 
             <div style="text-align: center; margin: 30px 0;">
               <a href="${invitationUrl}"
-                 style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                 style="background: #5266eb;
                         color: white;
                         padding: 16px 32px;
                         text-decoration: none;
@@ -204,14 +204,14 @@ serve(async (req) => {
                         font-weight: 600;
                         font-size: 16px;
                         display: inline-block;
-                        box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);">
+                        box-shadow: 0 4px 6px rgba(82, 102, 235, 0.25);">
                 Create Account & View Dues
               </a>
             </div>
 
             <p style="font-size: 14px; color: #999; border-top: 1px solid #e1e4e8; padding-top: 20px; margin-top: 40px;">
               Or copy and paste this link into your browser:<br>
-              <a href="${invitationUrl}" style="color: #667eea; word-break: break-all;">${invitationUrl}</a>
+              <a href="${invitationUrl}" style="color: #5266eb; word-break: break-all;">${invitationUrl}</a>
             </p>
 
             <p style="font-size: 14px; color: #999; margin-top: 30px;">
