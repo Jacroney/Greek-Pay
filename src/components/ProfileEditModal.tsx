@@ -118,20 +118,20 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
           <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 px-6 py-5 sm:rounded-t-2xl">
+        {/* Header */}
+        <div className="border-b border-[var(--brand-border)] px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-                <User className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--brand-primary-soft)]">
+                <User className="w-5 h-5 text-[var(--brand-primary)]" />
               </div>
-              <h2 className="text-lg sm:text-xl font-semibold text-white">
+              <h2 className="text-lg sm:text-xl font-semibold text-[var(--brand-text)]">
                 Edit Profile
               </h2>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 touch-manipulation"
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors active:scale-95 touch-manipulation"
               disabled={isSubmitting}
               aria-label="Close"
             >
@@ -260,7 +260,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none touch-manipulation font-semibold flex items-center justify-center"
+              className="flex-1 px-4 py-3 bg-[var(--brand-primary)] hover:bg-[var(--brand-primary-dark)] text-white rounded-xl shadow-sm hover:shadow-md transition-all active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none touch-manipulation font-semibold flex items-center justify-center"
             >
               {isSubmitting ? (
                 <>

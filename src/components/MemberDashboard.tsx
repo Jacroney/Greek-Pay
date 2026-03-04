@@ -1,23 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
-  User,
   CreditCard,
   Clock,
   Lock,
   Mail,
-  RefreshCw,
-  HelpCircle,
   DollarSign,
-  GraduationCap,
-  BookOpen,
-  Award,
-  Phone,
-  ArrowRight,
   LogOut,
   Pencil,
   Calendar,
   CheckCircle,
+  Receipt,
+  ChevronDown,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { MemberDuesInfo } from '../services/authService';
@@ -27,9 +21,9 @@ import { MemberDuesSummary, InstallmentPlanWithPayments } from '../services/type
 import ProfileEditModal from './ProfileEditModal';
 import PaymentHistoryModal from './PaymentHistoryModal';
 import PasswordChangeModal from './PasswordChangeModal';
+import ReimbursementRequestModal from './ReimbursementRequestModal';
 import PayDuesButton from './PayDuesButton';
 import { getYearLabel } from '../utils/yearUtils';
-import CircularProgress from './CircularProgress';
 
 const formatCurrency = (amount: number) =>
   new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
@@ -59,6 +53,8 @@ export const MemberDashboard: React.FC = () => {
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isPaymentHistoryModalOpen, setIsPaymentHistoryModalOpen] = useState(false);
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isReimbursementModalOpen, setIsReimbursementModalOpen] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
@@ -120,38 +116,22 @@ export const MemberDashboard: React.FC = () => {
   const isOwed = duesBalance > 0;
   const chapterName = duesInfo?.chapter_name || 'Your Chapter';
 
-  // Calculate profile completeness
-  const profileFields = {
-    full_name: profile?.full_name,
-    email: profile?.email,
-    phone_number: profile?.phone_number,
-    year: profile?.year,
-    major: profile?.major,
-  };
-  const filledFields = Object.values(profileFields).filter(v => v && v !== profile?.email).length;
-  const totalFields = Object.keys(profileFields).length - 1; // Exclude email as it's always present
-  const profileCompleteness = Math.round((filledFields / totalFields) * 100);
-  const isProfileIncomplete = profileCompleteness < 75;
-
   return (
     <div className="min-h-screen bg-[var(--brand-surface)]">
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-[var(--brand-border)] bg-white/80 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <img
               src="/GreekPay-logo-transparent.png"
               alt="GreekPay Logo"
-              className="h-9 w-auto"
+              className="h-10 sm:h-14 w-auto"
             />
-            <div className="hidden sm:block">
-              <h1 className="text-lg font-semibold text-slate-900">Member Portal</h1>
-            </div>
           </div>
           <button
             type="button"
             onClick={signOut}
-            className="focus-ring inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"
+            className="inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-900 active:scale-95"
           >
             <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Sign out</span>
@@ -161,516 +141,277 @@ export const MemberDashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-        <div className="space-y-6">
-          {/* Hero Welcome Card */}
-          <div className="surface-card overflow-hidden">
-            <div className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 p-6 sm:p-8">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-                <div className="flex items-center gap-4 sm:gap-5">
-                  {/* Avatar with initials */}
-                  <div className="relative flex-shrink-0">
-                    <div className="flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 text-white text-xl sm:text-2xl font-bold shadow-lg">
-                      {getInitials(profile?.full_name)}
-                    </div>
-                    <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 border-[3px] border-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl sm:text-3xl font-bold text-slate-900">
-                      Welcome back, {getFirstName(profile?.full_name)}!
-                    </h2>
-                    <p className="text-slate-600 mt-1">
-                      {chapterName}
-                    </p>
-                  </div>
-                </div>
-                {/* Profile completeness indicator - hidden when 100% */}
-                {profileCompleteness < 100 && (
-                  <div className="flex items-center gap-4 sm:flex-col sm:items-end">
-                    <CircularProgress
-                      percentage={profileCompleteness}
-                      size={56}
-                      strokeWidth={5}
-                      color={profileCompleteness < 50 ? 'yellow' : profileCompleteness < 75 ? 'blue' : 'green'}
-                      showPercentage={true}
-                      label="Profile"
-                    />
-                    {isProfileIncomplete && (
-                      <button
-                        onClick={() => setIsProfileModalOpen(true)}
-                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
-                      >
-                        Complete profile <ArrowRight className="h-4 w-4" />
-                      </button>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="space-y-5">
+
+          {/* Greeting */}
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">
+              Hey, {getFirstName(profile?.full_name)}
+            </h2>
+            <p className="text-sm text-slate-500 mt-0.5">{chapterName}</p>
           </div>
 
-          {/* Dues Balance Card */}
-          <div className="surface-card overflow-hidden transition-all duration-200 hover:shadow-lg">
-            <div className="p-6 sm:p-8">
-              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-6">
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${
-                    isOwed ? 'bg-rose-100' : 'bg-emerald-100'
+          {/* ===== TOP SECTION: CTAs + Balance ===== */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Left: Two primary CTAs (span 2 cols on desktop) */}
+            <div className="md:col-span-2 space-y-3">
+              {/* Pay Dues Button — full width, biggest element */}
+              {isOwed && memberDuesSummary.length > 0 ? (
+                <>
+                  {memberDuesSummary.map((dues) => (
+                    <PayDuesButton
+                      key={dues.id}
+                      memberDues={dues}
+                      onPaymentSuccess={loadDuesInfo}
+                      refreshKey={refreshKey}
+                      variant="primary"
+                      className="w-full !rounded-2xl !py-6 sm:!py-8 !text-lg !font-bold"
+                    />
+                  ))}
+                </>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setIsPaymentHistoryModalOpen(true)}
+                  className="w-full flex items-center justify-center gap-3 rounded-2xl bg-emerald-50 border-2 border-emerald-200 py-6 sm:py-8 px-6 text-center transition-all active:scale-[0.98]"
+                >
+                  <CheckCircle className="h-7 w-7 text-emerald-600" />
+                  <span className="text-lg font-semibold text-emerald-700">All Paid</span>
+                </button>
+              )}
+
+              {/* Request Reimbursement — full width, secondary */}
+              <button
+                type="button"
+                onClick={() => setIsReimbursementModalOpen(true)}
+                className="w-full flex items-center justify-center gap-3 rounded-2xl border-2 border-[var(--brand-emerald)] bg-white py-4 sm:py-5 px-6 text-center transition-all hover:bg-emerald-50 active:scale-[0.98]"
+              >
+                <Receipt className="h-5 w-5 text-[var(--brand-emerald)]" />
+                <span className="text-base font-semibold text-[var(--brand-emerald)]">Request Reimbursement</span>
+              </button>
+            </div>
+
+            {/* Right: Balance card */}
+            <div className="rounded-2xl bg-white border border-[var(--brand-border)] p-5 flex flex-col justify-center">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-medium text-slate-400 uppercase tracking-wider">Balance</p>
+                  <p className={`text-3xl font-bold tracking-tight mt-1 ${
+                    isOwed ? 'text-rose-600' : 'text-emerald-600'
                   }`}>
-                    <DollarSign className={`h-7 w-7 ${isOwed ? 'text-rose-600' : 'text-emerald-600'}`} />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-slate-500">Dues Balance</p>
-                    <p className={`text-3xl sm:text-4xl font-bold tracking-tight ${
-                      isOwed ? 'text-rose-600' : 'text-emerald-600'
-                    }`}>
-                      {formatCurrency(Math.abs(duesBalance))}
-                    </p>
-                  </div>
+                    {formatCurrency(Math.abs(duesBalance))}
+                  </p>
                 </div>
-                <span className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium ${
+                <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${
                   isOwed
                     ? 'bg-rose-50 text-rose-700'
                     : 'bg-emerald-50 text-emerald-700'
                 }`}>
-                  {isOwed ? (
-                    <>
-                      <span className="h-2 w-2 rounded-full bg-rose-500 animate-pulse" />
-                      Payment Due
-                    </>
-                  ) : (
-                    <>
-                      <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                      Paid in Full
-                    </>
-                  )}
+                  <span className={`h-1.5 w-1.5 rounded-full ${isOwed ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500'}`} />
+                  {isOwed ? 'Due' : 'Paid'}
                 </span>
               </div>
 
-              <p className="text-sm text-slate-600">
-                {isOwed ? 'Amount owed for the current term' : duesBalance === 0 ? 'Your balance is paid in full - thank you!' : 'You have a credit balance'}
-              </p>
+              {/* Due date */}
+              {isOwed && memberDuesSummary.some(d => d.due_date) && (
+                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                  <Calendar className="h-4 w-4 flex-shrink-0" />
+                  {memberDuesSummary.filter(d => d.due_date).map(d => {
+                    const dueDate = new Date(d.due_date!);
+                    const today = new Date();
+                    const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                    const isOverdue = daysLeft < 0;
+                    return (
+                      <span key={d.id} className={isOverdue ? 'text-rose-600 font-medium' : ''}>
+                        Due {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {isOverdue
+                          ? ` (${Math.abs(daysLeft)}d overdue)`
+                          : daysLeft <= 14 ? ` (${daysLeft}d left)` : ''}
+                      </span>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Flexible Payment Plan Info */}
               {memberDuesSummary.some(dues => dues.flexible_plan_deadline) && (
-                <div className="mt-4 bg-purple-50 border border-purple-200 rounded-xl p-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
-                      <Calendar className="h-5 w-5 text-purple-600" />
-                    </div>
+                <div className="mt-4 bg-purple-50 border border-purple-200 rounded-xl p-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-4 w-4 text-purple-600 flex-shrink-0" />
                     <div className="flex-1">
-                      <h4 className="font-semibold text-purple-900">Flexible Payment Plan</h4>
                       {memberDuesSummary.filter(dues => dues.flexible_plan_deadline).map(dues => {
                         const deadline = new Date(dues.flexible_plan_deadline!);
                         const today = new Date();
                         const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                        const weeksRemaining = Math.max(1, Math.ceil(daysRemaining / 7));
-                        const suggestedWeekly = dues.balance / weeksRemaining;
-
                         return (
-                          <div key={dues.id} className="text-sm text-purple-700 mt-1">
-                            <p>
-                              Deadline: {deadline.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                              {daysRemaining > 0 && (
-                                <span className="ml-2 text-purple-500">({daysRemaining} days remaining)</span>
-                              )}
-                            </p>
-                            {daysRemaining > 0 && dues.balance > 0 && (
-                              <p className="mt-1 text-xs text-purple-600">
-                                Suggested: ~{formatCurrency(suggestedWeekly)}/week to pay off on time
-                              </p>
-                            )}
-                            {dues.flexible_plan_notes && (
-                              <p className="mt-1 text-xs italic">{dues.flexible_plan_notes}</p>
-                            )}
-                          </div>
+                          <p key={dues.id} className="text-xs text-purple-700">
+                            Payment plan deadline: {deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            {daysRemaining > 0 && <span className="text-purple-500"> ({daysRemaining}d left)</span>}
+                          </p>
                         );
                       })}
                     </div>
                   </div>
                 </div>
               )}
-
-              {isOwed && (
-                <div className="mt-6 pt-6 border-t border-[var(--brand-border)] space-y-4">
-                  <div className="rounded-xl bg-slate-50 p-4">
-                    <h3 className="font-semibold text-slate-900 mb-3 text-sm flex items-center gap-2">
-                      <CreditCard className="h-4 w-4 text-slate-500" />
-                      Payment Options
-                    </h3>
-                    <ul className="text-sm text-slate-600 space-y-2">
-                      <li className="flex items-start gap-3">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
-                        <span>Pay online using the button below</span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
-                        <span></span>
-                      </li>
-                      <li className="flex items-start gap-3">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0" />
-                        <span>Include your full name in payment description</span>
-                      </li>
-                    </ul>
-                  </div>
-                  {memberDuesSummary.length > 0 ? (
-                    <div className="space-y-2">
-                      {memberDuesSummary.map((dues) => (
-                        <PayDuesButton
-                          key={dues.id}
-                          memberDues={dues}
-                          onPaymentSuccess={loadDuesInfo}
-                          refreshKey={refreshKey}
-                          variant="primary"
-                          className="w-full"
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const email = 'joseph@greekpay.org';
-                        const subject = 'Question about dues';
-                        const body = `Hi,\n\nI have a question about my dues balance.\n\nBest regards,\n${profile?.full_name || ''}`;
-                        window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-                      }}
-                      className="focus-ring w-full rounded-xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-blue-700 active:scale-[0.98]"
-                    >
-                      Contact Treasurer for Payment Options
-                    </button>
-                  )}
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Active Installment Plans */}
-          {installmentPlans.length > 0 && (
-            <div className="space-y-4">
-              {installmentPlans.map((plan) => {
-                const completedPayments = plan.payments.filter(p => p.status === 'succeeded').length;
-                const progressPercentage = (completedPayments / plan.num_installments) * 100;
-                const nextPayment = plan.payments.find(p => p.status === 'scheduled');
+          {/* ===== ACTIVE INSTALLMENT PLANS ===== */}
+          {installmentPlans.length > 0 && installmentPlans.map((plan) => {
+            const completedPayments = plan.payments.filter(p => p.status === 'succeeded').length;
+            const progressPercentage = (completedPayments / plan.num_installments) * 100;
+            const nextPayment = plan.payments.find(p => p.status === 'scheduled');
 
-                return (
-                  <div key={plan.id} className="surface-card overflow-hidden">
-                    <div className="p-6">
-                      <div className="flex items-start justify-between gap-4 mb-4">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100">
-                            <Calendar className="h-6 w-6 text-indigo-600" />
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-slate-900">Payment Plan Active</h3>
-                            <p className="text-sm text-slate-500">
-                              {plan.num_installments} payments of {formatCurrency(plan.installment_amount)}
-                            </p>
-                          </div>
-                        </div>
-                        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                          plan.status === 'active'
-                            ? 'bg-blue-50 text-blue-700'
-                            : plan.status === 'completed'
-                            ? 'bg-emerald-50 text-emerald-700'
-                            : 'bg-rose-50 text-rose-700'
-                        }`}>
-                          {plan.status === 'active' ? 'Active' : plan.status === 'completed' ? 'Completed' : 'Cancelled'}
+            return (
+              <div key={plan.id} className="rounded-2xl bg-white border border-[var(--brand-border)] p-5">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="h-5 w-5 text-indigo-600" />
+                    <h3 className="font-semibold text-slate-900 text-sm">Payment Plan</h3>
+                  </div>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                    plan.status === 'active' ? 'bg-blue-50 text-blue-700'
+                    : plan.status === 'completed' ? 'bg-emerald-50 text-emerald-700'
+                    : 'bg-rose-50 text-rose-700'
+                  }`}>
+                    {plan.status === 'active' ? 'Active' : plan.status === 'completed' ? 'Done' : 'Cancelled'}
+                  </span>
+                </div>
+
+                {/* Progress */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-xs mb-1.5">
+                    <span className="text-slate-500">{completedPayments}/{plan.num_installments} payments</span>
+                    <span className="font-medium text-slate-700">{formatCurrency(plan.installment_amount)} each</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[var(--brand-primary)] rounded-full transition-all duration-500"
+                      style={{ width: `${progressPercentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Payment list */}
+                <div className="space-y-1.5">
+                  {plan.payments.map((payment, idx) => (
+                    <div
+                      key={payment.id}
+                      className={`flex items-center justify-between px-3 py-2 rounded-lg text-sm ${
+                        payment.status === 'succeeded' ? 'bg-emerald-50'
+                        : payment.status === 'failed' ? 'bg-rose-50'
+                        : 'bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        {payment.status === 'succeeded' ? (
+                          <CheckCircle className="h-4 w-4 text-emerald-500" />
+                        ) : (
+                          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-slate-300 text-[10px] font-bold text-slate-600">{idx + 1}</span>
+                        )}
+                        <span className="text-slate-700">
+                          {payment.status === 'succeeded' && payment.processed_at
+                            ? new Date(payment.processed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                            : new Date(payment.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                          }
                         </span>
                       </div>
+                      <span className="font-medium text-slate-900">{formatCurrency(payment.amount)}</span>
+                    </div>
+                  ))}
+                </div>
 
-                      {/* Progress Bar */}
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between text-sm mb-2">
-                          <span className="text-slate-600">Progress</span>
-                          <span className="font-medium text-slate-900">
-                            {completedPayments} of {plan.num_installments} payments
-                          </span>
-                        </div>
-                        <div className="h-2.5 bg-slate-200 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500"
-                            style={{ width: `${progressPercentage}%` }}
-                          />
-                        </div>
-                      </div>
-
-                      {/* Payment Schedule */}
-                      <div className="space-y-2">
-                        {plan.payments.map((payment, idx) => (
-                          <div
-                            key={payment.id}
-                            className={`flex items-center justify-between p-3 rounded-lg ${
-                              payment.status === 'succeeded'
-                                ? 'bg-emerald-50'
-                                : payment.status === 'scheduled'
-                                ? 'bg-slate-50'
-                                : payment.status === 'failed'
-                                ? 'bg-rose-50'
-                                : 'bg-yellow-50'
-                            }`}
-                          >
-                            <div className="flex items-center gap-3">
-                              <div className={`flex h-8 w-8 items-center justify-center rounded-full ${
-                                payment.status === 'succeeded'
-                                  ? 'bg-emerald-500 text-white'
-                                  : payment.status === 'scheduled'
-                                  ? 'bg-slate-300 text-slate-600'
-                                  : payment.status === 'failed'
-                                  ? 'bg-rose-500 text-white'
-                                  : 'bg-yellow-500 text-white'
-                              }`}>
-                                {payment.status === 'succeeded' ? (
-                                  <CheckCircle className="h-4 w-4" />
-                                ) : (
-                                  <span className="text-sm font-medium">{idx + 1}</span>
-                                )}
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium text-slate-900">
-                                  Payment {idx + 1}
-                                </p>
-                                <p className="text-xs text-slate-500">
-                                  {payment.status === 'succeeded' && payment.processed_at
-                                    ? `Paid ${new Date(payment.processed_at).toLocaleDateString()}`
-                                    : `Due ${new Date(payment.scheduled_date).toLocaleDateString()}`
-                                  }
-                                </p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-semibold text-slate-900">
-                                {formatCurrency(payment.amount)}
-                              </p>
-                              <p className={`text-xs ${
-                                payment.status === 'succeeded'
-                                  ? 'text-emerald-600'
-                                  : payment.status === 'failed'
-                                  ? 'text-rose-600'
-                                  : 'text-slate-500'
-                              }`}>
-                                {payment.status === 'succeeded' ? 'Paid'
-                                  : payment.status === 'failed' ? 'Failed'
-                                  : payment.status === 'processing' ? 'Processing'
-                                  : 'Scheduled'}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Next Payment Info */}
-                      {nextPayment && plan.status === 'active' && (
-                        <div className="mt-4 p-4 rounded-xl bg-blue-50 border border-blue-200">
-                          <div className="flex items-start gap-3">
-                            <CreditCard className="h-5 w-5 text-blue-600 mt-0.5" />
-                            <div>
-                              <p className="text-sm font-medium text-blue-800">
-                                Next payment: {formatCurrency(nextPayment.amount)}
-                              </p>
-                              <p className="text-xs text-blue-600">
-                                Scheduled for {new Date(nextPayment.scheduled_date).toLocaleDateString()}
-                                {plan.payment_method_type && ` via ${plan.payment_method_type === 'card' ? 'Card' : 'Bank Transfer'}`}
-                              </p>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Completion Message */}
-                      {plan.status === 'completed' && (
-                        <div className="mt-4 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-                          <div className="flex items-center gap-3">
-                            <CheckCircle className="h-5 w-5 text-emerald-600" />
-                            <p className="text-sm font-medium text-emerald-800">
-                              Payment plan completed! Thank you for your payments.
-                            </p>
-                          </div>
-                        </div>
-                      )}
+                {nextPayment && plan.status === 'active' && (
+                  <div className="mt-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
+                    <div className="flex items-center gap-2">
+                      <CreditCard className="h-4 w-4 text-blue-600" />
+                      <p className="text-xs text-blue-700">
+                        Next: {formatCurrency(nextPayment.amount)} on {new Date(nextPayment.scheduled_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Grid Layout for Info and Actions */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Member Information */}
-            <div className="surface-card p-4 sm:p-6">
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="text-lg font-semibold text-slate-900">Member Information</h2>
-                <button
-                  type="button"
-                  onClick={() => setIsProfileModalOpen(true)}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1 transition-colors"
-                >
-                  <Pencil className="h-3.5 w-3.5" />
-                  Edit
-                </button>
+                )}
               </div>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
-                    <Mail className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Email</p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.email}</p>
-                  </div>
-                </div>
+            );
+          })}
 
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
-                    <GraduationCap className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Year</p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.year ? getYearLabel(profile.year) : 'Not specified'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
-                    <BookOpen className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Major</p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.major || 'Not specified'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
-                    <Award className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Position</p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.position || 'Member'}</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-white shadow-sm flex-shrink-0">
-                    <Phone className="h-4 w-4 text-slate-500" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs text-slate-500">Phone</p>
-                    <p className="text-sm font-medium text-slate-900 truncate">{profile?.phone_number || 'Not provided'}</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Quick Actions */}
-            <div className="surface-card p-4 sm:p-6">
-              <h2 className="text-lg font-semibold text-slate-900 mb-5">Quick Actions</h2>
-              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => setIsProfileModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-blue-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-50 text-blue-600 group-hover:scale-110 transition-transform duration-200">
-                    <User className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">Edit Profile</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsPaymentHistoryModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-purple-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform duration-200">
-                    <Clock className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">History</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsPasswordModalOpen(true)}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-amber-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform duration-200">
-                    <Lock className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">Security</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    const email = 'joseph@greekpay.org';
-                    const subject = 'Question about dues';
-                    const body = `Hi,\n\nI have a question about my dues balance.\n\nBest regards,\n${profile?.full_name || ''}`;
-                    window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
-                  }}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-emerald-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform duration-200">
-                    <Mail className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">Contact</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={loadDuesInfo}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-cyan-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 group-hover:scale-110 transition-transform duration-200">
-                    <RefreshCw className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">Refresh</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={signOut}
-                  className="focus-ring group flex flex-col items-center gap-3 rounded-xl border border-[var(--brand-border)] bg-white p-4 text-center transition-all duration-200 hover:bg-slate-50 hover:border-rose-200 hover:shadow-md hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-rose-50 text-rose-600 group-hover:scale-110 transition-transform duration-200">
-                    <LogOut className="h-6 w-6" />
-                  </div>
-                  <span className="text-sm font-medium text-slate-700">Sign Out</span>
-                </button>
-              </div>
-            </div>
+          {/* ===== SECONDARY ACTIONS ===== */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <button
+              type="button"
+              onClick={() => setIsPaymentHistoryModalOpen(true)}
+              className="flex items-center gap-3 rounded-xl bg-white border border-[var(--brand-border)] py-4 px-5 text-left transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-soft)] active:scale-[0.98]"
+            >
+              <Clock className="h-5 w-5 text-[var(--brand-primary)] flex-shrink-0" />
+              <span className="text-sm font-medium text-[var(--brand-text)]">Payment History</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const email = 'joseph@greekpay.org';
+                const subject = 'Question about dues';
+                const body = `Hi,\n\nI have a question about my dues balance.\n\nBest regards,\n${profile?.full_name || ''}`;
+                window.open(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+              }}
+              className="flex items-center gap-3 rounded-xl bg-white border border-[var(--brand-border)] py-4 px-5 text-left transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-soft)] active:scale-[0.98]"
+            >
+              <Mail className="h-5 w-5 text-[var(--brand-primary)] flex-shrink-0" />
+              <span className="text-sm font-medium text-[var(--brand-text)]">Contact Us</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setIsPasswordModalOpen(true)}
+              className="flex items-center gap-3 rounded-xl bg-white border border-[var(--brand-border)] py-4 px-5 text-left transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-soft)] active:scale-[0.98]"
+            >
+              <Lock className="h-5 w-5 text-[var(--brand-primary)] flex-shrink-0" />
+              <span className="text-sm font-medium text-[var(--brand-text)]">Security</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowProfile(!showProfile)}
+              className="flex items-center gap-3 rounded-xl bg-white border border-[var(--brand-border)] py-4 px-5 text-left transition-all hover:border-[var(--brand-primary)] hover:bg-[var(--brand-primary-soft)] active:scale-[0.98]"
+            >
+              <ChevronDown className={`h-5 w-5 text-[var(--brand-primary)] flex-shrink-0 transition-transform duration-200 ${showProfile ? 'rotate-180' : ''}`} />
+              <span className="text-sm font-medium text-[var(--brand-text)]">My Profile</span>
+            </button>
           </div>
 
-          {/* Help Section */}
-          <div className="surface-card p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-4">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-indigo-100 flex-shrink-0">
-                <HelpCircle className="h-6 w-6 text-indigo-600" />
-              </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-slate-900">Need Help?</h3>
-                <p className="text-sm text-slate-600 mt-1">
-                  Questions about your dues or account? We're here to help.
-                </p>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  <a
-                    href="mailto:joseph@greekpay.org"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-50 text-blue-700 text-sm font-medium hover:bg-blue-100 transition-colors"
-                  >
-                    <Mail className="h-4 w-4" />
-                    Email Treasurer
-                  </a>
+          {/* ===== COLLAPSIBLE PROFILE ===== */}
+          {showProfile && (
+            <div className="rounded-2xl bg-white border border-[var(--brand-border)] overflow-hidden">
+              <div className="px-5 py-5">
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-slate-700">My Profile</span>
                   <button
                     type="button"
-                    onClick={() => setIsPaymentHistoryModalOpen(true)}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 text-slate-700 text-sm font-medium hover:bg-slate-200 transition-colors"
+                    onClick={() => setIsProfileModalOpen(true)}
+                    className="text-xs text-[var(--brand-primary)] hover:text-[var(--brand-primary-dark)] font-medium flex items-center gap-1"
                   >
-                    <Clock className="h-4 w-4" />
-                    View History
+                    <Pencil className="h-3 w-3" />
+                    Edit
                   </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-1">
+                  {[
+                    { label: 'Email', value: profile?.email },
+                    { label: 'Year', value: profile?.year ? getYearLabel(profile.year) : null },
+                    { label: 'Major', value: profile?.major },
+                    { label: 'Position', value: profile?.position || 'Member' },
+                    { label: 'Phone', value: profile?.phone_number },
+                  ].map(({ label, value }) => (
+                    <div key={label} className="flex items-center justify-between py-2.5 border-b border-slate-100 last:border-0">
+                      <span className="text-sm text-slate-500">{label}</span>
+                      <span className="text-sm font-medium text-slate-900 text-right truncate max-w-[60%]">
+                        {value || <span className="text-slate-300">--</span>}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </main>
 
@@ -689,6 +430,11 @@ export const MemberDashboard: React.FC = () => {
       <PasswordChangeModal
         isOpen={isPasswordModalOpen}
         onClose={() => setIsPasswordModalOpen(false)}
+      />
+
+      <ReimbursementRequestModal
+        isOpen={isReimbursementModalOpen}
+        onClose={() => setIsReimbursementModalOpen(false)}
       />
     </div>
   );

@@ -171,11 +171,11 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
 
     switch (variant) {
       case 'primary':
-        return `${baseStyles} px-6 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 disabled:shadow-none disabled:hover:translate-y-0`;
+        return `${baseStyles} px-6 py-3.5 bg-[var(--brand-emerald)] hover:bg-emerald-700 text-white rounded-xl shadow-sm hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 disabled:shadow-none disabled:hover:translate-y-0`;
       case 'secondary':
-        return `${baseStyles} px-4 py-2.5 bg-white text-blue-600 border-2 border-blue-500 rounded-xl hover:bg-blue-50 hover:border-blue-600`;
+        return `${baseStyles} px-4 py-2.5 bg-white text-[var(--brand-emerald)] border-2 border-[var(--brand-emerald)] rounded-xl hover:bg-emerald-50 hover:border-emerald-700`;
       case 'small':
-        return `${baseStyles} px-3 py-1.5 text-sm bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg shadow-sm hover:shadow-md`;
+        return `${baseStyles} px-3 py-1.5 text-sm bg-[var(--brand-emerald)] hover:bg-emerald-700 text-white rounded-lg shadow-sm hover:shadow-md`;
       default:
         return baseStyles;
     }
@@ -210,7 +210,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
         case 'processing':
           return {
             buttonText: variant === 'small' ? 'Processing' : 'Payment Processing',
-            buttonClass: 'from-green-500 to-emerald-500 shadow-green-500/25',
+            buttonClass: 'bg-emerald-600',
             title: `${paymentType} is processing`,
             message: 'Bank transfers typically take 3-5 business days to complete.',
             bgClass: 'bg-green-50 border-green-200',
@@ -222,7 +222,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
         case 'requires_action':
           return {
             buttonText: variant === 'small' ? 'Action Needed' : 'Action Needed',
-            buttonClass: 'from-yellow-500 to-amber-500 shadow-yellow-500/25',
+            buttonClass: 'bg-amber-500',
             title: 'Bank verification needed',
             message: 'Check your email for bank verification instructions. You\'ll need to enter a code from your bank statement to complete payment.',
             bgClass: 'bg-yellow-50 border-yellow-200',
@@ -234,7 +234,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
         default: // 'pending'
           return {
             buttonText: variant === 'small' ? 'Pending' : 'Payment Pending',
-            buttonClass: 'from-amber-500 to-orange-500 shadow-amber-500/25',
+            buttonClass: 'bg-amber-500',
             title: `${paymentType} is pending`,
             message: 'Your payment is being processed.',
             bgClass: 'bg-amber-50 border-amber-200',
@@ -251,7 +251,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
     return (
       <div className="space-y-3">
         <div
-          className={`font-semibold transition-all duration-200 flex items-center justify-center px-6 py-3.5 bg-gradient-to-r ${display.buttonClass} text-white rounded-xl shadow-lg cursor-default ${className}`}
+          className={`font-semibold transition-all duration-200 flex items-center justify-center px-6 py-3.5 ${display.buttonClass} text-white rounded-xl shadow-sm cursor-default ${className}`}
         >
           <Clock className={`mr-2 ${getIconSize()} animate-pulse`} />
           {display.buttonText}
@@ -300,7 +300,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
     return (
       <div className="space-y-3">
         <div className="surface-card overflow-hidden">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3">
+          <div className="bg-[var(--brand-emerald)] px-4 py-3">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold text-white text-sm">Choose Payment Amount</h3>
               <button
@@ -389,7 +389,7 @@ const PayDuesButton: React.FC<PayDuesButtonProps> = ({
             <button
               onClick={handlePayClick}
               disabled={paymentMode === 'custom' && (!customAmount || parseFloat(customAmount) <= 0)}
-              className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-lg font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
+              className="w-full px-4 py-3 bg-[var(--brand-emerald)] hover:bg-emerald-700 text-white rounded-lg font-semibold shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
             >
               <CreditCard className="w-5 h-5 mr-2" />
               {paymentMode === 'custom' && customAmount

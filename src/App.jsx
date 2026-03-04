@@ -28,6 +28,7 @@ import Features from './pages/Features';
 import AuthPage from './pages/AuthPage';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentFailure from './pages/PaymentFailure';
+import Reimbursements from './pages/Reimbursements';
 import Invite from './pages/Invite';
 import { enableDemoMode } from './demo/demoMode';
 
@@ -179,6 +180,7 @@ const ProtectedAppRoutes = () => {
           <Route path="reports" element={<Reports />} />
           <Route path="members" element={<Members />} />
           <Route path="plaid-sync" element={<PlaidSync />} />
+          <Route path="reimbursements" element={<Reimbursements />} />
           <Route path="settings" element={<Settings />} />
           <Route path="payment-success" element={<PaymentSuccess />} />
           <Route path="payment-failure" element={<PaymentFailure />} />
