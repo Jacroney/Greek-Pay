@@ -666,6 +666,33 @@ export interface InstallmentPlanWithPayments extends InstallmentPlan {
   payments: InstallmentPayment[];
 }
 
+// ============================================================================
+// REIMBURSEMENT REQUEST TYPES
+// ============================================================================
+
+export interface ReimbursementRequest {
+  id: string;
+  chapter_id: string;
+  member_id: string;
+  purchase_name: string;
+  reason: string;
+  amount: number;
+  purchase_date: string;
+  zelle_contact: string;
+  zelle_contact_type: 'phone' | 'email';
+  status: 'pending' | 'approved' | 'denied';
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  admin_notes: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ReimbursementRequestWithMember extends ReimbursementRequest {
+  member_name: string;
+  member_email: string;
+}
+
 export interface DeadlineEligibility {
   eligible: boolean;
   deadline: string | null;

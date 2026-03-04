@@ -115,25 +115,25 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
           <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
         </div>
 
-        {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-purple-600 via-violet-500 to-indigo-600 px-6 py-5 sm:rounded-t-2xl">
+        {/* Header */}
+        <div className="border-b border-[var(--brand-border)] px-6 py-5 sm:rounded-t-2xl">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white/20 backdrop-blur-sm">
-                <Receipt className="w-5 h-5 text-white" />
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--brand-primary-soft)]">
+                <Receipt className="w-5 h-5 text-[var(--brand-primary)]" />
               </div>
               <div>
-                <h2 className="text-lg sm:text-xl font-semibold text-white">
+                <h2 className="text-lg sm:text-xl font-semibold text-[var(--brand-text)]">
                   Payment History
                 </h2>
-                <p className="text-xs sm:text-sm text-purple-100 mt-0.5">
+                <p className="text-xs sm:text-sm text-[var(--brand-text-subdued)] mt-0.5">
                   Your dues payment records
                 </p>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-white/80 hover:text-white hover:bg-white/10 rounded-lg transition-colors active:scale-95 touch-manipulation"
+              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors active:scale-95 touch-manipulation"
               aria-label="Close"
             >
               <X className="w-5 h-5" />
@@ -156,7 +156,7 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
           ) : payments.length === 0 ? (
             // Empty State
             <div className="text-center py-16">
-              <div className="mx-auto h-20 w-20 rounded-2xl bg-gradient-to-br from-purple-50 to-indigo-50 flex items-center justify-center mb-5 border border-purple-100">
+              <div className="mx-auto h-20 w-20 rounded-2xl bg-[var(--brand-primary-soft)] flex items-center justify-center mb-5 border border-purple-100">
                 <FileText className="h-9 w-9 text-purple-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -171,7 +171,7 @@ const PaymentHistoryModal: React.FC<PaymentHistoryModalProps> = ({
             <>
               {/* Summary Card */}
               <div className="surface-card overflow-hidden mb-6">
-                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 sm:p-5">
+                <div className="bg-[var(--brand-primary-soft)] p-4 sm:p-5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-100">
