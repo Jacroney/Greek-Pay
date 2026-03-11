@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, DollarSign, Calendar, FileText, Search, User, Mail, ChevronDown, GraduationCap } from 'lucide-react';
+import { X, DollarSign, Calendar, FileText, Search, User, Mail, ChevronDown, GraduationCap, Tag } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import { DuesConfiguration } from '../services/types';
@@ -37,10 +37,12 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
   onSuccess
 }) => {
   const [selectedMember, setSelectedMember] = useState<MemberOption | null>(null);
+  const [duesType, setDuesType] = useState<'period' | 'event'>('period');
   const [selectedYear, setSelectedYear] = useState<string>('default');
   const [amount, setAmount] = useState(config?.default_dues?.toString() || '');
   const [dueDate, setDueDate] = useState(config?.due_date || '');
   const [notes, setNotes] = useState('');
+  const [eventLabel, setEventLabel] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Get amount for selected year from config
@@ -176,13 +178,18 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!config) {
+    if (duesType === 'period' && !config) {
       toast.error('Please create a dues configuration first');
       return;
     }
 
     if (!selectedMember) {
       toast.error('Please select a member');
+      return;
+    }
+
+    if (duesType === 'event' && !eventLabel.trim()) {
+      toast.error('Please enter a label for this event/custom dues');
       return;
     }
 
@@ -197,14 +204,17 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
         return;
       }
 
+      const effectiveNotes = duesType === 'event' ? eventLabel.trim() : (notes || null);
+      const effectiveConfigId = duesType === 'event' ? null : config!.id;
+
       // Call the database function to assign dues by email
       const { data, error } = await supabase.rpc('assign_dues_by_email', {
         p_chapter_id: chapterId,
         p_email: selectedMember.email,
-        p_config_id: config.id,
+        p_config_id: effectiveConfigId,
         p_base_amount: parseFloat(amount),
         p_due_date: dueDate || null,
-        p_notes: notes || null
+        p_notes: effectiveNotes
       });
 
       if (error) {
@@ -216,10 +226,8 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
         throw new Error(data?.error || 'Failed to assign dues');
       }
 
-      // Show success message
       toast.success(`Dues assigned to ${selectedMember.name}!`);
 
-      // Reset form and close
       resetForm();
       onSuccess?.();
       onClose();
@@ -234,10 +242,12 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
 
   const resetForm = () => {
     setSelectedMember(null);
+    setDuesType('period');
     setSelectedYear('default');
     setAmount(config?.default_dues?.toString() || '');
     setDueDate(config?.due_date || '');
     setNotes('');
+    setEventLabel('');
     setSearchTerm('');
   };
 
@@ -397,7 +407,71 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
               )}
             </div>
 
-            {/* Year Selection */}
+            {/* Dues Type Toggle */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                <Tag className="inline w-4 h-4 mr-1" />
+                Dues Type
+              </label>
+              <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDuesType('period');
+                    if (config) {
+                      setAmount(config.default_dues?.toString() || '');
+                      setDueDate(config.due_date || '');
+                    }
+                  }}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    duesType === 'period'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Period Dues
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDuesType('event');
+                    setAmount('');
+                    setDueDate('');
+                  }}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    duesType === 'event'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Event / Custom
+                </button>
+              </div>
+            </div>
+
+            {/* Event Label (only for event/custom) */}
+            {duesType === 'event' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <FileText className="inline w-4 h-4 mr-1" />
+                  Event Label *
+                </label>
+                <input
+                  type="text"
+                  value={eventLabel}
+                  onChange={(e) => setEventLabel(e.target.value)}
+                  required
+                  placeholder="e.g. Vegas Formal, Spring Fundraiser"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  This label identifies the dues (no config required)
+                </p>
+              </div>
+            )}
+
+            {/* Year Selection (only for period dues) */}
+            {duesType === 'period' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <GraduationCap className="inline w-4 h-4 mr-1" />
@@ -421,6 +495,7 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                 Selecting a year will auto-fill the amount from your dues configuration
               </p>
             </div>
+            )}
 
             {/* Amount */}
             <div>
@@ -457,7 +532,8 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
               />
             </div>
 
-            {/* Reason/Notes */}
+            {/* Reason/Notes (period dues only) */}
+            {duesType === 'period' && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <FileText className="inline w-4 h-4 mr-1" />
@@ -467,10 +543,11 @@ const AssignDuesModal: React.FC<AssignDuesModalProps> = ({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                placeholder="e.g., Spring 2025 chapter dues, Social event fee, etc."
+                placeholder="e.g., Spring 2025 chapter dues"
                 className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
               />
             </div>
+            )}
           </div>
 
           {/* Footer */}

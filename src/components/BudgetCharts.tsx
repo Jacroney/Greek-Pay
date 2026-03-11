@@ -40,29 +40,25 @@ const BudgetCharts: React.FC<BudgetChartsProps> = ({ budgetSummary }) => {
     );
   }
 
-  // Prepare data by category type
-  const fixedCostsData = budgetSummary
-    .filter(b => b.category_type === 'Fixed Costs')
-    .sort((a, b) => b.spent - a.spent)
-    .slice(0, 5);
+  // Derive unique category types from data
+  const categoryTypes = [...new Set(budgetSummary.map(b => b.category_type))].sort();
 
-  const operationalCostsData = budgetSummary
-    .filter(b => b.category_type === 'Operational Costs')
-    .sort((a, b) => b.spent - a.spent)
-    .slice(0, 5);
-
-  const eventCostsData = budgetSummary
-    .filter(b => b.category_type === 'Event Costs')
-    .sort((a, b) => b.spent - a.spent)
-    .slice(0, 5);
+  // Prepare data by category type — dynamic grouping
+  const categoryTypeGroups = categoryTypes.map(type => ({
+    type,
+    data: budgetSummary
+      .filter(b => b.category_type === type)
+      .sort((a, b) => b.spent - a.spent)
+      .slice(0, 5)
+  }));
 
   // Overall summary
-  const categoryTypeData = ['Fixed Costs', 'Operational Costs', 'Event Costs'].map(type => {
+  const categoryTypeData = categoryTypes.map(type => {
     const items = budgetSummary.filter(b => b.category_type === type);
     const allocated = items.reduce((sum, b) => sum + b.allocated, 0);
     const spent = items.reduce((sum, b) => sum + b.spent, 0);
     return {
-      name: type.split(' ')[0], // Shorter names
+      name: type,
       allocated,
       spent,
       remaining: allocated - spent,
@@ -81,9 +77,12 @@ const BudgetCharts: React.FC<BudgetChartsProps> = ({ budgetSummary }) => {
       percentOver: item.percent_used - 100
     }));
 
-  const FIXED_COLOR = '#3B82F6';
-  const OPERATIONAL_COLOR = '#10B981';
-  const EVENT_COLOR = '#F59E0B';
+  const TYPE_COLORS = [
+    '#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899',
+    '#14B8A6', '#F97316', '#6366F1', '#EF4444', '#84CC16'
+  ];
+
+  const getTypeColor = (index: number) => TYPE_COLORS[index % TYPE_COLORS.length];
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -162,115 +161,46 @@ const BudgetCharts: React.FC<BudgetChartsProps> = ({ budgetSummary }) => {
         </ResponsiveContainer>
       </div>
 
-      {/* Category Type Breakdown - 3 separate charts */}
+      {/* Category Type Breakdown - dynamic charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Fixed Costs */}
-        {fixedCostsData.length > 0 && (
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl shadow-sm border border-blue-200">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-blue-900">
-                Fixed Costs
-              </h3>
-              <p className="text-sm text-blue-700 mt-1">
-                Top {Math.min(fixedCostsData.length, 5)} categories
-              </p>
+        {categoryTypeGroups.map((group, index) => {
+          if (group.data.length === 0) return null;
+          const color = getTypeColor(index);
+          return (
+            <div key={group.type} className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {group.type}
+                </h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  Top {Math.min(group.data.length, 5)} categories
+                </p>
+              </div>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={group.data} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
+                  <XAxis
+                    type="number"
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                    tick={{ fill: '#6b7280', fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    dataKey="category"
+                    type="category"
+                    width={100}
+                    tick={{ fill: '#6b7280', fontSize: 11 }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="spent" fill={color} radius={[0, 8, 8, 0]} barSize={20} />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={fixedCostsData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#93c5fd" opacity={0.3} />
-                <XAxis
-                  type="number"
-                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  tick={{ fill: '#1e40af', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  dataKey="category"
-                  type="category"
-                  width={100}
-                  tick={{ fill: '#1e40af', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="spent" fill={FIXED_COLOR} radius={[0, 8, 8, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* Operational Costs */}
-        {operationalCostsData.length > 0 && (
-          <div className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl shadow-sm border border-green-200">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-green-900">
-                Operational Costs
-              </h3>
-              <p className="text-sm text-green-700 mt-1">
-                Top {Math.min(operationalCostsData.length, 5)} categories
-              </p>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={operationalCostsData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#86efac" opacity={0.3} />
-                <XAxis
-                  type="number"
-                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  tick={{ fill: '#15803d', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  dataKey="category"
-                  type="category"
-                  width={100}
-                  tick={{ fill: '#15803d', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="spent" fill={OPERATIONAL_COLOR} radius={[0, 8, 8, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-
-        {/* Event Costs */}
-        {eventCostsData.length > 0 && (
-          <div className="bg-gradient-to-br from-amber-50 to-amber-100 p-6 rounded-xl shadow-sm border border-amber-200">
-            <div className="mb-4">
-              <h3 className="text-lg font-semibold text-amber-900">
-                Event Costs
-              </h3>
-              <p className="text-sm text-amber-700 mt-1">
-                Top {Math.min(eventCostsData.length, 5)} categories
-              </p>
-            </div>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={eventCostsData} layout="vertical" margin={{ top: 5, right: 10, left: 5, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#fcd34d" opacity={0.3} />
-                <XAxis
-                  type="number"
-                  tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
-                  tick={{ fill: '#92400e', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  dataKey="category"
-                  type="category"
-                  width={100}
-                  tick={{ fill: '#92400e', fontSize: 11 }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Bar dataKey="spent" fill={EVENT_COLOR} radius={[0, 8, 8, 0]} barSize={20} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
+          );
+        })}
       </div>
 
       {/* Budget Utilization by Type */}
@@ -291,28 +221,23 @@ const BudgetCharts: React.FC<BudgetChartsProps> = ({ budgetSummary }) => {
         {categoryTypeData.length > 0 ? (
           <div className="space-y-6">
             {categoryTypeData.map((cat, index) => {
-              const colors = [
-                { bg: 'bg-blue-100', bar: 'bg-blue-600', text: 'text-blue-900' },
-                { bg: 'bg-green-100', bar: 'bg-green-600', text: 'text-green-900' },
-                { bg: 'bg-amber-100', bar: 'bg-amber-600', text: 'text-amber-900' }
-              ];
-              const color = colors[index];
               const isOverBudget = cat.utilizationPercent > 100;
 
               return (
-                <div key={cat.name} className={`p-4 rounded-lg ${color.bg}`}>
+                <div key={cat.name} className="p-4 rounded-lg bg-gray-50">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`font-semibold ${color.text}`}>{cat.name} Costs</span>
-                    <span className={`text-sm font-bold ${isOverBudget ? 'text-red-600' : color.text}`}>
+                    <span className="font-semibold text-gray-900">{cat.name}</span>
+                    <span className={`text-sm font-bold ${isOverBudget ? 'text-red-600' : 'text-gray-900'}`}>
                       {Math.round(cat.utilizationPercent)}%
                     </span>
                   </div>
                   <div className="relative w-full bg-white rounded-full h-4 overflow-hidden shadow-inner">
                     <div
-                      className={`h-4 rounded-full transition-all duration-500 ${
-                        isOverBudget ? 'bg-red-600' : color.bar
-                      }`}
-                      style={{ width: `${Math.min(cat.utilizationPercent, 100)}%` }}
+                      className="h-4 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.min(cat.utilizationPercent, 100)}%`,
+                        backgroundColor: isOverBudget ? '#DC2626' : getTypeColor(index)
+                      }}
                     />
                   </div>
                   <div className="flex justify-between mt-2 text-xs">
@@ -354,10 +279,7 @@ const BudgetCharts: React.FC<BudgetChartsProps> = ({ budgetSummary }) => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
             {overBudgetItems.map((item, index) => {
-              const typeColor =
-                item.categoryType === 'Fixed Costs' ? 'border-blue-300' :
-                item.categoryType === 'Operational Costs' ? 'border-green-300' :
-                'border-amber-300';
+              const typeColor = 'border-gray-300';
 
               return (
                 <div key={index} className={`bg-white p-4 rounded-xl shadow-sm border-l-4 ${typeColor} hover:shadow-md transition-shadow`}>

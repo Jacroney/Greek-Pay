@@ -9,18 +9,23 @@ import {
   Download,
   RefreshCw,
   Edit2,
-  MailPlus,
   Trash2,
-  Calendar
+  Calendar,
+  ChevronDown,
+  ChevronRight,
+  XCircle,
+  CreditCard
 } from 'lucide-react';
 import { DuesService } from '../services/duesService';
+import { InstallmentService } from '../services/installmentService';
 import { formatCurrency } from '../utils/currency';
 import { AuthService } from '../services/authService';
 import {
   DuesConfiguration,
   MemberDuesSummary,
   ChapterDuesStats,
-  Member
+  Member,
+  InstallmentPlanWithPayments
 } from '../services/types';
 import DuesConfigurationModal from './DuesConfigurationModal';
 import PayDuesButton from './PayDuesButton';
@@ -87,6 +92,17 @@ const computeStatsFromSummaries = (
   return aggregated;
 };
 
+interface MemberGroup {
+  memberId: string;
+  memberName: string;
+  memberEmail: string;
+  memberYear: string | null;
+  dues: MemberDuesSummary[];
+  totalBalance: number;
+  allPaid: boolean;
+  unpaidLabels: string[];
+}
+
 interface DemoDuesData {
   configurations: DuesConfiguration[];
   current: DuesConfiguration;
@@ -125,7 +141,11 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
 
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterYear, setFilterYear] = useState<string>('all');
+  const [filterPeriod, setFilterPeriod] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Expanded member rows
+  const [expandedMembers, setExpandedMembers] = useState<Set<string>>(new Set());
 
   // Installment eligibility modal
   const [showInstallmentModal, setShowInstallmentModal] = useState(false);
@@ -137,6 +157,10 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
   // Edit dues modal
   const [showEditDuesModal, setShowEditDuesModal] = useState(false);
   const [editingDues, setEditingDues] = useState<MemberDuesSummary | null>(null);
+
+  // Payment plans
+  const [activePlans, setActivePlans] = useState<InstallmentPlanWithPayments[]>([]);
+  const [cancellingPlanId, setCancellingPlanId] = useState<string | null>(null);
 
   const applyDemoData = useCallback(() => {
     if (!demoData) return;
@@ -177,14 +201,20 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       setCurrentConfig(current);
       setMembers(membersData);
 
-      if (current) {
-        const [duesData, statsData] = await Promise.all([
-          DuesService.getMemberDues(chapterId, current.id),
-          DuesService.getChapterStats(chapterId, current.period_name)
-        ]);
+      // Load all dues across all configs (no config filter)
+      const duesData = await DuesService.getMemberDues(chapterId);
+      setMemberDues(duesData);
 
-        setMemberDues(duesData);
-        setStats(statsData);
+      if (current) {
+        setStats(computeStatsFromSummaries(duesData, current));
+      }
+
+      // Load active installment plans
+      try {
+        const plans = await InstallmentService.getChapterActivePlans(chapterId);
+        setActivePlans(plans);
+      } catch (err) {
+        console.error('Error loading active plans:', err);
       }
     } catch (error) {
       console.error('Error loading dues data:', error);
@@ -196,38 +226,6 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
     setShowConfigModal(false);
     setEditingConfig(undefined);
     loadData();
-  };
-
-  const handleAutoAssignDues = async () => {
-    if (isDemo) {
-      toast.success('Demo: dues have already been assigned to each member.');
-      return;
-    }
-    if (!currentConfig) {
-      toast.error('Please create a dues configuration first');
-      return;
-    }
-
-    if (!confirm('This will automatically assign dues to all active members based on their year. Continue?')) {
-      return;
-    }
-
-    setIsProcessing(true);
-    try {
-      const result = await DuesService.assignDuesToChapter(chapterId, currentConfig.id);
-      toast.success(`Assigned dues to ${result.assigned} members. Skipped ${result.skipped} members.`);
-
-      if (result.errors && result.errors.length > 0) {
-        console.error('Errors during assignment:', result.errors);
-      }
-
-      loadData();
-    } catch (error) {
-      console.error('Error auto-assigning dues:', error);
-      toast.error('Failed to assign dues');
-    } finally {
-      setIsProcessing(false);
-    }
   };
 
   const handleApplyLateFees = async () => {
@@ -352,8 +350,9 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       return;
     }
 
+    const duesLabel = dues.notes || dues.period_name || 'Dues';
     const confirmed = window.confirm(
-      `Are you sure you want to delete dues for ${dues.member_name}?\n\nAmount: ${formatCurrency(dues.total_amount)}\nStatus: ${dues.status}\n\nThis action cannot be undone.`
+      `Are you sure you want to delete "${duesLabel}" for ${dues.member_name}?\n\nAmount: ${formatCurrency(dues.total_amount)}\nStatus: ${dues.status}\n\nThis action cannot be undone.`
     );
 
     if (!confirmed) return;
@@ -378,7 +377,7 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `dues_${currentConfig?.period_name}_${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `dues_${currentConfig?.period_name || 'all'}_${new Date().toISOString().split('T')[0]}.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -390,34 +389,102 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
     }
   };
 
+  const toggleExpanded = (memberId: string) => {
+    setExpandedMembers(prev => {
+      const next = new Set(prev);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+
+  // Unique period names for the filter dropdown
+  const periodOptions = Array.from(
+    new Set(memberDues.map(d => d.notes || d.period_name).filter(Boolean))
+  );
+
   // Filter dues
   const filteredDues = memberDues.filter(dues => {
     const matchesStatus = filterStatus === 'all' || dues.status === filterStatus;
     const matchesYear = filterYear === 'all' || dues.member_year === filterYear;
+    const duesLabel = dues.notes || dues.period_name;
+    const matchesPeriod = filterPeriod === 'all' || duesLabel === filterPeriod;
     const matchesSearch =
       dues.member_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       dues.member_email.toLowerCase().includes(searchTerm.toLowerCase());
-    return matchesStatus && matchesYear && matchesSearch;
+    return matchesStatus && matchesYear && matchesPeriod && matchesSearch;
   });
 
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      paid: { bg: 'bg-green-100', text: 'text-green-800', icon: CheckCircle },
-      pending: { bg: 'bg-yellow-100', text: 'text-yellow-800', icon: AlertCircle },
-      overdue: { bg: 'bg-red-100', text: 'text-red-800', icon: AlertCircle },
-      partial: { bg: 'bg-blue-100', text: 'text-blue-800', icon: TrendingUp },
-      waived: { bg: 'bg-gray-100', text: 'text-gray-800', icon: CheckCircle }
-    };
+  // Group filtered dues by member
+  const memberGroups: MemberGroup[] = (() => {
+    const groupMap = new Map<string, MemberGroup>();
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    const Icon = config.icon;
+    filteredDues.forEach(dues => {
+      const key = dues.member_id || dues.member_email;
+      if (!groupMap.has(key)) {
+        groupMap.set(key, {
+          memberId: key,
+          memberName: dues.member_name,
+          memberEmail: dues.member_email,
+          memberYear: dues.member_year,
+          dues: [],
+          totalBalance: 0,
+          allPaid: true,
+          unpaidLabels: []
+        });
+      }
+      const group = groupMap.get(key)!;
+      group.dues.push(dues);
+      group.totalBalance += dues.balance;
+      if (dues.status !== 'paid' && dues.status !== 'waived') {
+        group.allPaid = false;
+        const label = dues.notes || dues.period_name || 'Dues';
+        group.unpaidLabels.push(label);
+      }
+    });
 
-    return (
-      <span className={`inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full ${config.bg} ${config.text}`}>
-        <Icon className="w-3 h-3" />
-        {status.charAt(0).toUpperCase() + status.slice(1)}
-      </span>
+    return Array.from(groupMap.values()).sort((a, b) =>
+      a.memberName.localeCompare(b.memberName)
     );
+  })();
+
+  // Recompute stats from filtered view
+  const displayStats = currentConfig
+    ? computeStatsFromSummaries(filteredDues, currentConfig)
+    : stats;
+
+  const getDuesLabel = (dues: MemberDuesSummary) => dues.notes || dues.period_name || 'Dues';
+
+  const getPlanMemberInfo = (plan: InstallmentPlanWithPayments) => {
+    const dues = memberDues.find(d => d.id === plan.member_dues_id);
+    return {
+      memberName: dues?.member_name || 'Unknown',
+      duesLabel: dues ? getDuesLabel(dues) : 'Unknown',
+    };
+  };
+
+  const handleCancelPlan = async (planId: string) => {
+    if (!window.confirm('Are you sure you want to cancel this payment plan? Remaining scheduled payments will be cancelled.')) {
+      return;
+    }
+    setCancellingPlanId(planId);
+    try {
+      const result = await InstallmentService.cancelPlan(planId);
+      if (result.success) {
+        toast.success('Payment plan cancelled');
+        loadData();
+      } else {
+        toast.error(result.error || 'Failed to cancel plan');
+      }
+    } catch (error) {
+      console.error('Error cancelling plan:', error);
+      toast.error('Failed to cancel plan');
+    } finally {
+      setCancellingPlanId(null);
+    }
   };
 
   return (
@@ -452,14 +519,19 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
         </div>
       </div>
 
-      {/* Stripe Connect Setup Section */}
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-          <DollarSign className="w-5 h-5 mr-2" />
-          Online Payment Setup
-        </h3>
-        <StripeConnectSetup chapterId={chapterId} onSetupComplete={loadData} />
-      </div>
+      {/* Stripe Connect Setup — collapsible */}
+      <details className="bg-white rounded-lg shadow">
+        <summary className="flex items-center justify-between px-6 py-4 cursor-pointer select-none hover:bg-gray-50 transition-colors rounded-lg">
+          <div className="flex items-center gap-2">
+            <CreditCard className="w-5 h-5 text-indigo-600" />
+            <span className="text-base font-semibold text-gray-900">Online Payment Setup</span>
+          </div>
+          <ChevronDown className="w-4 h-4 text-gray-400" />
+        </summary>
+        <div className="px-6 pb-5">
+          <StripeConnectSetup chapterId={chapterId} onSetupComplete={loadData} />
+        </div>
+      </details>
 
       {/* Current Configuration Info */}
       {currentConfig && (
@@ -507,13 +579,13 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
       )}
 
       {/* Statistics */}
-      {stats && (
+      {displayStats && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Total Members</p>
-                <p className="text-3xl font-bold text-gray-900">{stats.total_members}</p>
+                <p className="text-sm text-gray-600">Dues Records</p>
+                <p className="text-3xl font-bold text-gray-900">{displayStats.total_members}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
@@ -523,8 +595,8 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600">Payment Rate</p>
-                <p className="text-3xl font-bold text-green-600">{stats.payment_rate}%</p>
-                <p className="text-xs text-gray-500 mt-1">{stats.members_paid} paid</p>
+                <p className="text-3xl font-bold text-green-600">{displayStats.payment_rate}%</p>
+                <p className="text-xs text-gray-500 mt-1">{displayStats.members_paid} paid</p>
               </div>
               <TrendingUp className="w-8 h-8 text-green-500" />
             </div>
@@ -535,10 +607,10 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
               <div>
                 <p className="text-sm text-gray-600">Collected</p>
                 <p className="text-3xl font-bold text-gray-900">
-                  {formatCurrency(stats.total_collected)}
+                  {formatCurrency(displayStats.total_collected)}
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
-                  of {formatCurrency(stats.total_expected)}
+                  of {formatCurrency(displayStats.total_expected)}
                 </p>
               </div>
               <DollarSign className="w-8 h-8 text-blue-500" />
@@ -550,9 +622,9 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
               <div>
                 <p className="text-sm text-gray-600">Outstanding</p>
                 <p className="text-3xl font-bold text-red-600">
-                  {formatCurrency(stats.total_outstanding)}
+                  {formatCurrency(displayStats.total_outstanding)}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">{stats.members_overdue} overdue</p>
+                <p className="text-xs text-gray-500 mt-1">{displayStats.members_overdue} overdue</p>
               </div>
               <AlertCircle className="w-8 h-8 text-red-500" />
             </div>
@@ -642,12 +714,24 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
             <option value="overdue">Overdue</option>
             <option value="waived">Waived</option>
           </select>
-          {/* Clear Filters */}
-          {(filterYear !== 'all' || filterStatus !== 'all') && (
+          {periodOptions.length > 1 && (
+            <select
+              value={filterPeriod}
+              onChange={(e) => setFilterPeriod(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg"
+            >
+              <option value="all">All Periods</option>
+              {periodOptions.map(p => (
+                <option key={p} value={p}>{p}</option>
+              ))}
+            </select>
+          )}
+          {(filterYear !== 'all' || filterStatus !== 'all' || filterPeriod !== 'all') && (
             <button
               onClick={() => {
                 setFilterYear('all');
                 setFilterStatus('all');
+                setFilterPeriod('all');
               }}
               className="px-3 py-2 text-sm text-blue-600 hover:text-blue-800"
             >
@@ -657,125 +741,265 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
         </div>
       </div>
 
-      {/* Member Dues Table */}
+      {/* Member Dues Table — grouped by member */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
+                <th className="w-8 px-4 py-3"></th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Base</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Late Fee</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Paid</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unpaid Dues</th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Balance</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {filteredDues.map((dues) => (
-                <tr key={dues.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">{dues.member_name}</div>
-                    <div className="text-xs text-gray-500">{dues.member_email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {getYearLabel(dues.member_year)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {formatCurrency(dues.base_amount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {dues.late_fee > 0 ? (
-                      <span className="text-red-600 font-medium">{formatCurrency(dues.late_fee)}</span>
-                    ) : (
-                      <span className="text-gray-400">-</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {formatCurrency(dues.total_amount)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-green-600">
-                    {formatCurrency(dues.amount_paid)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    {dues.balance > 0 ? (
-                      <span className="text-red-600">{formatCurrency(dues.balance)}</span>
-                    ) : (
-                      <span className="text-green-600">{formatCurrency(0)}</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getStatusBadge(dues.status)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm">
-                    <div className="flex gap-2">
-                      {/* Online Payment Button */}
-                      <PayDuesButton
-                        memberDues={dues}
-                        onPaymentSuccess={loadData}
-                        variant="small"
-                      />
-                      {/* Installment Eligibility Button */}
-                      <button
-                        onClick={() => {
-                          setInstallmentMemberDues(dues);
-                          setShowInstallmentModal(true);
-                        }}
-                        disabled={dues.balance <= 0 || isDemo}
-                        className="px-3 py-1.5 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                        title="Configure installment payment eligibility"
-                      >
-                        <Calendar className="w-3 h-3" />
-                      </button>
-                      {/* Admin Manual Payment Button */}
-                      <button
-                        onClick={() => openPaymentModal(dues)}
-                        disabled={dues.balance <= 0 || isDemo}
-                        className="px-3 py-1.5 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Record manual payment (admin only)"
-                      >
-                        Record
-                      </button>
-                      {/* Edit Button */}
-                      <button
-                        onClick={() => {
-                          setEditingDues(dues);
-                          setShowEditDuesModal(true);
-                        }}
-                        disabled={isProcessing || isDemo}
-                        className="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                        title="Edit dues amount and due date"
-                      >
-                        <Edit2 className="w-3 h-3" />
-                      </button>
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => handleDeleteDues(dues)}
-                        disabled={isProcessing || isDemo}
-                        className="px-3 py-1.5 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1"
-                        title="Delete dues assignment"
-                      >
-                        <Trash2 className="w-3 h-3" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {memberGroups.map((group) => {
+                const isExpanded = expandedMembers.has(group.memberId);
+                return (
+                  <React.Fragment key={group.memberId}>
+                    {/* Member summary row */}
+                    <tr
+                      className="hover:bg-gray-50 cursor-pointer"
+                      onClick={() => toggleExpanded(group.memberId)}
+                    >
+                      <td className="px-4 py-4 text-gray-400">
+                        {isExpanded ? (
+                          <ChevronDown className="w-4 h-4" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4" />
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900">{group.memberName}</div>
+                        <div className="text-xs text-gray-500">{group.memberEmail}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {getYearLabel(group.memberYear)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {group.allPaid ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                            <CheckCircle className="w-3 h-3" />
+                            Paid
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">
+                            <AlertCircle className="w-3 h-3" />
+                            Unpaid
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {group.allPaid ? (
+                          <span className="text-gray-400">-</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1">
+                            {group.unpaidLabels.map((label, i) => (
+                              <span
+                                key={i}
+                                className="inline-block px-2 py-0.5 text-xs rounded bg-red-50 text-red-700 border border-red-200"
+                              >
+                                {label}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        {group.totalBalance > 0 ? (
+                          <span className="text-red-600">{formatCurrency(group.totalBalance)}</span>
+                        ) : (
+                          <span className="text-green-600">{formatCurrency(0)}</span>
+                        )}
+                      </td>
+                    </tr>
+
+                    {/* Expanded detail rows */}
+                    {isExpanded && group.dues.map((dues) => (
+                      <tr key={dues.id} className="bg-gray-50 border-l-4 border-indigo-200">
+                        <td></td>
+                        <td className="px-6 py-3 text-sm text-gray-700" colSpan={1}>
+                          <span className="font-medium">{getDuesLabel(dues)}</span>
+                        </td>
+                        <td className="px-6 py-3 text-sm text-gray-600">
+                          {formatCurrency(dues.total_amount)}
+                          {dues.late_fee > 0 && (
+                            <span className="text-red-500 text-xs ml-1">(+{formatCurrency(dues.late_fee)} late)</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-3">
+                          {dues.status === 'paid' || dues.status === 'waived' ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                              <CheckCircle className="w-3 h-3" />
+                              {dues.status === 'waived' ? 'Waived' : 'Paid'}
+                            </span>
+                          ) : (
+                            <span className="text-sm text-gray-600">
+                              {formatCurrency(dues.amount_paid)} / {formatCurrency(dues.total_amount)}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-3 text-sm">
+                          {dues.balance > 0 ? (
+                            <span className="text-red-600 font-medium">{formatCurrency(dues.balance)}</span>
+                          ) : (
+                            <span className="text-green-600">{formatCurrency(0)}</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-3">
+                          <div className="flex gap-1.5">
+                            <PayDuesButton
+                              memberDues={dues}
+                              onPaymentSuccess={loadData}
+                              variant="small"
+                            />
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setInstallmentMemberDues(dues);
+                                setShowInstallmentModal(true);
+                              }}
+                              disabled={dues.balance <= 0 || isDemo}
+                              className="px-2 py-1 bg-purple-600 text-white text-xs rounded hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Configure installment payment eligibility"
+                            >
+                              <Calendar className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                openPaymentModal(dues);
+                              }}
+                              disabled={dues.balance <= 0 || isDemo}
+                              className="px-2 py-1 bg-gray-600 text-white text-xs rounded hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Record manual payment"
+                            >
+                              Record
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingDues(dues);
+                                setShowEditDuesModal(true);
+                              }}
+                              disabled={isProcessing || isDemo}
+                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Edit dues"
+                            >
+                              <Edit2 className="w-3 h-3" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteDues(dues);
+                              }}
+                              disabled={isProcessing || isDemo}
+                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                              title="Delete dues"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </React.Fragment>
+                );
+              })}
             </tbody>
           </table>
 
-          {filteredDues.length === 0 && (
+          {memberGroups.length === 0 && (
             <div className="text-center py-12">
               <p className="text-gray-500">
-                {currentConfig ? 'No dues assigned yet. Click "Auto-Assign Dues" to get started.' : 'Please create a dues configuration first.'}
+                {currentConfig ? 'No dues assigned yet. Click "Bulk Assign Dues" to get started.' : 'Please create a dues configuration first.'}
               </p>
             </div>
           )}
         </div>
       </div>
+
+      {/* Active Payment Plans */}
+      {activePlans.length > 0 && !isDemo && (
+        <div className="bg-white rounded-lg shadow overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+              <Calendar className="w-5 h-5 text-indigo-600" />
+              Active Payment Plans
+              <span className="text-sm font-normal text-gray-500">({activePlans.length})</span>
+            </h3>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Member</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dues</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progress</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Per Payment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Next Payment</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {activePlans.map((plan) => {
+                  const { memberName, duesLabel } = getPlanMemberInfo(plan);
+                  const completedPayments = plan.payments.filter(p => p.status === 'succeeded').length;
+                  const progressPct = (completedPayments / plan.num_installments) * 100;
+
+                  return (
+                    <tr key={plan.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {memberName}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {duesLabel}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center gap-2">
+                          <div className="w-24 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-indigo-500 rounded-full transition-all"
+                              style={{ width: `${progressPct}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-gray-600">{completedPayments}/{plan.num_installments}</span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatCurrency(plan.installment_amount)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                        {plan.next_payment_date
+                          ? new Date(plan.next_payment_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                          : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        {formatCurrency(plan.total_amount)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => handleCancelPlan(plan.id)}
+                          disabled={cancellingPlanId === plan.id}
+                          className="inline-flex items-center gap-1 px-2 py-1 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded hover:bg-red-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Cancel payment plan"
+                        >
+                          <XCircle className="w-3 h-3" />
+                          {cancellingPlanId === plan.id ? 'Cancelling...' : 'Cancel'}
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
       {/* Configuration Modal */}
       <DuesConfigurationModal
@@ -817,6 +1041,8 @@ const DuesManagementSection: React.FC<DuesManagementSectionProps> = ({ chapterId
             <div className="mb-4 p-3 bg-gray-50 rounded">
               <p className="text-sm text-gray-600">Member:</p>
               <p className="font-medium text-gray-900">{selectedMemberDues.member_name}</p>
+              <p className="text-sm text-gray-600 mt-1">Dues:</p>
+              <p className="text-sm font-medium text-gray-900">{getDuesLabel(selectedMemberDues)}</p>
               <p className="text-sm text-gray-600 mt-2">Outstanding Balance:</p>
               <p className="text-lg font-bold text-red-600">{formatCurrency(selectedMemberDues.balance)}</p>
             </div>

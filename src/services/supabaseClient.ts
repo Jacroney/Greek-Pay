@@ -69,7 +69,10 @@ export interface Database {
           id: string;
           chapter_id: string;
           name: string;
-          type: 'Fixed Costs' | 'Operational Costs' | 'Event Costs';
+          type: string;
+          expense_type: string | null;
+          income_type: string | null;
+          category_usage_type: 'expense' | 'income' | 'both';
           description: string | null;
           is_active: boolean;
           created_at?: string;

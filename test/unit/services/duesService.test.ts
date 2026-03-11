@@ -253,19 +253,8 @@ describe('DuesService', () => {
   // ============================================================================
 
   describe('assignDuesToMember', () => {
-    it('creates new dues when none exist', async () => {
-      // First call: check if exists (returns null)
-      // Second call: insert new record
-      const mockSelectChain = {
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({
-          data: null,
-          error: { code: 'PGRST116' }
-        })
-      };
-
-      const mockInsertChain = {
+    it('creates new dues assignment', async () => {
+      const mockChain = {
         insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
@@ -274,18 +263,13 @@ describe('DuesService', () => {
             base_amount: 500,
             total_amount: 500,
             balance: 500,
+            amount_paid: 0,
             status: 'pending'
           },
           error: null
         })
       };
-
-      let callCount = 0;
-      mockSupabaseClient.from.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) return mockSelectChain;
-        return mockInsertChain;
-      });
+      mockSupabaseClient.from.mockReturnValue(mockChain);
 
       const result = await DuesService.assignDuesToMember(
         mockChapterId,
@@ -294,116 +278,75 @@ describe('DuesService', () => {
         500
       );
 
+      expect(mockSupabaseClient.from).toHaveBeenCalledWith('member_dues');
+      expect(mockChain.insert).toHaveBeenCalledWith(expect.objectContaining({
+        chapter_id: mockChapterId,
+        member_id: mockMemberId,
+        config_id: mockConfigId,
+        base_amount: 500,
+        total_amount: 500,
+        balance: 500,
+        amount_paid: 0,
+        status: 'pending'
+      }));
       expect(result.base_amount).toBe(500);
       expect(result.status).toBe('pending');
     });
 
-    it('adds to existing dues when already assigned', async () => {
-      // Existing dues: $500 base, $100 paid, $400 balance
-      const existingDues = {
-        id: 'existing-dues-id',
-        base_amount: 500,
-        late_fee: 0,
-        adjustments: 0,
-        amount_paid: 100
-      };
-
-      const mockSelectChain = {
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({
-          data: existingDues,
-          error: null
-        })
-      };
-
-      const mockUpdateChain = {
-        update: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+    it('passes due date and notes when provided', async () => {
+      const mockChain = {
+        insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
           data: {
-            id: 'existing-dues-id',
-            base_amount: 700, // 500 + 200 new
-            total_amount: 700,
-            balance: 600, // 700 - 100 paid
-            status: 'partial',
-            amount_paid: 100
+            ...mockMemberDues,
+            base_amount: 200,
+            total_amount: 200,
+            balance: 200,
+            amount_paid: 0,
+            due_date: '2025-03-01',
+            notes: 'Spring dues',
+            status: 'pending'
           },
           error: null
         })
       };
-
-      let callCount = 0;
-      mockSupabaseClient.from.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) return mockSelectChain;
-        return mockUpdateChain;
-      });
+      mockSupabaseClient.from.mockReturnValue(mockChain);
 
       const result = await DuesService.assignDuesToMember(
         mockChapterId,
         mockMemberId,
         mockConfigId,
-        200 // Adding $200 more
+        200,
+        '2025-03-01',
+        'Spring dues'
       );
 
-      expect(result.base_amount).toBe(700);
-      expect(result.balance).toBe(600);
-      expect(result.status).toBe('partial');
+      expect(mockChain.insert).toHaveBeenCalledWith(expect.objectContaining({
+        due_date: '2025-03-01',
+        notes: 'Spring dues'
+      }));
+      expect(result.due_date).toBe('2025-03-01');
+      expect(result.notes).toBe('Spring dues');
     });
 
-    it('calculates correct status based on payment', async () => {
-      // Test: fully paid = 'paid', partial payment = 'partial', no payment = 'pending'
-      const existingDues = {
-        id: 'existing-dues-id',
-        base_amount: 100,
-        late_fee: 0,
-        adjustments: 0,
-        amount_paid: 100 // Fully paid
-      };
-
-      const mockSelectChain = {
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        single: vi.fn().mockResolvedValue({
-          data: existingDues,
-          error: null
-        })
-      };
-
-      const mockUpdateChain = {
-        update: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
+    it('throws error on insert failure', async () => {
+      const mockChain = {
+        insert: vi.fn().mockReturnThis(),
         select: vi.fn().mockReturnThis(),
         single: vi.fn().mockResolvedValue({
-          data: {
-            id: 'existing-dues-id',
-            base_amount: 200, // 100 + 100 new
-            total_amount: 200,
-            balance: 100, // 200 - 100 paid
-            status: 'partial', // Was paid, now partial after adding more dues
-            amount_paid: 100
-          },
-          error: null
+          data: null,
+          error: { message: 'Insert failed' }
         })
       };
+      mockSupabaseClient.from.mockReturnValue(mockChain);
 
-      let callCount = 0;
-      mockSupabaseClient.from.mockImplementation(() => {
-        callCount++;
-        if (callCount === 1) return mockSelectChain;
-        return mockUpdateChain;
-      });
-
-      const result = await DuesService.assignDuesToMember(
+      await expect(DuesService.assignDuesToMember(
         mockChapterId,
         mockMemberId,
         mockConfigId,
         100
-      );
-
-      expect(result.status).toBe('partial');
+      )).rejects.toThrow();
     });
   });
 

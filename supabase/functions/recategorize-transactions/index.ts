@@ -3,8 +3,11 @@ import { handleCorsPreflightRequest, corsJsonResponse } from '../_shared/cors.ts
 import { createSupabaseClient, authenticateUser, sanitizeError, requireAdminOrExec } from '../_shared/auth.ts';
 import { categorizeTransaction } from '../_shared/categorization.ts';
 
-// Enable AI categorization for recategorization (set to false to disable)
-const USE_AI_CATEGORIZATION = Deno.env.get('USE_AI_CATEGORIZATION') !== 'false'; // Defaults to true
+// Disable AI categorization by default to avoid timeouts (each AI call adds ~1-2s)
+const USE_AI_CATEGORIZATION = Deno.env.get('USE_AI_CATEGORIZATION') === 'true'; // Defaults to false
+
+// Wall-clock budget: stop processing before the edge function timeout (60s)
+const MAX_EXECUTION_MS = 50_000; // 50s, leaving 10s buffer
 
 interface RecategorizeRequest {
   category_name?: string; // Optional: only recategorize transactions in this category (e.g., "Uncategorized")
@@ -22,18 +25,23 @@ serve(async (req) => {
   if (corsResponse) return corsResponse;
 
   try {
+    console.log('[RECATEGORIZE] Function invoked, parsing body...');
+
+    // Parse request body first (before auth, since body stream can only be read once)
+    const body: RecategorizeRequest = await req.json();
+    console.log('[RECATEGORIZE] Body parsed:', JSON.stringify(body));
+
     // SECURITY: Authenticate user
     const supabase = createSupabaseClient();
+    console.log('[RECATEGORIZE] Supabase client created, authenticating...');
     const user = await authenticateUser(req, supabase);
+    console.log('[RECATEGORIZE] Authenticated user:', user.id);
 
     // SECURITY: Only admins and exec can recategorize transactions
     requireAdminOrExec(user);
-
-    // Parse request body
-    const body: RecategorizeRequest = await req.json();
     const recategorizeAll = body.recategorize_all === true;
     const categoryName = body.category_name || 'Uncategorized';
-    const limit = body.limit && body.limit > 0 ? Math.min(body.limit, 1000) : 1000; // Max 1000
+    const limit = body.limit && body.limit > 0 ? Math.min(body.limit, 500) : 500; // Max 500
     const dryRun = body.dry_run === true;
 
     console.log(`[RECATEGORIZE] Starting${dryRun ? ' (DRY RUN)' : ''} - ${recategorizeAll ? 'ALL transactions' : `Category: ${categoryName}`}, Limit: ${limit}`);
@@ -46,6 +54,8 @@ serve(async (req) => {
         description,
         vendor,
         source,
+        amount,
+        payment_method,
         category_id,
         plaid_primary_category,
         plaid_detailed_category,
@@ -109,6 +119,8 @@ serve(async (req) => {
 
     console.log(`[RECATEGORIZE] Found ${transactions.length} transactions to process`);
 
+    const startTime = Date.now();
+
     // Track statistics
     const stats = {
       recategorized: 0,
@@ -129,6 +141,13 @@ serve(async (req) => {
 
     // Process each transaction individually to use Plaid category data
     for (const tx of transactions) {
+      // Check wall-clock budget to avoid edge function timeout
+      if (Date.now() - startTime > MAX_EXECUTION_MS) {
+        console.log(`[RECATEGORIZE] Stopping early due to time budget`);
+        errors.push('Stopped early due to time limit. Run again to process remaining transactions.');
+        break;
+      }
+
       try {
         const merchantName = tx.vendor || tx.description || 'Unknown';
         const oldCategoryName = (tx.budget_categories as any)?.name || 'Unknown';
@@ -148,6 +167,8 @@ serve(async (req) => {
           source: tx.source === 'PLAID' ? 'PLAID' : 'MANUAL',
           useAI: USE_AI_CATEGORIZATION,
           plaidCategory,
+          amount: tx.amount != null ? Math.abs(tx.amount) : undefined,
+          paymentMethod: tx.payment_method,
         });
 
         // Check if category changed

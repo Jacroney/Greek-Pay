@@ -12,6 +12,7 @@ import {
   CheckCircle,
   Receipt,
   ChevronDown,
+  AlertTriangle,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { MemberDuesInfo } from '../services/authService';
@@ -155,19 +156,65 @@ export const MemberDashboard: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Left: Two primary CTAs (span 2 cols on desktop) */}
             <div className="md:col-span-2 space-y-3">
-              {/* Pay Dues Button — full width, biggest element */}
+              {/* Dues Cards */}
               {isOwed && memberDuesSummary.length > 0 ? (
                 <>
-                  {memberDuesSummary.map((dues) => (
-                    <PayDuesButton
-                      key={dues.id}
-                      memberDues={dues}
-                      onPaymentSuccess={loadDuesInfo}
-                      refreshKey={refreshKey}
-                      variant="primary"
-                      className="w-full !rounded-2xl !py-6 sm:!py-8 !text-lg !font-bold"
-                    />
-                  ))}
+                  {memberDuesSummary.filter(d => d.balance > 0).map((dues) => {
+                    const duesLabel = dues.notes || dues.period_name || 'Dues';
+                    const hasDueDate = !!dues.due_date;
+                    const dueDate = hasDueDate ? new Date(dues.due_date!) : null;
+                    const today = new Date();
+                    const daysLeft = dueDate ? Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)) : null;
+                    const isOverdue = daysLeft !== null && daysLeft < 0;
+                    const isPartial = dues.amount_paid > 0;
+
+                    return (
+                      <div
+                        key={dues.id}
+                        className={`rounded-2xl border-2 bg-white p-4 sm:p-5 ${
+                          isOverdue ? 'border-rose-300' : 'border-[var(--brand-border)]'
+                        }`}
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <h3 className="text-base font-semibold text-slate-900 truncate">{duesLabel}</h3>
+                              {isOverdue && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-100 text-rose-700 flex-shrink-0">
+                                  <AlertTriangle className="h-3 w-3" />
+                                  Overdue
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-2xl font-bold text-slate-900">{formatCurrency(dues.balance)}</p>
+                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1">
+                              {isPartial && (
+                                <span className="text-xs text-slate-500">
+                                  {formatCurrency(dues.amount_paid)} of {formatCurrency(dues.total_amount)} paid
+                                </span>
+                              )}
+                              {dueDate && (
+                                <span className={`text-xs ${isOverdue ? 'text-rose-600 font-medium' : 'text-slate-500'}`}>
+                                  Due {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  {isOverdue
+                                    ? ` (${Math.abs(daysLeft!)}d overdue)`
+                                    : daysLeft !== null && daysLeft <= 14 ? ` (${daysLeft}d left)` : ''}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            <PayDuesButton
+                              memberDues={dues}
+                              onPaymentSuccess={loadDuesInfo}
+                              refreshKey={refreshKey}
+                              variant="primary"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </>
               ) : (
                 <button
@@ -212,48 +259,52 @@ export const MemberDashboard: React.FC = () => {
                 </span>
               </div>
 
-              {/* Due date */}
-              {isOwed && memberDuesSummary.some(d => d.due_date) && (
-                <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
-                  <Calendar className="h-4 w-4 flex-shrink-0" />
-                  {memberDuesSummary.filter(d => d.due_date).map(d => {
-                    const dueDate = new Date(d.due_date!);
-                    const today = new Date();
-                    const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                    const isOverdue = daysLeft < 0;
-                    return (
-                      <span key={d.id} className={isOverdue ? 'text-rose-600 font-medium' : ''}>
-                        Due {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        {isOverdue
-                          ? ` (${Math.abs(daysLeft)}d overdue)`
-                          : daysLeft <= 14 ? ` (${daysLeft}d left)` : ''}
-                      </span>
-                    );
-                  })}
-                </div>
-              )}
+              {/* Earliest due date */}
+              {isOwed && (() => {
+                const withDates = memberDuesSummary.filter(d => d.due_date && d.balance > 0);
+                if (withDates.length === 0) return null;
+                const earliest = withDates.reduce((a, b) =>
+                  new Date(a.due_date!) <= new Date(b.due_date!) ? a : b
+                );
+                const dueDate = new Date(earliest.due_date!);
+                const today = new Date();
+                const daysLeft = Math.ceil((dueDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                const overdue = daysLeft < 0;
+                return (
+                  <div className="mt-3 flex items-center gap-2 text-sm text-slate-500">
+                    <Calendar className="h-4 w-4 flex-shrink-0" />
+                    <span className={overdue ? 'text-rose-600 font-medium' : ''}>
+                      Due {dueDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      {overdue
+                        ? ` (${Math.abs(daysLeft)}d overdue)`
+                        : daysLeft <= 14 ? ` (${daysLeft}d left)` : ''}
+                    </span>
+                  </div>
+                );
+              })()}
 
-              {/* Flexible Payment Plan Info */}
-              {memberDuesSummary.some(dues => dues.flexible_plan_deadline) && (
-                <div className="mt-4 bg-purple-50 border border-purple-200 rounded-xl p-3">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4 text-purple-600 flex-shrink-0" />
-                    <div className="flex-1">
-                      {memberDuesSummary.filter(dues => dues.flexible_plan_deadline).map(dues => {
-                        const deadline = new Date(dues.flexible_plan_deadline!);
-                        const today = new Date();
-                        const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
-                        return (
-                          <p key={dues.id} className="text-xs text-purple-700">
-                            Payment plan deadline: {deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                            {daysRemaining > 0 && <span className="text-purple-500"> ({daysRemaining}d left)</span>}
-                          </p>
-                        );
-                      })}
+              {/* Earliest Flexible Payment Plan Deadline */}
+              {(() => {
+                const withDeadlines = memberDuesSummary.filter(d => d.flexible_plan_deadline && d.balance > 0);
+                if (withDeadlines.length === 0) return null;
+                const earliest = withDeadlines.reduce((a, b) =>
+                  new Date(a.flexible_plan_deadline!) <= new Date(b.flexible_plan_deadline!) ? a : b
+                );
+                const deadline = new Date(earliest.flexible_plan_deadline!);
+                const today = new Date();
+                const daysRemaining = Math.ceil((deadline.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+                return (
+                  <div className="mt-4 bg-purple-50 border border-purple-200 rounded-xl p-3">
+                    <div className="flex items-center gap-2">
+                      <Calendar className="h-4 w-4 text-purple-600 flex-shrink-0" />
+                      <p className="text-xs text-purple-700">
+                        Payment plan deadline: {deadline.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        {daysRemaining > 0 && <span className="text-purple-500"> ({daysRemaining}d left)</span>}
+                      </p>
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
 

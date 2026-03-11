@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Edit2,
   Trash2,
@@ -13,7 +13,9 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
-  Receipt
+  Receipt,
+  AlertTriangle,
+  RefreshCw
 } from 'lucide-react';
 import { ExpenseDetail, BudgetCategory, BudgetPeriod } from '../services/types';
 import { ExpenseService } from '../services/expenseService';
@@ -49,6 +51,10 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [editingExpense, setEditingExpense] = useState<ExpenseDetail | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [needsReviewFilter, setNeedsReviewFilter] = useState(false);
+  const [categorizingId, setCategorizingId] = useState<string | null>(null);
+  const [rulePromptExpense, setRulePromptExpense] = useState<{ id: string; vendor: string; categoryName: string } | null>(null);
+  const [isRecategorizing, setIsRecategorizing] = useState(false);
 
   // Formatting helpers
   const formatCurrency = (amount: number) => {
@@ -112,9 +118,106 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
       <ChevronDown className="w-4 h-4 inline ml-1" />;
   };
 
+  // Count uncategorized
+  const uncategorizedCount = expenses.filter(e => e.category_name === 'Uncategorized').length;
+
+  // Group categories by expense_type for the inline dropdown
+  const categoryGroups = React.useMemo(() => {
+    const expenseCategories = categories.filter(c => c.category_usage_type !== 'income');
+    const incomeCategories = categories.filter(c => c.category_usage_type === 'income' || c.category_usage_type === 'both');
+    const groups = new Map<string, BudgetCategory[]>();
+    expenseCategories.forEach(c => {
+      const key = c.expense_type || c.type || 'Other';
+      if (!groups.has(key)) groups.set(key, []);
+      groups.get(key)!.push(c);
+    });
+    return { groups, incomeCategories };
+  }, [categories]);
+
+  // Handle inline category change
+  const handleInlineCategoryChange = async (expense: ExpenseDetail, newCategoryId: string) => {
+    if (!newCategoryId || newCategoryId === expense.category_id) return;
+
+    const selectedCategory = categories.find(c => c.id === newCategoryId);
+    if (!selectedCategory) return;
+
+    setCategorizingId(expense.id);
+    try {
+      await ExpenseService.updateExpense(expense.id, { category_id: newCategoryId });
+      toast.success(`Categorized as "${selectedCategory.name}"`);
+
+      // If expense has a vendor, prompt to save as rule
+      if (expense.vendor) {
+        setRulePromptExpense({
+          id: expense.id,
+          vendor: expense.vendor,
+          categoryName: selectedCategory.name,
+        });
+      }
+
+      onExpenseUpdated?.();
+    } catch (error) {
+      console.error('Error updating category:', error);
+      toast.error('Failed to update category');
+    } finally {
+      setCategorizingId(null);
+    }
+  };
+
+  // Handle saving a category rule
+  const handleSaveRule = async () => {
+    if (!rulePromptExpense || !chapterId) return;
+
+    try {
+      await ExpenseService.saveCategoryRule(
+        chapterId,
+        rulePromptExpense.vendor,
+        rulePromptExpense.categoryName,
+        'ALL'
+      );
+      toast.success(`Future "${rulePromptExpense.vendor}" transactions will auto-categorize as "${rulePromptExpense.categoryName}"`);
+    } catch (error) {
+      console.error('Error saving rule:', error);
+      toast.error('Failed to save categorization rule');
+    } finally {
+      setRulePromptExpense(null);
+    }
+  };
+
+  // Handle recategorize all transactions
+  const handleRecategorizeAll = async () => {
+    if (!chapterId) return;
+
+    setIsRecategorizing(true);
+    const toastId = toast.loading('Re-categorizing transactions...');
+    try {
+      const result = await ExpenseService.recategorizeTransactions(chapterId, {
+        recategorizeAll: true,
+      });
+
+      if (result.recategorized > 0) {
+        toast.success(
+          `Re-categorized ${result.recategorized} of ${result.processed} transactions`,
+          { id: toastId }
+        );
+        onExpenseUpdated?.();
+      } else {
+        toast.success('All transactions already have correct categories', { id: toastId });
+      }
+    } catch (error) {
+      console.error('Recategorization error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to re-categorize', { id: toastId });
+    } finally {
+      setIsRecategorizing(false);
+    }
+  };
+
   // Filter and sort expenses
   const filteredAndSortedExpenses = expenses
     .filter(expense => {
+      // Needs review filter
+      if (needsReviewFilter && expense.category_name !== 'Uncategorized') return false;
+
       if (!searchTerm) return true;
       const search = searchTerm.toLowerCase();
       return (
@@ -173,20 +276,132 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
 
   const colspan = calculateColspan();
 
+  const isUncategorized = (expense: ExpenseDetail) => expense.category_name === 'Uncategorized';
+
+  // Inline category select rendered for uncategorized expenses
+  const renderCategoryCell = (expense: ExpenseDetail) => {
+    if (isUncategorized(expense) && showActions) {
+      return (
+        <td className="px-4 py-3 whitespace-nowrap text-sm" onClick={(e) => e.stopPropagation()}>
+          <select
+            value=""
+            onChange={(e) => handleInlineCategoryChange(expense, e.target.value)}
+            disabled={categorizingId === expense.id}
+            className="w-full max-w-[180px] px-2 py-1.5 text-sm border border-amber-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer"
+          >
+            <option value="">Categorize...</option>
+            {Array.from(categoryGroups.groups.entries()).map(([groupName, cats]) => (
+              <optgroup key={groupName} label={groupName}>
+                {cats.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </optgroup>
+            ))}
+            {categoryGroups.incomeCategories.length > 0 && (
+              <optgroup label="Income">
+                {categoryGroups.incomeCategories.map(cat => (
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
+                ))}
+              </optgroup>
+            )}
+          </select>
+        </td>
+      );
+    }
+
+    return (
+      <td className="px-4 py-3 whitespace-nowrap text-sm">
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-full font-medium border border-blue-200">
+          <Tag className="w-3 h-3" />
+          {expense.category_name}
+        </span>
+      </td>
+    );
+  };
+
+  // Mobile category for uncategorized
+  const renderMobileCategoryBadge = (expense: ExpenseDetail) => {
+    if (isUncategorized(expense) && showActions) {
+      return (
+        <select
+          value=""
+          onChange={(e) => handleInlineCategoryChange(expense, e.target.value)}
+          disabled={categorizingId === expense.id}
+          className="w-full px-2 py-1.5 text-xs border border-amber-300 bg-amber-50 rounded-lg focus:ring-2 focus:ring-primary"
+        >
+          <option value="">Categorize...</option>
+          {Array.from(categoryGroups.groups.entries()).map(([groupName, cats]) => (
+            <optgroup key={groupName} label={groupName}>
+              {cats.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </optgroup>
+          ))}
+          {categoryGroups.incomeCategories.length > 0 && (
+            <optgroup label="Income">
+              {categoryGroups.incomeCategories.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </optgroup>
+          )}
+        </select>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-gray-700">
+        <Tag className="w-3 h-3" />
+        {expense.category_name}
+      </span>
+    );
+  };
+
   return (
     <div className="space-y-4">
       {/* Search and Summary */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-            <input
-              type="text"
-              placeholder="Search expenses..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-            />
+          <div className="flex items-center gap-3 flex-1">
+            <div className="relative flex-1 max-w-md">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <input
+                type="text"
+                placeholder="Search expenses..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+            </div>
+            {uncategorizedCount > 0 && (
+              <>
+                <button
+                  onClick={() => setNeedsReviewFilter(!needsReviewFilter)}
+                  className={`inline-flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap ${
+                    needsReviewFilter
+                      ? 'bg-amber-100 text-amber-800 border border-amber-300 shadow-sm'
+                      : 'bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100'
+                  }`}
+                >
+                  <AlertTriangle className="w-4 h-4" />
+                  Needs Review
+                  <span className={`inline-flex items-center justify-center min-w-[20px] h-5 px-1.5 rounded-full text-xs font-bold ${
+                    needsReviewFilter ? 'bg-amber-200 text-amber-900' : 'bg-amber-200 text-amber-800'
+                  }`}>
+                    {uncategorizedCount}
+                  </span>
+                </button>
+                {chapterId && showActions && (
+                  <button
+                    onClick={handleRecategorizeAll}
+                    disabled={isRecategorizing}
+                    className="inline-flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all whitespace-nowrap bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className={`w-4 h-4 ${isRecategorizing ? 'animate-spin' : ''}`} />
+                    Re-categorize All
+                  </button>
+                )}
+              </>
+            )}
           </div>
           <div className="flex items-center gap-4 text-sm">
             <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
@@ -232,6 +447,35 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Save Rule Prompt */}
+      {rulePromptExpense && (
+        <div className="bg-white rounded-xl shadow-sm border border-amber-200 p-4 flex items-center justify-between gap-4 animate-fadeIn">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-amber-100 rounded-lg">
+              <Tag className="w-4 h-4 text-amber-700" />
+            </div>
+            <p className="text-sm text-gray-700">
+              Apply <span className="font-semibold">"{rulePromptExpense.categoryName}"</span> to all future{' '}
+              <span className="font-semibold">"{rulePromptExpense.vendor}"</span> transactions?
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <button
+              onClick={handleSaveRule}
+              className="px-3 py-1.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Yes, save rule
+            </button>
+            <button
+              onClick={() => setRulePromptExpense(null)}
+              className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              No thanks
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Desktop Table View */}
       <div className="hidden md:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -295,13 +539,19 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
               {filteredAndSortedExpenses.length === 0 ? (
                 <tr>
                   <td colSpan={colspan} className="px-4 py-8 text-center text-gray-500">
-                    No expenses found. {searchTerm && 'Try adjusting your search.'}
+                    {needsReviewFilter
+                      ? 'No uncategorized expenses. Nice work!'
+                      : `No expenses found. ${searchTerm ? 'Try adjusting your search.' : ''}`
+                    }
                   </td>
                 </tr>
               ) : (
                 filteredAndSortedExpenses.map((expense) => (
                   <React.Fragment key={expense.id}>
-                    <tr className="hover:bg-gray-50 transition-colors cursor-pointer"
+                    <tr
+                      className={`hover:bg-gray-50 transition-colors cursor-pointer ${
+                        isUncategorized(expense) ? 'bg-amber-50/40' : ''
+                      }`}
                       onClick={() => setExpandedRow(expandedRow === expense.id ? null : expense.id)}
                     >
                       <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
@@ -310,14 +560,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
                       <td className="px-4 py-3 text-sm text-gray-900 max-w-xs truncate">
                         {expense.description}
                       </td>
-                      {showCategoryColumn && (
-                        <td className="px-4 py-3 whitespace-nowrap text-sm">
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 rounded-full font-medium border border-blue-200">
-                            <Tag className="w-3 h-3" />
-                            {expense.category_name}
-                          </span>
-                        </td>
-                      )}
+                      {showCategoryColumn && renderCategoryCell(expense)}
                       {showPeriodColumn && (
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-600">
                           {expense.period_name}
@@ -407,13 +650,18 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
       <div className="md:hidden space-y-3">
         {filteredAndSortedExpenses.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm p-8 text-center text-gray-500">
-            No expenses found. {searchTerm && 'Try adjusting your search.'}
+            {needsReviewFilter
+              ? 'No uncategorized expenses. Nice work!'
+              : `No expenses found. ${searchTerm ? 'Try adjusting your search.' : ''}`
+            }
           </div>
         ) : (
           filteredAndSortedExpenses.map((expense) => (
             <div
               key={expense.id}
-              className="bg-white rounded-lg shadow-sm p-4"
+              className={`bg-white rounded-lg shadow-sm p-4 ${
+                isUncategorized(expense) ? 'border border-amber-200' : ''
+              }`}
             >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
@@ -435,10 +683,7 @@ const ExpenseList: React.FC<ExpenseListProps> = ({
                 </div>
               </div>
               <div className="flex flex-wrap gap-2 text-xs mt-3">
-                <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-gray-700">
-                  <Tag className="w-3 h-3" />
-                  {expense.category_name}
-                </span>
+                {renderMobileCategoryBadge(expense)}
                 {expense.vendor && (
                   <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded text-gray-700">
                     <User className="w-3 h-3" />
