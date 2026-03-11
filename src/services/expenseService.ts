@@ -148,7 +148,7 @@ export class ExpenseService {
         id: demoHelpers.nextId(),
         chapter_id: chapterId,
         category_name: 'Demo Category',
-        category_type: 'Operational Costs',
+        category_type: 'Operations',
         period_name: 'FY25 – Spring',
         period_type: 'Semester',
         fiscal_year: 2025,
@@ -190,7 +190,7 @@ export class ExpenseService {
         id: demoHelpers.nextId(),
         chapter_id: chapterId,
         category_name: 'Demo Category',
-        category_type: 'Operational Costs',
+        category_type: 'Operations',
         period_name: 'FY25 – Spring',
         period_type: 'Semester',
         fiscal_year: 2025,
@@ -548,35 +548,32 @@ export class ExpenseService {
   }
 
   /**
-   * Get spending totals by category type for a period
+   * Get spending totals by category type for a period.
+   * Dynamically groups by whatever category_type values exist in the data.
    */
   static async getTotalsByPeriod(chapterId: string, periodName: string) {
+    const emptyTotal = { allocated: 0, spent: 0, remaining: 0 };
+
     if (!chapterId) {
       console.warn('Chapter ID is required');
-      return {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
-      };
+      return { 'Grand Total': { ...emptyTotal } } as Record<string, { allocated: number; spent: number; remaining: number }>;
     }
 
     try {
       const summaryData = await this.getBudgetSummary(chapterId, periodName);
 
-      const totals = {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
+      const totals: Record<string, { allocated: number; spent: number; remaining: number }> = {
+        'Grand Total': { ...emptyTotal }
       };
 
       summaryData.forEach(item => {
-        if (item.category_type in totals) {
-          totals[item.category_type].allocated += item.allocated;
-          totals[item.category_type].spent += item.spent;
-          totals[item.category_type].remaining += item.remaining;
+        const key = item.category_type || 'Other';
+        if (!totals[key]) {
+          totals[key] = { ...emptyTotal };
         }
+        totals[key].allocated += item.allocated;
+        totals[key].spent += item.spent;
+        totals[key].remaining += item.remaining;
         totals['Grand Total'].allocated += item.allocated;
         totals['Grand Total'].spent += item.spent;
         totals['Grand Total'].remaining += item.remaining;
@@ -585,12 +582,7 @@ export class ExpenseService {
       return totals;
     } catch (error) {
       console.warn('Error fetching totals by period:', error);
-      return {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
-      };
+      return { 'Grand Total': { ...emptyTotal } } as Record<string, { allocated: number; spent: number; remaining: number }>;
     }
   }
 
@@ -637,6 +629,438 @@ export class ExpenseService {
     // This function is kept for backwards compatibility but should not be used
     // Budget initialization is now handled through the UI wizard
     throw new Error('This function is deprecated. Please use the BudgetSetupWizard component.');
+  }
+
+  /**
+   * Save a category rule so future transactions from this vendor auto-categorize
+   */
+  static async saveCategoryRule(
+    chapterId: string,
+    vendorName: string,
+    categoryName: string,
+    source: 'PLAID' | 'MANUAL' | 'CSV_IMPORT' | 'ALL' = 'ALL'
+  ): Promise<boolean> {
+    if (isDemoModeEnabled()) {
+      return true;
+    }
+
+    try {
+      const escapedName = vendorName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const pattern = `(?i)(${escapedName})`;
+
+      const { error } = await supabase
+        .from('category_rules')
+        .insert({
+          chapter_id: chapterId,
+          source,
+          merchant_pattern: pattern,
+          category: categoryName,
+          priority: 500,
+          is_active: true,
+        });
+
+      if (error) throw error;
+      return true;
+    } catch (error) {
+      console.error('Error saving category rule:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Recategorize existing transactions by applying current category rules client-side.
+   * Fetches category_rules, matches them against expense vendors, and batch-updates categories.
+   */
+  static async recategorizeTransactions(
+    chapterId: string,
+    options?: {
+      recategorizeAll?: boolean;
+      periodId?: string;
+    }
+  ): Promise<{
+    success: boolean;
+    processed: number;
+    recategorized: number;
+    unchanged: number;
+    errors: string[];
+  }> {
+    if (isDemoModeEnabled()) {
+      return { success: true, processed: 0, recategorized: 0, unchanged: 0, errors: [] };
+    }
+
+    // 1. Fetch active budget categories for this chapter (needed for both compound and DB rules)
+    const { data: categories, error: catError } = await supabase
+      .from('budget_categories')
+      .select('id, name')
+      .eq('chapter_id', chapterId)
+      .eq('is_active', true);
+
+    if (catError) throw new Error('Failed to fetch categories');
+    const categoryMap = new Map((categories || []).map(c => [c.name, c.id]));
+
+    // 2. Fetch active category rules for this chapter (and global rules)
+    const { data: rules, error: rulesError } = await supabase
+      .from('category_rules')
+      .select('*')
+      .or(`chapter_id.eq.${chapterId},chapter_id.is.null`)
+      .eq('is_active', true)
+      .order('priority', { ascending: false });
+
+    if (rulesError) throw new Error('Failed to fetch category rules');
+    // Note: even with zero DB rules, compound rules still apply
+
+    // 3. Fetch expenses to recategorize (include amount and payment_method for compound rules)
+    let query = supabase
+      .from('expense_details')
+      .select('id, vendor, description, category_id, category_name, source, amount, payment_method')
+      .eq('chapter_id', chapterId)
+      .order('created_at', { ascending: false })
+      .limit(1000);
+
+    if (!options?.recategorizeAll) {
+      // Only recategorize uncategorized expenses by default
+      const uncategorizedId = categoryMap.get('Uncategorized');
+      if (uncategorizedId) {
+        query = query.eq('category_id', uncategorizedId);
+      }
+    }
+
+    if (options?.periodId) {
+      query = query.eq('period_id', options.periodId);
+    }
+
+    const { data: expenses, error: expError } = await query;
+    if (expError) throw new Error('Failed to fetch expenses');
+    if (!expenses || expenses.length === 0) {
+      return { success: true, processed: 0, recategorized: 0, unchanged: 0, errors: [] };
+    }
+
+    // 4a. Merchant-based pattern rules (mirrors server-side MERCHANT_RULES)
+    const MERCHANT_RULES: Array<[RegExp, string]> = [
+      // ── National/IHQ Fees ──
+      [/kappa\s*sigma/i, 'National/IHQ Fees'],
+      [/endowment\s*fund/i, 'National/IHQ Fees'],
+      [/fraternity\s*headquarters/i, 'National/IHQ Fees'],
+      [/ihq|national\s*dues/i, 'National/IHQ Fees'],
+      [/greek\s*life\s*office/i, 'National/IHQ Fees'],
+      [/interfraternity\s*council|^ifc\b/i, 'National/IHQ Fees'],
+      [/panhellenic/i, 'National/IHQ Fees'],
+      [/npc\s*fees/i, 'National/IHQ Fees'],
+
+      // ── Fines ──
+      [/slo\s*city/i, 'Fines'],
+      [/city\s*of\s*san\s*luis/i, 'Fines'],
+      [/noise\s*violation/i, 'Fines'],
+      [/code\s*enforcement/i, 'Fines'],
+      [/municipal\s*court/i, 'Fines'],
+      [/parking\s*citation/i, 'Fines'],
+
+      // ── Insurance ──
+      [/state\s*farm/i, 'Insurance'],
+      [/geico/i, 'Insurance'],
+      [/allstate/i, 'Insurance'],
+      [/liberty\s*mutual/i, 'Insurance'],
+      [/holmes\s*murphy/i, 'Insurance'],
+      [/fraternal\s*insurance/i, 'Insurance'],
+      [/mj\s*insurance/i, 'Insurance'],
+      [/james\s*r\.\s*favor/i, 'Insurance'],
+      [/greek\s*insurance/i, 'Insurance'],
+
+      // ── Housing ──
+      [/pg&?e|pacific\s*gas/i, 'Housing'],
+      [/edison|southern\s*cal.*electric/i, 'Housing'],
+      [/water\s*(?:bill|dept|utility|district)/i, 'Housing'],
+      [/sewer/i, 'Housing'],
+      [/garbage|waste\s*management|trash/i, 'Housing'],
+      [/spectrum|comcast|xfinity|at&?t.*internet|frontier/i, 'Housing'],
+      [/home\s*depot|lowe'?s|ace\s*hardware/i, 'Housing'],
+      [/plumb|electrician|hvac|roofing|handyman/i, 'Housing'],
+      [/campus\s*realty/i, 'Housing'],
+      [/property\s*management/i, 'Housing'],
+      [/rent|lease\s*payment/i, 'Housing'],
+      [/cleaning\s*(?:service|crew|supplies)/i, 'Housing'],
+
+      // ── Food/Meals ──
+      [/chipotle/i, 'Food/Meals'],
+      [/chick[\s-]*fil[\s-]*a/i, 'Food/Meals'],
+      [/mcdonald'?s/i, 'Food/Meals'],
+      [/taco\s*bell/i, 'Food/Meals'],
+      [/wendy'?s/i, 'Food/Meals'],
+      [/in[\s-]*n[\s-]*out/i, 'Food/Meals'],
+      [/subway/i, 'Food/Meals'],
+      [/panda\s*express/i, 'Food/Meals'],
+      [/domino'?s|pizza\s*hut|papa\s*john'?s/i, 'Food/Meals'],
+      [/doordash|uber\s*eats|grubhub|postmates/i, 'Food/Meals'],
+      [/catering|cater/i, 'Food/Meals'],
+      [/firestone\s*grill/i, 'Food/Meals'],
+      [/splash\s*cafe/i, 'Food/Meals'],
+      [/high\s*street\s*deli/i, 'Food/Meals'],
+      [/woodstock'?s/i, 'Food/Meals'],
+      [/campus\s*dining/i, 'Food/Meals'],
+      [/sysco|us\s*foods|restaurant\s*depot/i, 'Food/Meals'],
+      [/grocery|trader\s*joe'?s|vons|safeway|albertsons|ralph'?s/i, 'Food/Meals'],
+      [/smart\s*&?\s*final/i, 'Food/Meals'],
+
+      // ── Social ──
+      [/party\s*(?:city|supply)/i, 'Social'],
+      [/total\s*wine|bevmo/i, 'Social'],
+      [/liquor/i, 'Social'],
+      [/dj\s|disc\s*jockey|sound\s*system/i, 'Social'],
+      [/event\s*(?:rental|supply|equipment)/i, 'Social'],
+      [/photo\s*booth/i, 'Social'],
+      [/ticketmaster|stubhub|axs\b/i, 'Social'],
+      [/bowling|topgolf|dave\s*&?\s*buster/i, 'Social'],
+      [/karaoke/i, 'Social'],
+      [/uber(?!\s*eats)|lyft/i, 'Social'],
+      [/limo|party\s*bus|charter\s*bus/i, 'Social'],
+
+      // ── Rush/Recruitment ──
+      [/rush\s*(?:week|event|supply|shirt|banner)/i, 'Rush/Recruitment'],
+      [/vistaprint|custom\s*ink|sticker\s*mule/i, 'Rush/Recruitment'],
+      [/banner|yard\s*sign|flyer|poster/i, 'Rush/Recruitment'],
+      [/recruitment/i, 'Rush/Recruitment'],
+
+      // ── Philanthropy ──
+      [/united\s*way/i, 'Philanthropy'],
+      [/habitat\s*for\s*humanity/i, 'Philanthropy'],
+      [/st\.\s*jude|saint\s*jude/i, 'Philanthropy'],
+      [/red\s*cross/i, 'Philanthropy'],
+      [/special\s*olympics/i, 'Philanthropy'],
+      [/boys\s*&?\s*girls\s*club/i, 'Philanthropy'],
+      [/food\s*bank/i, 'Philanthropy'],
+      [/make[\s-]*a[\s-]*wish/i, 'Philanthropy'],
+      [/wounded\s*warrior/i, 'Philanthropy'],
+      [/charity|charit\b|donation\s*to/i, 'Philanthropy'],
+
+      // ── Operations ──
+      [/staples|office\s*depot|office\s*max/i, 'Operations'],
+      [/amazon(?!\s*prime\s*video)/i, 'Operations'],
+      [/usps|ups\s*store|fedex/i, 'Operations'],
+      [/google\s*workspace|microsoft\s*365|zoom\s*(?:video)?/i, 'Operations'],
+      [/quickbooks|intuit/i, 'Operations'],
+      [/venmo\s*fee|stripe\s*fee|paypal\s*fee|processing\s*fee/i, 'Operations'],
+      [/canva/i, 'Operations'],
+      [/adobe/i, 'Operations'],
+      [/slack/i, 'Operations'],
+      [/bank\s*(?:fee|charge|service)/i, 'Operations'],
+
+      // ── Athletics/Intramurals ──
+      [/intramural/i, 'Athletics/Intramurals'],
+      [/dick'?s\s*sporting/i, 'Athletics/Intramurals'],
+      [/rec\s*center|recreation\s*center/i, 'Athletics/Intramurals'],
+      [/gym\s*membership|fitness/i, 'Athletics/Intramurals'],
+      [/league\s*fee|ref(?:eree)?\s*fee/i, 'Athletics/Intramurals'],
+      [/jersey|uniform\s*order/i, 'Athletics/Intramurals'],
+
+      // ── Chapter Development ──
+      [/leadership\s*(?:retreat|conference|academy)/i, 'Chapter Development'],
+      [/conference\s*(?:fee|registration)/i, 'Chapter Development'],
+      [/workshop/i, 'Chapter Development'],
+      [/training\s*(?:program|seminar)/i, 'Chapter Development'],
+      [/airbnb|vrbo|hotel|marriott|hilton|hyatt/i, 'Chapter Development'],
+      [/southwest|american\s*airlines|united\s*airlines|delta\s*air/i, 'Chapter Development'],
+
+      // ── Income: Member Dues ──
+      [/dues\s*(?:payment|collection|deposit)/i, 'Member Dues'],
+
+      // ── Income: Fundraising ──
+      [/fundrais/i, 'Fundraising'],
+      [/gofundme|givebutter/i, 'Fundraising'],
+      [/car\s*wash\s*(?:proceeds|revenue)/i, 'Fundraising'],
+
+      // ── Income: Alumni Donations ──
+      [/alumni\s*(?:donation|gift|contrib)/i, 'Alumni Donations'],
+
+      // ── Income: Event Ticket Sales ──
+      [/ticket\s*(?:sale|revenue|proceed)/i, 'Event Ticket Sales'],
+      [/formal\s*(?:ticket|revenue)/i, 'Event Ticket Sales'],
+    ];
+
+    // Compound rules (merchant + amount + payment method) — checked before merchant-only rules
+    const tryCompoundRule = (
+      merchantName: string,
+      amount: number | null,
+      paymentMethod: string | null
+    ): string | null => {
+      // Costco > $500 → Social (bulk event purchases)
+      if (/costco/i.test(merchantName) && amount != null && Math.abs(amount) > 500) {
+        return 'Social';
+      }
+      // Costco ≤ $500 → Food/Meals (regular grocery runs)
+      if (/costco/i.test(merchantName) && amount != null && Math.abs(amount) <= 500) {
+        return 'Food/Meals';
+      }
+      // Checks under $400 → Philanthropy
+      if (
+        paymentMethod?.toLowerCase() === 'check' &&
+        amount != null &&
+        Math.abs(amount) < 400
+      ) {
+        return 'Philanthropy';
+      }
+
+      // Merchant-only pattern rules
+      for (const [regex, category] of MERCHANT_RULES) {
+        if (regex.test(merchantName)) {
+          return category;
+        }
+      }
+      return null;
+    };
+
+    // 4b. Compile DB rule regexes once
+    const compiledRules: Array<{ regex: RegExp; categoryId: string | null; source: string }> = [];
+    for (const rule of rules) {
+      try {
+        const regex = new RegExp(rule.merchant_pattern, 'i');
+        const categoryId = categoryMap.get(rule.category) || null;
+        if (categoryId) {
+          compiledRules.push({ regex, categoryId, source: rule.source });
+        }
+      } catch {
+        // Skip invalid regex patterns
+      }
+    }
+
+    // 5. Match expenses against compound rules first, then DB pattern rules
+    const updates: Array<{ id: string; category_id: string }> = [];
+    const errors: string[] = [];
+
+    for (const expense of expenses) {
+      const merchantName = expense.vendor || expense.description || '';
+      if (!merchantName) continue;
+
+      // Try compound rules first
+      const compoundCategory = tryCompoundRule(
+        merchantName,
+        expense.amount ?? null,
+        expense.payment_method ?? null
+      );
+      if (compoundCategory) {
+        const compoundCategoryId = categoryMap.get(compoundCategory);
+        if (compoundCategoryId && compoundCategoryId !== expense.category_id) {
+          updates.push({ id: expense.id, category_id: compoundCategoryId });
+        }
+        continue; // Compound rule matched, skip DB rules
+      }
+
+      // Fall back to DB pattern rules
+      for (const rule of compiledRules) {
+        // Check source compatibility
+        if (rule.source !== 'ALL' && rule.source !== expense.source) continue;
+
+        if (rule.regex.test(merchantName) && rule.categoryId !== expense.category_id) {
+          updates.push({ id: expense.id, category_id: rule.categoryId });
+          break; // First match wins (rules are sorted by priority)
+        }
+      }
+    }
+
+    // 6. Batch update expenses
+    let recategorized = 0;
+    for (const update of updates) {
+      const { error: updateError } = await supabase
+        .from('expenses')
+        .update({ category_id: update.category_id })
+        .eq('id', update.id);
+
+      if (updateError) {
+        errors.push(`Failed to update expense ${update.id}`);
+      } else {
+        recategorized++;
+      }
+    }
+
+    return {
+      success: true,
+      processed: expenses.length,
+      recategorized,
+      unchanged: expenses.length - updates.length,
+      errors,
+    };
+  }
+
+  /**
+   * Get a summary of uncategorized transactions grouped by vendor.
+   * Useful for identifying which vendors need category rules.
+   */
+  static async getUncategorizedVendors(chapterId: string): Promise<Array<{ vendor: string; count: number; descriptions: string[] }>> {
+    const { data: categories } = await supabase
+      .from('budget_categories')
+      .select('id')
+      .eq('chapter_id', chapterId)
+      .eq('name', 'Uncategorized')
+      .eq('is_active', true)
+      .maybeSingle();
+
+    if (!categories) return [];
+
+    const { data: expenses, error } = await supabase
+      .from('expense_details')
+      .select('vendor, description')
+      .eq('chapter_id', chapterId)
+      .eq('category_id', categories.id)
+      .order('vendor');
+
+    if (error || !expenses) return [];
+
+    const vendorMap = new Map<string, { count: number; descriptions: Set<string> }>();
+    for (const exp of expenses) {
+      const key = exp.vendor || exp.description || 'Unknown';
+      const entry = vendorMap.get(key) || { count: 0, descriptions: new Set<string>() };
+      entry.count++;
+      if (exp.description) entry.descriptions.add(exp.description);
+      vendorMap.set(key, entry);
+    }
+
+    return Array.from(vendorMap.entries())
+      .map(([vendor, data]) => ({ vendor, count: data.count, descriptions: Array.from(data.descriptions).slice(0, 3) }))
+      .sort((a, b) => b.count - a.count);
+  }
+
+  /**
+   * Seed category rules for common vendor patterns and immediately apply them.
+   * Rules map vendor regex patterns to budget category names.
+   */
+  static async seedAndApplyRules(
+    chapterId: string,
+    rules: Array<{ pattern: string; category: string }>
+  ): Promise<{ rulesCreated: number; recategorized: number }> {
+    // Get existing category names for validation
+    const { data: categories } = await supabase
+      .from('budget_categories')
+      .select('name')
+      .eq('chapter_id', chapterId)
+      .eq('is_active', true);
+
+    const validCategories = new Set((categories || []).map(c => c.name));
+
+    // Insert rules (skip ones targeting non-existent categories)
+    let rulesCreated = 0;
+    for (const rule of rules) {
+      if (!validCategories.has(rule.category)) {
+        console.warn(`Skipping rule: category "${rule.category}" not found`);
+        continue;
+      }
+
+      const { error } = await supabase
+        .from('category_rules')
+        .insert({
+          chapter_id: chapterId,
+          source: 'ALL',
+          merchant_pattern: rule.pattern,
+          category: rule.category,
+          priority: 500,
+          is_active: true,
+        });
+
+      if (!error) rulesCreated++;
+    }
+
+    // Now apply
+    const result = await this.recategorizeTransactions(chapterId, { recategorizeAll: true });
+
+    return { rulesCreated, recategorized: result.recategorized };
   }
 
   /**

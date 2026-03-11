@@ -40,6 +40,8 @@ export interface CategorizationOptions {
   useAI?: boolean;
   availableCategories?: string[]; // For AI categorization
   plaidCategory?: PlaidCategory; // Plaid's personal_finance_category data
+  amount?: number; // Transaction amount (positive) for amount-based rules
+  paymentMethod?: string | null; // e.g. 'Check', 'ACH', 'Credit Card'
 }
 
 /**
@@ -147,11 +149,18 @@ export async function categorizeTransaction(
   supabase: SupabaseClient,
   options: CategorizationOptions
 ): Promise<CategorizationResult> {
-  const { merchantName, chapterId, source, useAI = false, plaidCategory } = options;
+  const { merchantName, chapterId, source, useAI = false, plaidCategory, amount, paymentMethod } = options;
 
-  console.log(`[Categorization] Starting for merchant: "${merchantName}", source: ${source}`);
+  console.log(`[Categorization] Starting for merchant: "${merchantName}", source: ${source}, amount: ${amount}, method: ${paymentMethod}`);
 
-  // Step 1: Try Plaid category mapping (for Plaid transactions with category data)
+  // Step 1: Try compound rules (merchant + amount + payment method)
+  const compoundResult = await tryCompoundRules(supabase, merchantName, chapterId, amount, paymentMethod);
+  if (compoundResult) {
+    console.log(`[Categorization] Compound rule match found: ${compoundResult.category_name}`);
+    return compoundResult;
+  }
+
+  // Step 2: Try Plaid category mapping (for Plaid transactions with category data)
   if (source === 'PLAID' && plaidCategory) {
     console.log(`[Categorization] Trying Plaid category: ${plaidCategory.primary}/${plaidCategory.detailed} (${plaidCategory.confidence_level})`);
     const plaidResult = await tryPlaidCategoryMapping(supabase, chapterId, plaidCategory);
@@ -161,14 +170,14 @@ export async function categorizeTransaction(
     }
   }
 
-  // Step 2: Try pattern matching
+  // Step 3: Try pattern matching
   const patternResult = await tryPatternMatch(supabase, merchantName, chapterId, source);
   if (patternResult) {
     console.log(`[Categorization] Pattern match found: ${patternResult.category_name}`);
     return patternResult;
   }
 
-  // Step 3: Try AI categorization if enabled
+  // Step 4: Try AI categorization if enabled
   if (useAI) {
     console.log('[Categorization] No pattern match, trying AI...');
     const aiResult = await tryAICategorization(supabase, merchantName, chapterId, options.availableCategories);
@@ -180,10 +189,234 @@ export async function categorizeTransaction(
     }
   }
 
-  // Step 4: Fallback to Uncategorized
+  // Step 5: Fallback to Uncategorized
   console.log('[Categorization] No match found, using Uncategorized');
   const uncategorizedResult = await getUncategorizedCategory(supabase, chapterId);
   return uncategorizedResult;
+}
+
+/**
+ * Merchant-based pattern rules for automatic categorization.
+ * Each entry: [regex pattern, target category name]
+ * Checked in order — first match wins.
+ */
+const MERCHANT_RULES: Array<[RegExp, string]> = [
+  // ── National/IHQ Fees ──
+  [/kappa\s*sigma/i, 'National/IHQ Fees'],
+  [/endowment\s*fund/i, 'National/IHQ Fees'],
+  [/fraternity\s*headquarters/i, 'National/IHQ Fees'],
+  [/ihq|national\s*dues/i, 'National/IHQ Fees'],
+  [/greek\s*life\s*office/i, 'National/IHQ Fees'],
+  [/interfraternity\s*council|^ifc\b/i, 'National/IHQ Fees'],
+  [/panhellenic/i, 'National/IHQ Fees'],
+  [/npc\s*fees/i, 'National/IHQ Fees'],
+
+  // ── Fines (city tickets, noise violations) ──
+  [/slo\s*city/i, 'Fines'],
+  [/city\s*of\s*san\s*luis/i, 'Fines'],
+  [/noise\s*violation/i, 'Fines'],
+  [/code\s*enforcement/i, 'Fines'],
+  [/municipal\s*court/i, 'Fines'],
+  [/parking\s*citation/i, 'Fines'],
+
+  // ── Insurance ──
+  [/state\s*farm/i, 'Insurance'],
+  [/geico/i, 'Insurance'],
+  [/allstate/i, 'Insurance'],
+  [/liberty\s*mutual/i, 'Insurance'],
+  [/holmes\s*murphy/i, 'Insurance'],
+  [/fraternal\s*insurance/i, 'Insurance'],
+  [/mj\s*insurance/i, 'Insurance'],
+  [/james\s*r\.\s*favor/i, 'Insurance'],
+  [/greek\s*insurance/i, 'Insurance'],
+
+  // ── Housing ──
+  [/pg&?e|pacific\s*gas/i, 'Housing'],
+  [/edison|southern\s*cal.*electric/i, 'Housing'],
+  [/water\s*(?:bill|dept|utility|district)/i, 'Housing'],
+  [/sewer/i, 'Housing'],
+  [/garbage|waste\s*management|trash/i, 'Housing'],
+  [/spectrum|comcast|xfinity|at&?t.*internet|frontier/i, 'Housing'],
+  [/home\s*depot|lowe'?s|ace\s*hardware/i, 'Housing'],
+  [/plumb|electrician|hvac|roofing|handyman/i, 'Housing'],
+  [/campus\s*realty/i, 'Housing'],
+  [/property\s*management/i, 'Housing'],
+  [/rent|lease\s*payment/i, 'Housing'],
+  [/cleaning\s*(?:service|crew|supplies)/i, 'Housing'],
+
+  // ── Food/Meals ──
+  [/chipotle/i, 'Food/Meals'],
+  [/chick[\s-]*fil[\s-]*a/i, 'Food/Meals'],
+  [/mcdonald'?s/i, 'Food/Meals'],
+  [/taco\s*bell/i, 'Food/Meals'],
+  [/wendy'?s/i, 'Food/Meals'],
+  [/in[\s-]*n[\s-]*out/i, 'Food/Meals'],
+  [/subway/i, 'Food/Meals'],
+  [/panda\s*express/i, 'Food/Meals'],
+  [/domino'?s|pizza\s*hut|papa\s*john'?s/i, 'Food/Meals'],
+  [/doordash|uber\s*eats|grubhub|postmates/i, 'Food/Meals'],
+  [/catering|cater/i, 'Food/Meals'],
+  [/firestone\s*grill/i, 'Food/Meals'],
+  [/splash\s*cafe/i, 'Food/Meals'],
+  [/high\s*street\s*deli/i, 'Food/Meals'],
+  [/woodstock'?s/i, 'Food/Meals'],
+  [/campus\s*dining/i, 'Food/Meals'],
+  [/sysco|us\s*foods|restaurant\s*depot/i, 'Food/Meals'],
+  [/grocery|trader\s*joe'?s|vons|safeway|albertsons|ralph'?s/i, 'Food/Meals'],
+  [/smart\s*&?\s*final/i, 'Food/Meals'],
+
+  // ── Social (events, parties, entertainment) ──
+  [/party\s*(?:city|supply)/i, 'Social'],
+  [/total\s*wine|bevmo/i, 'Social'],
+  [/liquor/i, 'Social'],
+  [/dj\s|disc\s*jockey|sound\s*system/i, 'Social'],
+  [/event\s*(?:rental|supply|equipment)/i, 'Social'],
+  [/photo\s*booth/i, 'Social'],
+  [/ticketmaster|stubhub|axs\b/i, 'Social'],
+  [/bowling|topgolf|dave\s*&?\s*buster/i, 'Social'],
+  [/karaoke/i, 'Social'],
+  [/uber(?!\s*eats)|lyft/i, 'Social'],
+  [/limo|party\s*bus|charter\s*bus/i, 'Social'],
+
+  // ── Rush/Recruitment ──
+  [/rush\s*(?:week|event|supply|shirt|banner)/i, 'Rush/Recruitment'],
+  [/vistaprint|custom\s*ink|sticker\s*mule/i, 'Rush/Recruitment'],
+  [/banner|yard\s*sign|flyer|poster/i, 'Rush/Recruitment'],
+  [/recruitment/i, 'Rush/Recruitment'],
+
+  // ── Philanthropy ──
+  [/united\s*way/i, 'Philanthropy'],
+  [/habitat\s*for\s*humanity/i, 'Philanthropy'],
+  [/st\.\s*jude|saint\s*jude/i, 'Philanthropy'],
+  [/red\s*cross/i, 'Philanthropy'],
+  [/special\s*olympics/i, 'Philanthropy'],
+  [/boys\s*&?\s*girls\s*club/i, 'Philanthropy'],
+  [/food\s*bank/i, 'Philanthropy'],
+  [/make[\s-]*a[\s-]*wish/i, 'Philanthropy'],
+  [/wounded\s*warrior/i, 'Philanthropy'],
+  [/charity|charit\b|donation\s*to/i, 'Philanthropy'],
+
+  // ── Operations ──
+  [/staples|office\s*depot|office\s*max/i, 'Operations'],
+  [/amazon(?!\s*prime\s*video)/i, 'Operations'],
+  [/usps|ups\s*store|fedex/i, 'Operations'],
+  [/google\s*workspace|microsoft\s*365|zoom\s*(?:video)?/i, 'Operations'],
+  [/quickbooks|intuit/i, 'Operations'],
+  [/venmo\s*fee|stripe\s*fee|paypal\s*fee|processing\s*fee/i, 'Operations'],
+  [/canva/i, 'Operations'],
+  [/adobe/i, 'Operations'],
+  [/slack/i, 'Operations'],
+  [/bank\s*(?:fee|charge|service)/i, 'Operations'],
+
+  // ── Athletics/Intramurals ──
+  [/intramural/i, 'Athletics/Intramurals'],
+  [/dick'?s\s*sporting/i, 'Athletics/Intramurals'],
+  [/rec\s*center|recreation\s*center/i, 'Athletics/Intramurals'],
+  [/gym\s*membership|fitness/i, 'Athletics/Intramurals'],
+  [/league\s*fee|ref(?:eree)?\s*fee/i, 'Athletics/Intramurals'],
+  [/jersey|uniform\s*order/i, 'Athletics/Intramurals'],
+
+  // ── Chapter Development ──
+  [/leadership\s*(?:retreat|conference|academy)/i, 'Chapter Development'],
+  [/conference\s*(?:fee|registration)/i, 'Chapter Development'],
+  [/workshop/i, 'Chapter Development'],
+  [/training\s*(?:program|seminar)/i, 'Chapter Development'],
+  [/airbnb|vrbo|hotel|marriott|hilton|hyatt/i, 'Chapter Development'],
+  [/southwest|american\s*airlines|united\s*airlines|delta\s*air/i, 'Chapter Development'],
+
+  // ── Income: Member Dues ──
+  [/dues\s*(?:payment|collection|deposit)/i, 'Member Dues'],
+
+  // ── Income: Fundraising ──
+  [/fundrais/i, 'Fundraising'],
+  [/gofundme|givebutter/i, 'Fundraising'],
+  [/car\s*wash\s*(?:proceeds|revenue)/i, 'Fundraising'],
+
+  // ── Income: Alumni Donations ──
+  [/alumni\s*(?:donation|gift|contrib)/i, 'Alumni Donations'],
+
+  // ── Income: Event Ticket Sales ──
+  [/ticket\s*(?:sale|revenue|proceed)/i, 'Event Ticket Sales'],
+  [/formal\s*(?:ticket|revenue)/i, 'Event Ticket Sales'],
+];
+
+/**
+ * Compound rules that use merchant name + amount + payment method together.
+ * These encode chapter-specific business knowledge that simple regex patterns can't capture.
+ *
+ * Checked first (before merchant-only rules) because they are more specific.
+ */
+function matchCompoundRule(
+  name: string,
+  amount?: number,
+  paymentMethod?: string | null
+): string | null {
+  // Costco > $500 → Social (bulk event purchases)
+  if (/costco/i.test(name) && amount != null && amount > 500) {
+    return 'Social';
+  }
+  // Costco ≤ $500 → Food/Meals (regular grocery runs)
+  if (/costco/i.test(name) && amount != null && amount <= 500) {
+    return 'Food/Meals';
+  }
+  // Checks under $400 → Philanthropy
+  if (
+    paymentMethod?.toLowerCase() === 'check' &&
+    amount != null &&
+    amount < 400
+  ) {
+    return 'Philanthropy';
+  }
+  return null;
+}
+
+/**
+ * Try compound rules (merchant + amount + payment method) first,
+ * then fall through to merchant-only pattern rules.
+ */
+async function tryCompoundRules(
+  supabase: SupabaseClient,
+  merchantName: string,
+  chapterId: string,
+  amount?: number,
+  paymentMethod?: string | null
+): Promise<CategorizationResult | null> {
+  // 1. Compound rules (amount/payment-method dependent)
+  let targetCategory = matchCompoundRule(merchantName, amount, paymentMethod);
+
+  // 2. Merchant-only pattern rules
+  if (!targetCategory) {
+    for (const [regex, category] of MERCHANT_RULES) {
+      if (regex.test(merchantName)) {
+        targetCategory = category;
+        break;
+      }
+    }
+  }
+
+  if (!targetCategory) return null;
+
+  // Resolve category name to category_id
+  const { data: category, error } = await supabase
+    .from('budget_categories')
+    .select('id, name')
+    .eq('chapter_id', chapterId)
+    .ilike('name', targetCategory)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (error || !category) {
+    console.warn(`[Categorization] Compound rule target "${targetCategory}" not found for chapter ${chapterId}`);
+    return null;
+  }
+
+  console.log(`[Categorization] Compound rule matched: "${merchantName}" (amount=${amount}, method=${paymentMethod}) -> ${category.name}`);
+  return {
+    category_id: category.id,
+    category_name: category.name,
+    matched_by: 'pattern',
+    confidence: 0.90,
+  };
 }
 
 /**
@@ -424,7 +657,9 @@ async function getUncategorizedCategory(
         .insert({
           chapter_id: chapterId,
           name: 'Uncategorized',
-          type: 'Operational Costs',
+          type: 'Operations',
+          expense_type: 'Operations',
+          category_usage_type: 'both',
           description: 'Transactions that could not be automatically categorized',
           is_active: true,
         })
@@ -466,6 +701,8 @@ export async function categorizeBatch(
   transactions: Array<{
     merchantName: string;
     transactionId?: string;
+    amount?: number;
+    paymentMethod?: string | null;
   }>,
   chapterId: string,
   source: 'PLAID' | 'MANUAL' | 'CSV_IMPORT',
@@ -489,6 +726,8 @@ export async function categorizeBatch(
         merchantName: transaction.merchantName,
         chapterId,
         source,
+        amount: transaction.amount,
+        paymentMethod: transaction.paymentMethod,
         useAI,
         availableCategories,
       });

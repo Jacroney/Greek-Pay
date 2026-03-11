@@ -38,6 +38,46 @@ function getPlaidCredentials(environment: string): { clientId: string; secret: s
 // TEMPORARILY DISABLED for faster bulk sync - run recategorize-transactions afterward
 const USE_AI_CATEGORIZATION = false; // Deno.env.get('USE_AI_CATEGORIZATION') !== 'false';
 
+// Payment platforms and services that represent fund transfers, not actual spending.
+// Transactions to these are labeled 'transfer' instead of 'expense'.
+const TRANSFER_SERVICE_PATTERNS = [
+  /\bswitch\b/i,
+  /\bgrink\b/i,
+];
+
+// Plaid primary categories that indicate transfers rather than spending
+const PLAID_TRANSFER_CATEGORIES = new Set([
+  'TRANSFER_OUT',
+  'TRANSFER_IN',
+]);
+
+/**
+ * Determine transaction_type for a Plaid transaction.
+ * Checks merchant name against known transfer services and Plaid's category data.
+ */
+function getTransactionType(
+  amount: number,
+  merchantName: string | null,
+  plaidPrimaryCategory?: string
+): 'expense' | 'income' | 'transfer' {
+  // Check Plaid category for transfer classification
+  if (plaidPrimaryCategory && PLAID_TRANSFER_CATEGORIES.has(plaidPrimaryCategory)) {
+    return 'transfer';
+  }
+
+  // Check merchant name against known transfer services
+  if (merchantName) {
+    for (const pattern of TRANSFER_SERVICE_PATTERNS) {
+      if (pattern.test(merchantName)) {
+        return 'transfer';
+      }
+    }
+  }
+
+  // Default: positive amount = expense (money out), negative = income (money in)
+  return amount < 0 ? 'income' : 'expense';
+}
+
 // Helper function to get current period for a chapter
 async function getCurrentPeriodId(supabase: any, chapterId: string): Promise<string | null> {
   try {
@@ -255,6 +295,14 @@ serve(async (req) => {
             confidence_level: transaction.personal_finance_category.confidence_level || 'UNKNOWN',
           } : undefined;
 
+          // Determine payment method from Plaid data
+          const paymentChannel = transaction.payment_channel || '';
+          const plaidPaymentMethod =
+            paymentChannel === 'online' ? 'ACH' :
+            paymentChannel === 'in store' ? 'Credit Card' :
+            paymentChannel === 'other' ? 'Check' :
+            'ACH';
+
           // Use centralized categorization service with Plaid category mapping + AI fallback
           const categorizationResult = await categorizeTransaction(supabase, {
             merchantName,
@@ -262,6 +310,8 @@ serve(async (req) => {
             source: 'PLAID',
             useAI: USE_AI_CATEGORIZATION,
             plaidCategory,
+            amount: Math.abs(transaction.amount),
+            paymentMethod: plaidPaymentMethod,
           });
 
           const accountDbId = accountIdMap.get(transaction.account_id);
@@ -279,10 +329,10 @@ serve(async (req) => {
               description: transaction.name,
               vendor: transaction.merchant_name,
               transaction_date: transaction.date,
-              payment_method: 'ACH',
+              payment_method: plaidPaymentMethod,
               status: 'completed',
               source: 'PLAID',
-              transaction_type: transaction.amount < 0 ? 'income' : 'expense', // Plaid: positive = expense (money out), negative = income (money in)
+              transaction_type: getTransactionType(transaction.amount, transaction.merchant_name, plaidCategory?.primary),
               plaid_transaction_id: transaction.transaction_id,
               account_id: accountDbId || null,
               created_by: user.id,
@@ -315,7 +365,7 @@ serve(async (req) => {
               description: transaction.name,
               vendor: transaction.merchant_name,
               transaction_date: transaction.date,
-              transaction_type: transaction.amount < 0 ? 'income' : 'expense', // Plaid: positive = expense (money out), negative = income (money in)
+              transaction_type: getTransactionType(transaction.amount, transaction.merchant_name, transaction.personal_finance_category?.primary),
             })
             .eq('plaid_transaction_id', transaction.transaction_id)
             .select();
@@ -338,6 +388,14 @@ serve(async (req) => {
               confidence_level: transaction.personal_finance_category.confidence_level || 'UNKNOWN',
             } : undefined;
 
+            // Determine payment method from Plaid data
+            const modPaymentChannel = transaction.payment_channel || '';
+            const modPaymentMethod =
+              modPaymentChannel === 'online' ? 'ACH' :
+              modPaymentChannel === 'in store' ? 'Credit Card' :
+              modPaymentChannel === 'other' ? 'Check' :
+              'ACH';
+
             // Use centralized categorization service with Plaid category mapping + AI fallback
             const categorizationResult = await categorizeTransaction(supabase, {
               merchantName,
@@ -345,6 +403,8 @@ serve(async (req) => {
               source: 'PLAID',
               useAI: USE_AI_CATEGORIZATION,
               plaidCategory,
+              amount: Math.abs(transaction.amount),
+              paymentMethod: modPaymentMethod,
             });
 
             const accountDbId = accountIdMap.get(transaction.account_id);
@@ -362,10 +422,10 @@ serve(async (req) => {
                 description: transaction.name,
                 vendor: transaction.merchant_name,
                 transaction_date: transaction.date,
-                payment_method: 'ACH',
+                payment_method: modPaymentMethod,
                 status: 'completed',
                 source: 'PLAID',
-                transaction_type: transaction.amount < 0 ? 'income' : 'expense', // Plaid: positive = expense (money out), negative = income (money in)
+                transaction_type: getTransactionType(transaction.amount, transaction.merchant_name, plaidCategory?.primary),
                 plaid_transaction_id: transaction.transaction_id,
                 account_id: accountDbId || null,
                 created_by: user.id,

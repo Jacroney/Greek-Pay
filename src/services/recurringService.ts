@@ -24,8 +24,8 @@ export class RecurringService {
         .recurring.filter(item => item.chapter_id === chapterId)
         .map(item => ({
           ...item,
-          category_name: 'Operational Costs',
-          category_type: 'Operational Costs',
+          category_name: 'Operations',
+          category_type: 'Operations',
           period_name: 'FY25 – Spring'
         }));
     }

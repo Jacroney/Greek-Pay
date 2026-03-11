@@ -375,7 +375,7 @@ export class BudgetService {
             id: demoHelpers.nextId(),
             chapter_id: chapterId,
             category_name: 'Misc',
-            category_type: 'Operational Costs',
+            category_type: 'Operations',
             period_name: 'FY25 – Spring',
             period_type: 'Semester',
             fiscal_year: 2025,
@@ -500,67 +500,40 @@ export class BudgetService {
   }
 
   static async getTotalsByPeriod(chapterId: string, periodName: string) {
-    if (isDemoModeEnabled()) {
-      const summaryData = await this.getBudgetSummary(chapterId, periodName);
-      const totals = {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
+    const buildTotals = (summaryData: BudgetSummary[]) => {
+      const totals: Record<string, { allocated: number; spent: number; remaining: number }> = {
         'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
       };
       summaryData.forEach(item => {
-        if (item.category_type in totals) {
-          totals[item.category_type as 'Fixed Costs' | 'Operational Costs' | 'Event Costs'].allocated += item.allocated;
-          totals[item.category_type as 'Fixed Costs' | 'Operational Costs' | 'Event Costs'].spent += item.spent;
-          totals[item.category_type as 'Fixed Costs' | 'Operational Costs' | 'Event Costs'].remaining += item.remaining;
+        if (!totals[item.category_type]) {
+          totals[item.category_type] = { allocated: 0, spent: 0, remaining: 0 };
         }
+        totals[item.category_type].allocated += item.allocated;
+        totals[item.category_type].spent += item.spent;
+        totals[item.category_type].remaining += item.remaining;
         totals['Grand Total'].allocated += item.allocated;
         totals['Grand Total'].spent += item.spent;
         totals['Grand Total'].remaining += item.remaining;
       });
       return totals;
+    };
+
+    if (isDemoModeEnabled()) {
+      const summaryData = await this.getBudgetSummary(chapterId, periodName);
+      return buildTotals(summaryData);
     }
 
     if (!chapterId) {
       console.warn('Chapter ID is required for getTotalsByPeriod');
-      return {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
-      };
+      return { 'Grand Total': { allocated: 0, spent: 0, remaining: 0 } };
     }
 
     try {
       const summaryData = await this.getBudgetSummary(chapterId, periodName);
-
-      const totals = {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
-      };
-
-      summaryData.forEach(item => {
-        if (item.category_type in totals) {
-          totals[item.category_type].allocated += item.allocated;
-          totals[item.category_type].spent += item.spent;
-          totals[item.category_type].remaining += item.remaining;
-        }
-        totals['Grand Total'].allocated += item.allocated;
-        totals['Grand Total'].spent += item.spent;
-        totals['Grand Total'].remaining += item.remaining;
-      });
-
-      return totals;
+      return buildTotals(summaryData);
     } catch (error) {
       console.warn('Error fetching totals by period:', error);
-      return {
-        'Fixed Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Operational Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Event Costs': { allocated: 0, spent: 0, remaining: 0 },
-        'Grand Total': { allocated: 0, spent: 0, remaining: 0 }
-      };
+      return { 'Grand Total': { allocated: 0, spent: 0, remaining: 0 } };
     }
   }
 }

@@ -3,210 +3,281 @@ import { Check, X, DollarSign, Calendar, ArrowRight, ArrowLeft, Info } from 'luc
 import toast from 'react-hot-toast';
 import { ExpenseService } from '../services/expenseService';
 import { formatCurrency } from '../utils/currency';
+import type { ExpenseCategoryType, IncomeCategoryType, CategoryUsageType } from '../services/types';
 
 interface RecommendedCategory {
   name: string;
-  type: 'Fixed Costs' | 'Operational Costs' | 'Event Costs';
+  expense_type: ExpenseCategoryType | null;
+  income_type: IncomeCategoryType | null;
+  category_usage_type: CategoryUsageType;
   description: string;
   suggestedAmount: number;
   required: boolean;
 }
 
 const RECOMMENDED_CATEGORIES: RecommendedCategory[] = [
-  // Fixed Costs
+  // National/IHQ Fees
   {
     name: 'IFC Dues',
-    type: 'Fixed Costs',
+    expense_type: 'National/IHQ Fees',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Inter-Fraternity Council membership fees',
     suggestedAmount: 500,
     required: true
   },
   {
     name: 'National Chapter Dues',
-    type: 'Fixed Costs',
+    expense_type: 'National/IHQ Fees',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'National headquarters membership fees',
     suggestedAmount: 2000,
     required: true
   },
+
+  // Housing
   {
     name: 'Rent',
-    type: 'Fixed Costs',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'House rent or facility lease payments',
     suggestedAmount: 5000,
     required: false
   },
   {
     name: 'Utilities',
-    type: 'Fixed Costs',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Water, electricity, gas, internet',
     suggestedAmount: 800,
     required: false
   },
   {
-    name: 'Insurance',
-    type: 'Fixed Costs',
-    description: 'Property and liability insurance',
-    suggestedAmount: 1200,
+    name: 'House Maintenance',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Repairs, cleaning supplies, general upkeep',
+    suggestedAmount: 1000,
     required: false
   },
   {
     name: 'Cleaning Services',
-    type: 'Fixed Costs',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Regular house cleaning and janitorial services',
     suggestedAmount: 600,
     required: false
   },
   {
     name: 'Security System',
-    type: 'Fixed Costs',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Alarm monitoring, cameras, and security equipment',
     suggestedAmount: 300,
     required: false
   },
   {
-    name: 'Legal & Compliance',
-    type: 'Fixed Costs',
-    description: 'Legal fees, chapter incorporation, compliance costs',
-    suggestedAmount: 400,
-    required: false
-  },
-
-  // Operational Costs
-  {
-    name: 'House Maintenance',
-    type: 'Operational Costs',
-    description: 'Repairs, cleaning supplies, general upkeep',
-    suggestedAmount: 1000,
-    required: false
-  },
-  {
-    name: 'Brotherhood Events',
-    type: 'Operational Costs',
-    description: 'Member bonding activities and dinners',
-    suggestedAmount: 800,
-    required: false
-  },
-  {
-    name: 'Philanthropy',
-    type: 'Operational Costs',
-    description: 'Charitable events and donations',
+    name: 'Furniture & Decorations',
+    expense_type: 'Housing',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'House furnishings, decor, composite photos',
     suggestedAmount: 600,
     required: false
   },
+
+  // Insurance
   {
-    name: 'Marketing & Recruitment',
-    type: 'Operational Costs',
-    description: 'Rush materials, advertising, chapter promotion',
-    suggestedAmount: 500,
+    name: 'Insurance',
+    expense_type: 'Insurance',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Property and liability insurance',
+    suggestedAmount: 1200,
     required: false
   },
+
+  // Operations
   {
     name: 'Office Supplies',
-    type: 'Operational Costs',
+    expense_type: 'Operations',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Printing, paper, general supplies',
     suggestedAmount: 200,
     required: false
   },
   {
-    name: 'Food & Dining',
-    type: 'Operational Costs',
-    description: 'Chef, groceries, catering for chapter meetings',
-    suggestedAmount: 1500,
-    required: false
-  },
-  {
-    name: 'Apparel & Merchandise',
-    type: 'Operational Costs',
-    description: 'T-shirts, letters, promotional items',
-    suggestedAmount: 700,
-    required: false
-  },
-  {
     name: 'Technology & Software',
-    type: 'Operational Costs',
+    expense_type: 'Operations',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Website hosting, management software, subscriptions',
     suggestedAmount: 300,
     required: false
   },
   {
-    name: 'Kitchen Equipment',
-    type: 'Operational Costs',
-    description: 'Appliances, cookware, dishes',
+    name: 'Legal & Compliance',
+    expense_type: 'Operations',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Legal fees, chapter incorporation, compliance costs',
     suggestedAmount: 400,
     required: false
   },
   {
-    name: 'Furniture & Decorations',
-    type: 'Operational Costs',
-    description: 'House furnishings, decor, composite photos',
-    suggestedAmount: 600,
-    required: false
-  },
-  {
-    name: 'New Member Education',
-    type: 'Operational Costs',
-    description: 'Pledging materials, initiation supplies',
-    suggestedAmount: 500,
-    required: false
-  },
-  {
-    name: 'Awards & Recognition',
-    type: 'Operational Costs',
-    description: 'Scholarships, trophies, member awards',
-    suggestedAmount: 400,
+    name: 'Apparel & Merchandise',
+    expense_type: 'Operations',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'T-shirts, letters, promotional items',
+    suggestedAmount: 700,
     required: false
   },
   {
     name: 'Transportation',
-    type: 'Operational Costs',
+    expense_type: 'Operations',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Van rental, parking permits, gas',
     suggestedAmount: 300,
     required: false
   },
 
-  // Event Costs
+  // Food/Meals
+  {
+    name: 'Food & Dining',
+    expense_type: 'Food/Meals',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Chef, groceries, catering for chapter meetings',
+    suggestedAmount: 1500,
+    required: false
+  },
+  {
+    name: 'Kitchen Equipment',
+    expense_type: 'Food/Meals',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Appliances, cookware, dishes',
+    suggestedAmount: 400,
+    required: false
+  },
+
+  // Social
   {
     name: 'Social Events',
-    type: 'Event Costs',
+    expense_type: 'Social',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Parties, mixers, and social gatherings',
     suggestedAmount: 2000,
     required: false
   },
   {
     name: 'Formal Events',
-    type: 'Event Costs',
+    expense_type: 'Social',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Formal dances and date functions',
     suggestedAmount: 3000,
     required: false
   },
   {
     name: 'Homecoming & Traditions',
-    type: 'Event Costs',
+    expense_type: 'Social',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Homecoming activities and annual traditions',
     suggestedAmount: 1500,
     required: false
   },
   {
     name: 'Alumni Events',
-    type: 'Event Costs',
+    expense_type: 'Social',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Alumni reunions and gatherings',
     suggestedAmount: 800,
     required: false
   },
   {
+    name: 'Brotherhood Events',
+    expense_type: 'Social',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Member bonding activities and dinners',
+    suggestedAmount: 800,
+    required: false
+  },
+
+  // Philanthropy
+  {
+    name: 'Philanthropy',
+    expense_type: 'Philanthropy',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Charitable events and donations',
+    suggestedAmount: 600,
+    required: false
+  },
+
+  // Rush/Recruitment
+  {
+    name: 'Marketing & Recruitment',
+    expense_type: 'Rush/Recruitment',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Rush materials, advertising, chapter promotion',
+    suggestedAmount: 500,
+    required: false
+  },
+  {
+    name: 'New Member Education',
+    expense_type: 'Rush/Recruitment',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Pledging materials, initiation supplies',
+    suggestedAmount: 500,
+    required: false
+  },
+
+  // Athletics/Intramurals
+  {
     name: 'Intramurals & Sports',
-    type: 'Event Costs',
+    expense_type: 'Athletics/Intramurals',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Team registrations, equipment, jerseys',
     suggestedAmount: 600,
     required: false
   },
+
+  // Chapter Development
   {
     name: 'Conferences & Conventions',
-    type: 'Event Costs',
+    expense_type: 'Chapter Development',
+    income_type: null,
+    category_usage_type: 'expense',
     description: 'Leadership conferences, regional events',
     suggestedAmount: 1000,
     required: false
-  }
+  },
+  {
+    name: 'Awards & Recognition',
+    expense_type: 'Chapter Development',
+    income_type: null,
+    category_usage_type: 'expense',
+    description: 'Scholarships, trophies, member awards',
+    suggestedAmount: 400,
+    required: false
+  },
 ];
 
 interface BudgetSetupWizardProps {
@@ -262,7 +333,10 @@ const BudgetSetupWizard: React.FC<BudgetSetupWizardProps> = ({ chapterId, onComp
         if (selectedCategories.has(recCat.name)) {
           const category = await ExpenseService.addCategory(chapterId, {
             name: recCat.name,
-            type: recCat.type,
+            type: recCat.expense_type || recCat.income_type || 'Operations',
+            expense_type: recCat.expense_type,
+            income_type: recCat.income_type,
+            category_usage_type: recCat.category_usage_type,
             description: recCat.description,
             is_active: true
           });
@@ -336,11 +410,13 @@ const BudgetSetupWizard: React.FC<BudgetSetupWizardProps> = ({ chapterId, onComp
   );
 
   const renderCategories = () => {
-    const groupedCategories = {
-      'Fixed Costs': RECOMMENDED_CATEGORIES.filter(c => c.type === 'Fixed Costs'),
-      'Operational Costs': RECOMMENDED_CATEGORIES.filter(c => c.type === 'Operational Costs'),
-      'Event Costs': RECOMMENDED_CATEGORIES.filter(c => c.type === 'Event Costs')
-    };
+    // Group by expense_type dynamically
+    const groupedCategories: Record<string, RecommendedCategory[]> = {};
+    for (const cat of RECOMMENDED_CATEGORIES) {
+      const key = cat.expense_type || 'Other';
+      if (!groupedCategories[key]) groupedCategories[key] = [];
+      groupedCategories[key].push(cat);
+    }
 
     return (
       <div>
@@ -567,7 +643,7 @@ const BudgetSetupWizard: React.FC<BudgetSetupWizardProps> = ({ chapterId, onComp
                     {category.name}
                   </h4>
                   <p className="text-sm text-gray-600 mt-1">
-                    {category.type}
+                    {category.expense_type || category.income_type || 'Other'}
                   </p>
                 </div>
                 <div className="flex items-center gap-2">
@@ -622,8 +698,9 @@ const BudgetSetupWizard: React.FC<BudgetSetupWizardProps> = ({ chapterId, onComp
     );
 
     const groupedByType = selectedCategoriesArray.reduce((acc, cat) => {
-      if (!acc[cat.type]) acc[cat.type] = [];
-      acc[cat.type].push(cat);
+      const key = cat.expense_type || cat.income_type || 'Other';
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(cat);
       return acc;
     }, {} as Record<string, typeof selectedCategoriesArray>);
 
