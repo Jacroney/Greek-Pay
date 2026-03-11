@@ -6,7 +6,6 @@ import { Transaction, BudgetPeriod, ExpenseDetail } from '../services/types';
 import { CSVService } from '../services/csvService';
 import { TransactionService } from '../services/transactionService';
 import { ExpenseService } from '../services/expenseService';
-import { supabase } from '../services/supabaseClient';
 import { isDemoModeEnabled } from '../utils/env';
 
 // Sorting types
@@ -162,40 +161,20 @@ const Transactions: React.FC = () => {
     const toastId = toast.loading('Recategorizing transactions...');
 
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) {
-        throw new Error('Not authenticated');
-      }
-
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/recategorize-transactions`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            recategorize_all: true,
-            limit: 1000,
-          }),
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to recategorize');
-      }
+      const result = await ExpenseService.recategorizeTransactions(currentChapter.id, {
+        recategorizeAll: true,
+      });
 
       await Promise.all([refreshData(), fetchExpenses()]);
-      toast.success(
-        `Recategorized ${result.recategorized} of ${result.processed} transactions`,
-        { id: toastId }
-      );
 
       if (result.recategorized > 0) {
+        toast.success(
+          `Recategorized ${result.recategorized} of ${result.processed} transactions`,
+          { id: toastId }
+        );
         console.log('Recategorization results:', result);
+      } else {
+        toast.success('All transactions already have correct categories', { id: toastId });
       }
     } catch (err) {
       console.error('Recategorization error:', err);

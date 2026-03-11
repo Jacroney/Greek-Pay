@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { X, Plus, Check } from 'lucide-react';
-import { BudgetCategory, BudgetPeriod, Expense, ExpenseDetail } from '../services/types';
+import { BudgetCategory, BudgetPeriod, Expense, ExpenseDetail, CategoryUsageType } from '../services/types';
 import { ExpenseService } from '../services/expenseService';
+import { EXPENSE_CATEGORY_TYPES, INCOME_CATEGORY_TYPES } from '../constants/categoryTypes';
 import toast from 'react-hot-toast';
 
 interface ExpenseModalProps {
@@ -43,7 +44,10 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
   const [showCategoryCreate, setShowCategoryCreate] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: '',
-    type: 'Operational Costs' as 'Fixed Costs' | 'Operational Costs' | 'Event Costs',
+    type: 'Operations',
+    expense_type: 'Operations' as string,
+    income_type: '' as string,
+    category_usage_type: 'expense' as CategoryUsageType,
     description: ''
   });
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
@@ -116,7 +120,10 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
     try {
       const created = await ExpenseService.addCategory(chapterId, {
         name: newCategory.name.trim(),
-        type: newCategory.type,
+        type: newCategory.expense_type || newCategory.income_type || 'Operations',
+        expense_type: newCategory.category_usage_type !== 'income' ? newCategory.expense_type as any : null,
+        income_type: newCategory.category_usage_type !== 'expense' ? newCategory.income_type as any : null,
+        category_usage_type: newCategory.category_usage_type,
         description: newCategory.description.trim() || null,
         is_active: true
       });
@@ -128,7 +135,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
       setFormData({ ...formData, category_id: created.id });
 
       // Reset form and hide
-      setNewCategory({ name: '', type: 'Operational Costs', description: '' });
+      setNewCategory({ name: '', type: 'Operations', expense_type: 'Operations', income_type: '', category_usage_type: 'expense', description: '' });
       setShowCategoryCreate(false);
 
       toast.success('Category created successfully');
@@ -172,6 +179,45 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
 
       if (mode === 'edit' && existingExpense) {
         await ExpenseService.updateExpense(existingExpense.id, expenseData);
+
+        // If category changed and expense has a vendor, offer to save as rule
+        const categoryChanged = formData.category_id !== existingExpense.category_id;
+        const vendor = formData.vendor?.trim();
+        if (categoryChanged && vendor) {
+          const selectedCategory = localCategories.find(c => c.id === formData.category_id);
+          if (selectedCategory) {
+            toast((t) => (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-gray-700">
+                  Always categorize <span className="font-semibold">"{vendor}"</span> as{' '}
+                  <span className="font-semibold">"{selectedCategory.name}"</span>?
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    onClick={async () => {
+                      toast.dismiss(t.id);
+                      try {
+                        await ExpenseService.saveCategoryRule(chapterId, vendor, selectedCategory.name, 'ALL');
+                        toast.success('Rule saved! Future transactions will auto-categorize.');
+                      } catch {
+                        toast.error('Failed to save rule');
+                      }
+                    }}
+                    className="px-3 py-1 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary/90"
+                  >
+                    Save Rule
+                  </button>
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="px-3 py-1 text-xs font-medium text-gray-600 hover:bg-gray-100 rounded-lg"
+                  >
+                    Skip
+                  </button>
+                </div>
+              </div>
+            ), { duration: 8000 });
+          }
+        }
       } else {
         await ExpenseService.addExpense(chapterId, expenseData);
       }
@@ -217,17 +263,39 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
               required
             >
               <option value="">Select a category</option>
-              {['Fixed Costs', 'Operational Costs', 'Event Costs'].map(type => (
-                <optgroup key={type} label={type}>
-                  {localCategories
-                    .filter(c => c.type === type)
-                    .map(category => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
+              {(() => {
+                const expenseCategories = localCategories.filter(c => c.category_usage_type !== 'income');
+                const incomeCategories = localCategories.filter(c => c.category_usage_type === 'income' || c.category_usage_type === 'both');
+                // Group expense categories by expense_type
+                const expenseGroups = new Map<string, BudgetCategory[]>();
+                expenseCategories.forEach(c => {
+                  const key = c.expense_type || c.type || 'Other';
+                  if (!expenseGroups.has(key)) expenseGroups.set(key, []);
+                  expenseGroups.get(key)!.push(c);
+                });
+                return (
+                  <>
+                    {Array.from(expenseGroups.entries()).map(([groupName, cats]) => (
+                      <optgroup key={groupName} label={groupName}>
+                        {cats.map(category => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))}
-                </optgroup>
-              ))}
+                    {incomeCategories.length > 0 && (
+                      <optgroup label="Income">
+                        {incomeCategories.map(category => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))}
+                      </optgroup>
+                    )}
+                  </>
+                );
+              })()}
             </select>
 
             {/* Create New Category Button/Form */}
@@ -252,15 +320,41 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
                     disabled={isCreatingCategory}
                   />
                   <select
-                    value={newCategory.type}
-                    onChange={(e) => setNewCategory({ ...newCategory, type: e.target.value as any })}
+                    value={newCategory.category_usage_type}
+                    onChange={(e) => setNewCategory({ ...newCategory, category_usage_type: e.target.value as CategoryUsageType })}
                     className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
                     disabled={isCreatingCategory}
                   >
-                    <option value="Fixed Costs">Fixed Costs</option>
-                    <option value="Operational Costs">Operational Costs</option>
-                    <option value="Event Costs">Event Costs</option>
+                    <option value="expense">Expense</option>
+                    <option value="income">Income</option>
+                    <option value="both">Both</option>
                   </select>
+                  {newCategory.category_usage_type !== 'income' && (
+                    <select
+                      value={newCategory.expense_type}
+                      onChange={(e) => setNewCategory({ ...newCategory, expense_type: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                      disabled={isCreatingCategory}
+                    >
+                      <option value="">Select expense type</option>
+                      {EXPENSE_CATEGORY_TYPES.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  )}
+                  {newCategory.category_usage_type !== 'expense' && (
+                    <select
+                      value={newCategory.income_type}
+                      onChange={(e) => setNewCategory({ ...newCategory, income_type: e.target.value })}
+                      className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
+                      disabled={isCreatingCategory}
+                    >
+                      <option value="">Select income type</option>
+                      {INCOME_CATEGORY_TYPES.map(t => (
+                        <option key={t} value={t}>{t}</option>
+                      ))}
+                    </select>
+                  )}
                   <input
                     type="text"
                     value={newCategory.description}
@@ -289,7 +383,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({
                       type="button"
                       onClick={() => {
                         setShowCategoryCreate(false);
-                        setNewCategory({ name: '', type: 'Operational Costs', description: '' });
+                        setNewCategory({ name: '', type: 'Operations', expense_type: 'Operations', income_type: '', category_usage_type: 'expense', description: '' });
                       }}
                       disabled={isCreatingCategory}
                       className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-200 rounded disabled:opacity-50"

@@ -50,16 +50,27 @@ const BudgetCard: React.FC<BudgetCardProps> = ({ budget, onClick }) => {
   };
 
   const getCategoryIcon = () => {
-    switch (budget.category_type) {
-      case 'Fixed Costs':
-        return '🏠';
-      case 'Operational Costs':
-        return '⚙️';
-      case 'Event Costs':
-        return '🎉';
-      default:
-        return '💰';
-    }
+    const iconMap: Record<string, string> = {
+      'Housing': '🏠',
+      'Social': '🎉',
+      'Philanthropy': '🤝',
+      'Rush/Recruitment': '📋',
+      'Operations': '⚙️',
+      'Insurance': '🛡️',
+      'National/IHQ Fees': '🏛️',
+      'Food/Meals': '🍽️',
+      'Athletics/Intramurals': '⚽',
+      'Chapter Development': '📚',
+      'Member Dues': '💳',
+      'New Member Fees': '🆕',
+      'Fundraising': '💰',
+      'Alumni Donations': '🎓',
+      'Fines': '⚠️',
+      'Event Ticket Sales': '🎟️',
+      'Sponsorships': '🤝',
+      'Interest/Returns': '📈',
+    };
+    return iconMap[budget.category_type] || '💰';
   };
 
   const status = getStatusInfo();

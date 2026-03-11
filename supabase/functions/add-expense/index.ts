@@ -113,6 +113,8 @@ serve(async (req) => {
           chapterId: user.chapter_id,
           source: 'MANUAL',
           useAI: USE_AI_CATEGORIZATION,
+          amount: body.amount != null ? Math.abs(body.amount) : undefined,
+          paymentMethod: body.payment_method || null,
         });
 
         categoryId = categorizationResult.category_id;

@@ -1,3 +1,31 @@
+// ============================================================================
+// CATEGORY TYPE SYSTEM
+// ============================================================================
+
+export type ExpenseCategoryType =
+  | 'Housing'
+  | 'Social'
+  | 'Philanthropy'
+  | 'Rush/Recruitment'
+  | 'Operations'
+  | 'Insurance'
+  | 'National/IHQ Fees'
+  | 'Food/Meals'
+  | 'Athletics/Intramurals'
+  | 'Chapter Development';
+
+export type IncomeCategoryType =
+  | 'Member Dues'
+  | 'New Member Fees'
+  | 'Fundraising'
+  | 'Alumni Donations'
+  | 'Fines'
+  | 'Event Ticket Sales'
+  | 'Sponsorships'
+  | 'Interest/Returns';
+
+export type CategoryUsageType = 'expense' | 'income' | 'both';
+
 // UNIFIED EXPENSE/TRANSACTION TYPE
 // This replaces the old separate Transaction type
 export interface Expense {
@@ -24,7 +52,7 @@ export interface Expense {
 // Expense with full details (from expense_details view)
 export interface ExpenseDetail extends Expense {
   category_name: string;
-  category_type: 'Fixed Costs' | 'Operational Costs' | 'Event Costs';
+  category_type: string;
   period_name: string;
   period_type: 'Quarter' | 'Semester' | 'Year';
   fiscal_year: number;
@@ -61,7 +89,11 @@ export interface BudgetCategory {
   id: string;
   chapter_id: string;
   name: string;
-  type: 'Fixed Costs' | 'Operational Costs' | 'Event Costs';
+  /** @deprecated Use expense_type/income_type instead */
+  type: string;
+  expense_type?: ExpenseCategoryType | null;
+  income_type?: IncomeCategoryType | null;
+  category_usage_type: CategoryUsageType;
   description: string | null;
   is_active: boolean;
   created_at?: string;
@@ -343,7 +375,7 @@ export interface RecurringTransaction {
 
 export interface RecurringTransactionDetail extends RecurringTransaction {
   category_name: string | null;
-  category_type: 'Fixed Costs' | 'Operational Costs' | 'Event Costs' | null;
+  category_type: string | null;
   period_name: string | null;
 }
 

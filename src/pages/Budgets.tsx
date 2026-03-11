@@ -27,17 +27,18 @@ import {
   LayoutGrid,
   Settings
 } from 'lucide-react';
+import BudgetRow from '../components/BudgetRow';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { BudgetCardSkeleton, BudgetCategorySkeleton, ChartSkeleton } from '../components/Skeleton';
 import ExpenseModal from '../components/ExpenseModal';
 import BudgetCharts from '../components/BudgetCharts';
 import ExpenseList from '../components/ExpenseList';
 import BudgetSetupWizard from '../components/BudgetSetupWizard';
-import BudgetCard from '../components/BudgetCard';
 import BudgetDetailModal from '../components/BudgetDetailModal';
 import { useChapter } from '../context/ChapterContext';
 import toast from 'react-hot-toast';
 import { demoStore } from '../demo/demoStore';
+import { EXPENSE_CATEGORY_TYPES, INCOME_CATEGORY_TYPES } from '../constants/categoryTypes';
 
 const Budgets: React.FC = () => {
   const { chapters, currentChapter, setCurrentChapter } = useChapter();
@@ -50,7 +51,7 @@ const Budgets: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [editingBudget, setEditingBudget] = useState<string | null>(null);
   const [editValue, setEditValue] = useState<number>(0);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set(['Fixed Costs', 'Operational Costs', 'Event Costs']));
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
   const [showExpenseModal, setShowExpenseModal] = useState(false);
   const [currentPeriod, setCurrentPeriod] = useState<BudgetPeriod | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'charts' | 'expenses'>('grid');
@@ -60,7 +61,10 @@ const Budgets: React.FC = () => {
   const [showSetupWizard, setShowSetupWizard] = useState(false);
   const [newCategory, setNewCategory] = useState({
     name: '',
-    type: 'Operational Costs' as 'Fixed Costs' | 'Operational Costs' | 'Event Costs',
+    type: 'Operations' as string,
+    expense_type: 'Operations' as string | null,
+    income_type: null as string | null,
+    category_usage_type: 'expense' as 'expense' | 'income' | 'both',
     description: ''
   });
   const [newPeriod, setNewPeriod] = useState({
@@ -73,7 +77,7 @@ const Budgets: React.FC = () => {
   });
   const [selectedBudget, setSelectedBudget] = useState<BudgetSummary | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'on-track' | 'warning' | 'over-budget'>('all');
-  const [filterType, setFilterType] = useState<'all' | 'Fixed Costs' | 'Operational Costs' | 'Event Costs'>('all');
+  const [filterType, setFilterType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'spent' | 'percent'>('name');
   const [showSettingsMenu, setShowSettingsMenu] = useState(false);
@@ -241,14 +245,17 @@ const Budgets: React.FC = () => {
     try {
       await ExpenseService.addCategory(currentChapter.id, {
         name: newCategory.name.trim(),
-        type: newCategory.type,
+        type: newCategory.expense_type || newCategory.income_type || 'Operations',
+        expense_type: (newCategory.expense_type as any) || null,
+        income_type: (newCategory.income_type as any) || null,
+        category_usage_type: newCategory.category_usage_type,
         description: newCategory.description.trim() || null,
         is_active: true
       });
 
       toast.success('Category created successfully');
       setShowCategoryModal(false);
-      setNewCategory({ name: '', type: 'Operational Costs', description: '' });
+      setNewCategory({ name: '', type: 'Operations', expense_type: 'Operations', income_type: null, category_usage_type: 'expense', description: '' });
       await loadData();
     } catch (error) {
       console.error('Error creating category:', error);
@@ -352,6 +359,12 @@ const Budgets: React.FC = () => {
     };
   }, [budgetSummary]);
 
+  // Derive available category types from budget summary data
+  const availableCategoryTypes = useMemo(() =>
+    [...new Set(budgetSummary.map(b => b.category_type))].sort(),
+    [budgetSummary]
+  );
+
   const grandTotals = useMemo(() => ({
     allocated: budgetSummary.reduce((sum, b) => sum + b.allocated, 0),
     spent: budgetSummary.reduce((sum, b) => sum + b.spent, 0),
@@ -400,6 +413,27 @@ const Budgets: React.FC = () => {
 
     return sorted;
   }, [budgetSummary, filterStatus, filterType, searchQuery, sortBy]);
+
+  // Group filtered budgets by category_type
+  const groupedBudgets = useMemo(() => {
+    const map = new Map<string, BudgetSummary[]>();
+    for (const b of filteredAndSortedBudgets) {
+      const list = map.get(b.category_type);
+      if (list) {
+        list.push(b);
+      } else {
+        map.set(b.category_type, [b]);
+      }
+    }
+    return map;
+  }, [filteredAndSortedBudgets]);
+
+  // Seed expandedCategories with all available types so groups start expanded
+  useEffect(() => {
+    if (availableCategoryTypes.length > 0 && expandedCategories.size === 0) {
+      setExpandedCategories(new Set(availableCategoryTypes));
+    }
+  }, [availableCategoryTypes]);
 
   if (loading) {
     return (
@@ -557,8 +591,8 @@ const Budgets: React.FC = () => {
                 : 'border-transparent text-gray-600 hover:text-gray-900'
             }`}
           >
-            <LayoutGrid className="w-4 h-4" />
-            Budget Grid
+            <List className="w-4 h-4" />
+            Budgets
           </button>
           <button
             onClick={() => setViewMode('charts')}
@@ -711,13 +745,13 @@ const Budgets: React.FC = () => {
             </label>
             <select
               value={filterType}
-              onChange={(e) => setFilterType(e.target.value as any)}
+              onChange={(e) => setFilterType(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-gray-400"
             >
               <option value="all">All Types</option>
-              <option value="Fixed Costs">Fixed Costs</option>
-              <option value="Operational Costs">Operational Costs</option>
-              <option value="Event Costs">Event Costs</option>
+              {availableCategoryTypes.map(type => (
+                <option key={type} value={type}>{type}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -743,11 +777,11 @@ const Budgets: React.FC = () => {
         </div>
       </div>
 
-      {/* Budget Grid */}
+      {/* Budget List */}
       {filteredAndSortedBudgets.length === 0 ? (
-        <div className="bg-white rounded-lg p-12 text-center shadow-sm border border-gray-200">
+        <div className="bg-white rounded-2xl p-12 text-center border border-gray-200">
           <div className="max-w-md mx-auto">
-            <LayoutGrid className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <List className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No budgets found</h3>
             <p className="text-gray-600">
               {searchQuery || filterStatus !== 'all' || filterType !== 'all'
@@ -757,14 +791,79 @@ const Budgets: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {filteredAndSortedBudgets.map((budget) => (
-            <BudgetCard
-              key={`${budget.category}-${budget.period}`}
-              budget={budget}
-              onClick={() => setSelectedBudget(budget)}
-            />
-          ))}
+        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
+          {/* Column headers */}
+          <div className="hidden md:grid grid-cols-[1fr_minmax(120px,200px)_auto_auto_auto_24px] items-center gap-x-4 px-4 py-2 border-b border-gray-100 text-xs font-medium text-gray-400 uppercase tracking-wider">
+            <span>Category</span>
+            <span>Progress</span>
+            <span>Spent</span>
+            <span>Remaining</span>
+            <span>%</span>
+            <span />
+          </div>
+
+          {[...groupedBudgets.entries()].map(([type, budgets], groupIdx) => {
+            const totals = calculateCategoryTotals(type);
+            const groupPercent = totals.allocated > 0 ? (totals.spent / totals.allocated) * 100 : 0;
+            const isExpanded = expandedCategories.has(type);
+            const groupBarColor = groupPercent > 100 ? 'bg-red-500' : groupPercent > 80 ? 'bg-amber-500' : 'bg-emerald-500';
+
+            return (
+              <div key={type}>
+                {/* Group divider (except first) */}
+                {groupIdx > 0 && <div className="border-t border-gray-100" />}
+
+                {/* Group header */}
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(type)}
+                  className="w-full grid grid-cols-[1fr_auto] md:grid-cols-[1fr_minmax(120px,200px)_auto_auto_auto_24px] items-center gap-x-4 px-4 py-3 text-left bg-gray-50/60 hover:bg-gray-50 transition-colors duration-150"
+                >
+                  <span className="flex items-center gap-2 text-sm font-semibold text-gray-700">
+                    <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-150 ${isExpanded ? 'rotate-90' : ''}`} />
+                    {type}
+                    <span className="text-xs font-normal text-gray-400">({totals.count})</span>
+                  </span>
+
+                  {/* Group progress bar */}
+                  <div className="hidden md:block">
+                    <div className="h-1.5 w-full rounded-full bg-gray-100">
+                      <div
+                        className={`h-1.5 rounded-full ${groupBarColor} transition-all duration-300`}
+                        style={{ width: `${Math.min(groupPercent, 100)}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  <span className="text-sm tabular-nums font-medium text-gray-700">
+                    {formatCurrency(totals.spent)}
+                    <span className="text-gray-400"> of {formatCurrency(totals.allocated)}</span>
+                  </span>
+
+                  <span className={`hidden md:inline text-sm tabular-nums font-medium ${totals.remaining < 0 ? 'text-red-600' : 'text-gray-500'}`}>
+                    {totals.remaining < 0 ? '-' : ''}{formatCurrency(Math.abs(totals.remaining))}
+                  </span>
+
+                  <span className={`hidden md:inline text-xs tabular-nums font-medium ${groupPercent > 100 ? 'text-red-600' : groupPercent > 80 ? 'text-amber-600' : 'text-gray-400'}`}>
+                    {Math.round(groupPercent)}%
+                  </span>
+
+                  <span className="hidden md:block w-4" />
+                </button>
+
+                {/* Child rows */}
+                {isExpanded && budgets.map((budget, idx) => (
+                  <React.Fragment key={`${budget.category}-${budget.period}`}>
+                    {idx > 0 && <div className="border-t border-gray-50 mx-4" />}
+                    <BudgetRow
+                      budget={budget}
+                      onClick={() => setSelectedBudget(budget)}
+                    />
+                  </React.Fragment>
+                ))}
+              </div>
+            );
+          })}
         </div>
       )}
         </>
@@ -909,18 +1008,60 @@ const Budgets: React.FC = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Category Type *
+                  Usage Type *
                 </label>
                 <select
-                  value={newCategory.type}
-                  onChange={(e) => setNewCategory({ ...newCategory, type: e.target.value as any })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg [&>option]: [&>option]:"
+                  value={newCategory.category_usage_type}
+                  onChange={(e) => {
+                    const usage = e.target.value as 'expense' | 'income' | 'both';
+                    setNewCategory({
+                      ...newCategory,
+                      category_usage_type: usage,
+                      expense_type: usage === 'income' ? null : (newCategory.expense_type || 'Operations'),
+                      income_type: usage === 'expense' ? null : (newCategory.income_type || 'Member Dues'),
+                    });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  <option value="Fixed Costs">Fixed Costs</option>
-                  <option value="Operational Costs">Operational Costs</option>
-                  <option value="Event Costs">Event Costs</option>
+                  <option value="expense">Expense</option>
+                  <option value="income">Income</option>
+                  <option value="both">Both</option>
                 </select>
               </div>
+
+              {(newCategory.category_usage_type === 'expense' || newCategory.category_usage_type === 'both') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Expense Type *
+                  </label>
+                  <select
+                    value={newCategory.expense_type || ''}
+                    onChange={(e) => setNewCategory({ ...newCategory, expense_type: e.target.value || null, type: e.target.value || newCategory.type })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    {EXPENSE_CATEGORY_TYPES.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {(newCategory.category_usage_type === 'income' || newCategory.category_usage_type === 'both') && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Income Type *
+                  </label>
+                  <select
+                    value={newCategory.income_type || ''}
+                    onChange={(e) => setNewCategory({ ...newCategory, income_type: e.target.value || null, type: e.target.value || newCategory.type })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  >
+                    {INCOME_CATEGORY_TYPES.map(t => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -940,7 +1081,7 @@ const Budgets: React.FC = () => {
               <button
                 onClick={() => {
                   setShowCategoryModal(false);
-                  setNewCategory({ name: '', type: 'Operational Costs', description: '' });
+                  setNewCategory({ name: '', type: 'Operations', expense_type: 'Operations', income_type: null, category_usage_type: 'expense', description: '' });
                 }}
                 className="px-4 py-2 border border-gray-300 text-gray-700 hover:bg-gray-50 rounded-lg"
               >
