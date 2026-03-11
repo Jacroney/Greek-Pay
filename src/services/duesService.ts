@@ -218,82 +218,37 @@ export class DuesService {
   }
 
   /**
-   * Create or update member dues assignment
-   * If member already has dues for this config, the new amount is ADDED to the existing balance
+   * Create a new member dues assignment.
+   * Always inserts a new row — each assignment is an independent obligation.
    */
   static async assignDuesToMember(
     chapterId: string,
     memberId: string,
-    configId: string,
+    configId: string | null,
     baseAmount: number,
     dueDate?: string,
     notes?: string
   ): Promise<MemberDues> {
     try {
-      // Check if already assigned
-      const { data: existing } = await supabase
+      const { data, error } = await supabase
         .from('member_dues')
-        .select('id, base_amount, late_fee, adjustments, amount_paid')
-        .eq('member_id', memberId)
-        .eq('config_id', configId)
+        .insert({
+          chapter_id: chapterId,
+          member_id: memberId,
+          config_id: configId,
+          base_amount: baseAmount,
+          total_amount: baseAmount,
+          balance: baseAmount,
+          amount_paid: 0,
+          due_date: dueDate || null,
+          notes: notes || null,
+          status: 'pending'
+        })
+        .select()
         .single();
 
-      if (existing) {
-        // Add to existing dues balance
-        const newBaseAmount = (existing.base_amount || 0) + baseAmount;
-        const lateFee = existing.late_fee || 0;
-        const adjustments = existing.adjustments || 0;
-        const newTotalAmount = newBaseAmount + lateFee + adjustments;
-        const newBalance = newTotalAmount - (existing.amount_paid || 0);
-
-        // Determine new status based on balance
-        let newStatus: string;
-        if (newBalance <= 0) {
-          newStatus = 'paid';
-        } else if ((existing.amount_paid || 0) > 0) {
-          newStatus = 'partial';
-        } else {
-          newStatus = 'pending';
-        }
-
-        const { data, error } = await supabase
-          .from('member_dues')
-          .update({
-            base_amount: newBaseAmount,
-            total_amount: newTotalAmount,
-            balance: newBalance,
-            status: newStatus,
-            due_date: dueDate || null,
-            notes: notes ? `${existing.notes || ''}\n${notes}`.trim() : existing.notes
-          })
-          .eq('id', existing.id)
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      } else {
-        // Create new
-        const { data, error } = await supabase
-          .from('member_dues')
-          .insert({
-            chapter_id: chapterId,
-            member_id: memberId,
-            config_id: configId,
-            base_amount: baseAmount,
-            total_amount: baseAmount,
-            balance: baseAmount,
-            amount_paid: 0,
-            due_date: dueDate || null,
-            notes: notes || null,
-            status: 'pending'
-          })
-          .select()
-          .single();
-
-        if (error) throw error;
-        return data;
-      }
+      if (error) throw error;
+      return data;
     } catch (error) {
       console.error('Error assigning dues to member:', error);
       throw error;

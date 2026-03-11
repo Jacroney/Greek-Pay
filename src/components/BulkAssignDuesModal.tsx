@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, DollarSign, Calendar, Users, GraduationCap, UserCheck } from 'lucide-react';
+import { X, DollarSign, Calendar, Users, GraduationCap, UserCheck, FileText, CheckSquare, Square, Tag } from 'lucide-react';
 import { supabase } from '../services/supabaseClient';
 import toast from 'react-hot-toast';
 import { DuesConfiguration } from '../services/types';
@@ -29,9 +29,12 @@ interface BulkAssignDuesModalProps {
   onSuccess?: () => void;
 }
 
-interface PreviewResult {
-  count: number;
-  members: Array<{ id: string; email: string; full_name: string; year: string | null; status: string }>;
+interface MemberPreview {
+  id: string;
+  email: string;
+  full_name: string;
+  year: string | null;
+  status: string;
 }
 
 const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
@@ -41,24 +44,39 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
   config,
   onSuccess
 }) => {
+  const [duesType, setDuesType] = useState<'period' | 'event'>('period');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('active');
   const [amount, setAmount] = useState(config?.default_dues?.toString() || '');
   const [dueDate, setDueDate] = useState(config?.due_date || '');
+  const [notes, setNotes] = useState('');
+  const [eventLabel, setEventLabel] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const [preview, setPreview] = useState<PreviewResult | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [members, setMembers] = useState<MemberPreview[]>([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState<Set<string>>(new Set());
 
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen) {
+      setDuesType('period');
       setSelectedYear('all');
       setSelectedStatus('active');
       setAmount(config?.default_dues?.toString() || '');
       setDueDate(config?.due_date || '');
-      setPreview(null);
+      setNotes('');
+      setEventLabel('');
+      setMembers([]);
+      setSelectedMemberIds(new Set());
     }
   }, [isOpen, config]);
+
+  // Auto-load members when year/status filters change
+  useEffect(() => {
+    if (isOpen) {
+      loadMembers();
+    }
+  }, [isOpen, selectedYear, selectedStatus, chapterId]);
 
   // Get amount for selected year from config
   const getAmountForYear = (year: string): number => {
@@ -71,19 +89,18 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
   // Update amount when year changes
   const handleYearChange = (year: string) => {
     setSelectedYear(year);
-    const yearAmount = getAmountForYear(year);
-    setAmount(yearAmount.toString());
-    setPreview(null); // Clear preview when filters change
+    if (duesType === 'period') {
+      const yearAmount = getAmountForYear(year);
+      setAmount(yearAmount.toString());
+    }
   };
 
   const handleStatusChange = (status: string) => {
     setSelectedStatus(status);
-    setPreview(null); // Clear preview when filters change
   };
 
-  // Preview which members will be affected
-  const handlePreview = async () => {
-    setIsPreviewing(true);
+  const loadMembers = async () => {
+    setIsLoading(true);
     try {
       if (isDemoModeEnabled()) {
         const demoMembers = demoStore.getState().members;
@@ -94,17 +111,15 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
         if (selectedStatus !== 'all') {
           filtered = filtered.filter(m => m.status?.toLowerCase() === selectedStatus);
         }
-        setPreview({
-          count: filtered.length,
-          members: filtered.map(m => ({
-            id: m.id,
-            email: m.email,
-            full_name: m.name,
-            year: m.year,
-            status: m.status || 'active'
-          }))
-        });
-        setIsPreviewing(false);
+        const mapped = filtered.map(m => ({
+          id: m.id,
+          email: m.email,
+          full_name: m.name,
+          year: m.year,
+          status: m.status || 'active'
+        }));
+        setMembers(mapped);
+        setSelectedMemberIds(new Set(mapped.map(m => m.id)));
         return;
       }
 
@@ -113,37 +128,57 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
         .select('id, email, full_name, year, status')
         .eq('chapter_id', chapterId);
 
-      // Filter by year
       if (selectedYear !== 'all') {
         query = query.eq('year', selectedYear);
       }
-
-      // Filter by status
       if (selectedStatus !== 'all') {
         query = query.eq('status', selectedStatus);
       }
 
       const { data, error } = await query.order('full_name');
-
       if (error) throw error;
 
-      setPreview({
-        count: data?.length || 0,
-        members: data || []
-      });
+      const loaded = data || [];
+      setMembers(loaded);
+      setSelectedMemberIds(new Set(loaded.map(m => m.id)));
     } catch (error) {
-      console.error('Error previewing members:', error);
-      toast.error('Failed to preview members');
+      console.error('Error loading members:', error);
+      toast.error('Failed to load members');
     } finally {
-      setIsPreviewing(false);
+      setIsLoading(false);
     }
+  };
+
+  const toggleMember = (memberId: string) => {
+    setSelectedMemberIds(prev => {
+      const next = new Set(prev);
+      if (next.has(memberId)) {
+        next.delete(memberId);
+      } else {
+        next.add(memberId);
+      }
+      return next;
+    });
+  };
+
+  const selectAll = () => {
+    setSelectedMemberIds(new Set(members.map(m => m.id)));
+  };
+
+  const deselectAll = () => {
+    setSelectedMemberIds(new Set());
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!config) {
+    if (duesType === 'period' && !config) {
       toast.error('Please create a dues configuration first');
+      return;
+    }
+
+    if (duesType === 'event' && !eventLabel.trim()) {
+      toast.error('Please enter an event label');
       return;
     }
 
@@ -153,25 +188,33 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
       return;
     }
 
+    if (selectedMemberIds.size === 0) {
+      toast.error('Please select at least one member');
+      return;
+    }
+
     setIsProcessing(true);
 
     try {
       if (isDemoModeEnabled()) {
-        const count = preview?.count || 0;
-        toast.success(`Assigned dues to ${count} members. Skipped 0. (Demo)`);
+        toast.success(`Assigned dues to ${selectedMemberIds.size} members. (Demo)`);
         onSuccess?.();
         onClose();
         return;
       }
 
-      // Call the RPC function to bulk assign dues
+      const effectiveConfigId = duesType === 'event' ? null : config!.id;
+      const effectiveNotes = duesType === 'event' ? eventLabel.trim() : (notes || null);
+
       const { data, error } = await supabase.rpc('bulk_assign_dues', {
         p_chapter_id: chapterId,
-        p_config_id: config.id,
+        p_config_id: effectiveConfigId,
         p_amount: parsedAmount,
-        p_year_filter: selectedYear === 'all' ? null : selectedYear,
-        p_status_filter: selectedStatus === 'all' ? null : selectedStatus,
-        p_due_date: dueDate || null
+        p_year_filter: null,
+        p_status_filter: null,
+        p_due_date: dueDate || null,
+        p_member_ids: Array.from(selectedMemberIds),
+        p_notes: effectiveNotes
       });
 
       if (error) {
@@ -195,6 +238,9 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
 
   if (!isOpen) return null;
 
+  const selectedCount = selectedMemberIds.size;
+  const totalCount = members.length;
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-4">
       <div className="w-full max-w-lg rounded-lg bg-white shadow-xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -215,27 +261,89 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
         {/* Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1">
           <div className="space-y-4">
-            {/* Year Selection */}
+            {/* Dues Type Toggle */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                <GraduationCap className="inline w-4 h-4 mr-1" />
-                Member Year
+                <Tag className="inline w-4 h-4 mr-1" />
+                Dues Type
               </label>
-              <select
-                value={selectedYear}
-                onChange={(e) => handleYearChange(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
-              >
-                {BULK_YEAR_OPTIONS.map((option) => {
-                  const yearAmount = option.value === 'all' ? config?.default_dues : getAmountForYear(option.value);
-                  return (
-                    <option key={option.value} value={option.value}>
-                      {option.label} {yearAmount ? `($${yearAmount.toFixed(2)})` : ''}
-                    </option>
-                  );
-                })}
-              </select>
+              <div className="flex rounded-lg border border-gray-300 overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDuesType('period');
+                    if (config) {
+                      setAmount(getAmountForYear(selectedYear).toString());
+                      setDueDate(config.due_date || '');
+                    }
+                  }}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    duesType === 'period'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Period Dues
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDuesType('event');
+                    setAmount('');
+                    setDueDate('');
+                  }}
+                  className={`flex-1 px-3 py-2 text-sm font-medium transition-colors ${
+                    duesType === 'event'
+                      ? 'bg-indigo-600 text-white'
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  Event / Custom
+                </button>
+              </div>
             </div>
+
+            {/* Event Label (only for event/custom) */}
+            {duesType === 'event' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <FileText className="inline w-4 h-4 mr-1" />
+                  Event Label *
+                </label>
+                <input
+                  type="text"
+                  value={eventLabel}
+                  onChange={(e) => setEventLabel(e.target.value)}
+                  required
+                  placeholder="e.g. Vegas Formal, Spring Fundraiser"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+            )}
+
+            {/* Year Selection (period mode only) */}
+            {duesType === 'period' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <GraduationCap className="inline w-4 h-4 mr-1" />
+                  Member Year
+                </label>
+                <select
+                  value={selectedYear}
+                  onChange={(e) => handleYearChange(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                >
+                  {BULK_YEAR_OPTIONS.map((option) => {
+                    const yearAmount = option.value === 'all' ? config?.default_dues : getAmountForYear(option.value);
+                    return (
+                      <option key={option.value} value={option.value}>
+                        {option.label} {yearAmount ? `($${yearAmount.toFixed(2)})` : ''}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
 
             {/* Status Selection */}
             <div>
@@ -288,43 +396,94 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
               />
             </div>
 
-            {/* Preview Button */}
-            <button
-              type="button"
-              onClick={handlePreview}
-              disabled={isPreviewing}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex items-center justify-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              {isPreviewing ? 'Loading...' : 'Preview Members'}
-            </button>
-
-            {/* Preview Results */}
-            {preview && (
-              <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                <div className="flex items-center gap-2 mb-3">
-                  <Users className="w-5 h-5 text-indigo-600" />
-                  <span className="font-medium text-gray-900">
-                    {preview.count} member{preview.count !== 1 ? 's' : ''} will be assigned dues
-                  </span>
-                </div>
-                {preview.count > 0 && (
-                  <div className="max-h-40 overflow-y-auto space-y-1">
-                    {preview.members.map((member) => (
-                      <div key={member.id} className="text-sm text-gray-600 flex justify-between">
-                        <span>{member.full_name || member.email}</span>
-                        <span className="text-gray-400">{member.year ? `Year ${member.year}` : ''}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {preview.count === 0 && (
-                  <p className="text-sm text-gray-500">
-                    No members match the selected filters.
-                  </p>
-                )}
+            {/* Notes / Label (period mode only — event mode uses eventLabel) */}
+            {duesType === 'period' && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <FileText className="inline w-4 h-4 mr-1" />
+                  Label / Notes
+                </label>
+                <input
+                  type="text"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="e.g. Spring 2026 Dues"
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  This label will appear on each member's dues record
+                </p>
               </div>
             )}
+
+            {/* Member List with Checkboxes */}
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              <div className="flex items-center justify-between bg-gray-50 px-4 py-2 border-b border-gray-200">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-indigo-600" />
+                  <span className="text-sm font-medium text-gray-900">
+                    {isLoading ? 'Loading...' : `${selectedCount} of ${totalCount} selected`}
+                  </span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={selectAll}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                  >
+                    Select All
+                  </button>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    type="button"
+                    onClick={deselectAll}
+                    className="text-xs text-indigo-600 hover:text-indigo-800 font-medium"
+                  >
+                    Deselect All
+                  </button>
+                </div>
+              </div>
+
+              {members.length > 0 ? (
+                <div className="max-h-48 overflow-y-auto divide-y divide-gray-100">
+                  {members.map((member) => {
+                    const isSelected = selectedMemberIds.has(member.id);
+                    return (
+                      <label
+                        key={member.id}
+                        className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-gray-50"
+                      >
+                        <button
+                          type="button"
+                          onClick={() => toggleMember(member.id)}
+                          className="flex-shrink-0 text-indigo-600"
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="w-4 h-4" />
+                          ) : (
+                            <Square className="w-4 h-4 text-gray-400" />
+                          )}
+                        </button>
+                        <div className="flex-1 min-w-0">
+                          <span className="text-sm text-gray-900 truncate block">
+                            {member.full_name || member.email}
+                          </span>
+                        </div>
+                        {member.year && (
+                          <span className="text-xs text-gray-400 flex-shrink-0">
+                            Year {member.year}
+                          </span>
+                        )}
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="px-4 py-6 text-center text-sm text-gray-500">
+                  {isLoading ? 'Loading members...' : 'No members match the selected filters.'}
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Footer */}
@@ -339,10 +498,10 @@ const BulkAssignDuesModal: React.FC<BulkAssignDuesModalProps> = ({
             </button>
             <button
               type="submit"
-              disabled={isProcessing || !amount}
+              disabled={isProcessing || !amount || selectedCount === 0}
               className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isProcessing ? 'Assigning...' : 'Assign Dues'}
+              {isProcessing ? 'Assigning...' : `Assign to ${selectedCount} Member${selectedCount !== 1 ? 's' : ''}`}
             </button>
           </div>
         </form>
